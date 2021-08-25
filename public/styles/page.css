@@ -1,0 +1,277 @@
+body{
+    height: 100vh;
+    margin: 0px;
+    font-family: 'Raleway';
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+header{
+    height: 380px;
+    background-image: url(../assets/shutterstock_1216923970SPOSTATO.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+nav{
+    color: white;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+#navOpen{
+    max-width: 70px;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    position: absolute;
+    top:10px;
+}
+
+#navClose{
+    cursor: pointer;
+    font-size: 3em;
+    display: none;
+}
+
+form[name=searchProducts].menuSearch{
+    display: none;
+}
+
+#navMain{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.buttonContainer{
+    display: flex;
+    align-items: center;
+}
+
+.profileContainer{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 5px;
+    font-size: 1em;
+    white-space: nowrap;
+}
+.profileContainer .navButton{
+    font-size: 1em;
+    padding: 5px;
+    
+}
+
+#cart{
+    background-image: url(../assets/carrello.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 50px;
+    width: 50px;
+    margin: 10px;
+    position: relative;
+}
+
+#cart:hover{
+    cursor:pointer;
+}
+
+#cart span{
+    position: absolute;
+    left:20px;
+    top:12px;
+}
+
+.navButton{
+    font-size: 1.3em;
+    padding: 10px;
+    border-radius: 20px;
+    margin: 5px;
+    border: 2px solid white;
+    color: white;
+    text-decoration: none;
+}
+
+.navButton:hover{
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.274);
+}
+
+#signupButton{
+    background-color: white;
+    border: 3px solid #0004ff;
+    color: #0004ff;
+    font-size: 1.5em;
+}
+
+#signupButton:hover{
+    background-color: #ffffffe8;
+}
+
+form[name=searchProducts]{
+    display: flex;
+    align-items: center;
+}
+
+form[name=searchProducts] input[type=text]{
+    height: 40px;
+    width: 250px;
+    margin: 0px;
+    padding: 0px 0px 0px 5px;
+    border: 0px solid white;
+}
+
+form[name=searchProducts] input[type=submit]{
+    height: 40px;
+    width: 38px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-image: url(../assets/searchButtonTransparent.png);
+    background-size: 35px;
+    background-repeat: no-repeat;
+    background-position:center;
+    border:0px solid white;
+    background-color: rgb(255, 255, 255);
+}
+
+form[name=searchProducts] input[type=submit]:hover{
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.801);
+}
+
+select[name=categories]{
+    height: 40px;
+    margin: 0px;
+    border:0px solid white;
+    background-color: rgb(185, 185, 185);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+select[name=categories]:hover{
+    background-color: rgba(185, 185, 185, 0.699);
+}
+
+#contactsButton{
+    font-size: 1em;
+}
+
+
+#navCategories{
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+}
+
+#navCategories span{
+    margin: 0px 10px 10px 10px;
+    text-align: center;
+}
+
+@media(max-width:900px){
+    form[name=searchProducts] input[type=text]{
+        width:200px;
+    }
+    nav{
+        height: 100vh;
+        width: 0;
+        overflow: hidden;
+        transition: 0.5s;
+    }
+    #navClose{
+        display: block;
+        align-self: flex-end;
+        margin-right: 10px;
+    }
+
+    form[name=searchProducts].menuSearch{
+        display: flex;
+    }
+    #navOpen{
+        display: block;
+        transition: 0.5s;
+    }
+    form[name=searchProducts]{
+        display: none;
+    }
+    #navMain,#navCategories,.buttonContainer,.profileContainer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .profileContainer *{
+        margin:10px;
+        font-size:1.5em;
+    }
+    #navCategories{
+        overflow: auto;
+    }
+}
+section{
+    flex-grow:1;
+}
+footer{
+    font-family: 'Merriweather', serif;
+    padding: 20px;
+    background-color: rgb(47, 120, 189);
+    color: white;
+    height: 150px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+
+#logoUNICT{
+    height: 87.5px;
+    width: 240px;
+    border-radius: 10px;
+}
+
+footer p{
+    font-size: 15px;
+    line-height: 30px;
+    text-align: center;
+    margin: 20px;
+}
+
+
+@media(max-width:500px){
+    select[name=categories]{
+        width: 100px;
+    }
+    header{
+        height: 280px;
+    }
+    #navOpen{
+        max-width: 55px;
+    }
+
+    footer{
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #logoUNICT{
+        height: 61px;
+        width: 168px;
+    }  
+    footer p{
+        margin: 0px;
+        font-size: 10px;
+        line-height: 20px;
+    }
+}
+
+.hidden{
+    display: none;
+}
+
+#navOpen.hidden{
+    display: none;
+}

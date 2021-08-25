@@ -1,0 +1,88 @@
+body{
+    background-image: url(../assets/shutterstock_1473274019.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display:flex;
+    align-items:center;
+    justify-content: space-around;
+    margin: 0px;
+    height: 100vh;
+    width: 100vw;
+}
+
+section{
+    font-family: 'Oxygen', sans-serif;
+    color: white;
+    text-align: center;
+    z-index: 1;
+}
+section p{
+    font-size: 40px;
+}
+#titolo{
+    font-size: 55px;
+    font-weight: 600;
+    font-style: italic;
+}
+
+#overlay{
+    position: absolute;
+    top:0px;
+    height: 100vh;
+    width:100vw;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 0;
+}
+
+main{
+    padding:20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    display: flex;
+    font-family: 'Raleway',sans-serif;
+    z-index: 1;
+}
+form{
+    display: flex;
+    flex-direction: column;
+}
+label{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3px;
+}
+.radio{
+    display: block;
+}
+
+input[type=radio]{
+    margin-right: 10px;
+}
+.error, #errorphp,#errorLogin{
+    color: red;
+    margin:3px;
+}
+
+form div{
+    display:flex;
+    flex-direction: column;
+}
+
+@media(max-width: 600px){
+    body{
+        flex-direction: column;
+        background-position-x: 60%;
+    }
+    main{
+        font-size: 15px;
+    }
+    input[type="text"],input[type="password"],input[type="file"]{
+        margin-left:-10px;
+    }
+}
+
+.hidden{
+    display: none;
+}

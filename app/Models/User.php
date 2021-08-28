@@ -20,6 +20,14 @@ class User extends Model
     {
         return $this->belongsToMany('Product','user_product');
     }
+    public function products()
+    {
+        return $this->hasMany('Product');
+    }
+    public function layouts()
+    {
+        return $this->hasMany('UsersLayout');
+    }
 }
 
 ?>

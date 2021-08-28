@@ -12,6 +12,7 @@ header{
     background-image: url(../assets/shutterstock_1216923970SPOSTATO.jpg);
     background-size: cover;
     background-position: center;
+    flex-shrink: 0;
 }
 
 nav{
@@ -29,6 +30,7 @@ nav{
     border-bottom-right-radius: 10px;
     position: absolute;
     top:10px;
+    left:0px;
 }
 
 #navClose{
@@ -115,6 +117,7 @@ form[name=searchProducts].menuSearch{
 
 form[name=searchProducts]{
     display: flex;
+    flex-direction: row;
     align-items: center;
 }
 
@@ -141,7 +144,7 @@ form[name=searchProducts] input[type=submit]{
 
 form[name=searchProducts] input[type=submit]:hover{
     cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.801);
+    background-color: rgb(189, 189, 189);
 }
 
 select[name=categories]{
@@ -154,13 +157,16 @@ select[name=categories]{
 }
 
 select[name=categories]:hover{
-    background-color: rgba(185, 185, 185, 0.699);
+    background-color: rgb(145, 145, 145);
 }
 
 #contactsButton{
     font-size: 1em;
 }
-
+#homeButton{
+    max-width: 60px;
+    margin: 10px 30px 0px 0px;
+}
 
 #navCategories{
     display: flex;
@@ -173,46 +179,7 @@ select[name=categories]:hover{
     text-align: center;
 }
 
-@media(max-width:900px){
-    form[name=searchProducts] input[type=text]{
-        width:200px;
-    }
-    nav{
-        height: 100vh;
-        width: 0;
-        overflow: hidden;
-        transition: 0.5s;
-    }
-    #navClose{
-        display: block;
-        align-self: flex-end;
-        margin-right: 10px;
-    }
-
-    form[name=searchProducts].menuSearch{
-        display: flex;
-    }
-    #navOpen{
-        display: block;
-        transition: 0.5s;
-    }
-    form[name=searchProducts]{
-        display: none;
-    }
-    #navMain,#navCategories,.buttonContainer,.profileContainer{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .profileContainer *{
-        margin:10px;
-        font-size:1.5em;
-    }
-    #navCategories{
-        overflow: auto;
-    }
-}
-section{
+#mainSection{
     flex-grow:1;
 }
 footer{
@@ -241,7 +208,66 @@ footer p{
 }
 
 
+@media(max-width:900px){
+    header{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    nav{
+        height: 100vh;
+        width: 0;
+        overflow: hidden;
+        transition: 0.5s;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index:1;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    #navClose{
+        display: block;
+        align-self: flex-end;
+        margin-right: 10px;
+    }
+
+    form[name=searchProducts].menuSearch{
+        display: flex;
+
+    }
+    #navOpen{
+        display: block;
+        transition: 0.5s;
+    }
+    form[name=searchProducts]{
+        display: none;
+    }
+    #navMain{
+        margin-top: 80px;
+    }
+    #navMain,#navCategories,.buttonContainer,.profileContainer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .profileContainer *{
+        margin:10px;
+        font-size:1.5em;
+    }
+    #navCategories{
+        overflow: auto;
+    }
+    #homeButton{
+        margin: 10px 0px 0px 0px;
+    }
+}
+
 @media(max-width:500px){
+    form[name=searchProducts] input[type=text]{
+        width:200px;
+    }
     select[name=categories]{
         width: 100px;
     }

@@ -3,7 +3,7 @@
 @section('title','Home')
 
 @section('section')
-<section>
-    a
+<section id="mainSection">
+    home
 </section>
 @endsection

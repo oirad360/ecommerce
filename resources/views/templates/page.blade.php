@@ -20,23 +20,22 @@
     <body>
         <header>
             <img id=navOpen src=/{{$app_folder}}/public/assets/menuButton.png>
+            <form class=menuSearch name=searchProducts method=POST>
+                <input type='hidden' name='_token' value='{{ $csrf_token }}'>
+                <input type="submit" value=""/>
+                <input type="text" placeholder='Cerca un prodotto'>
+                <select name=categories>
+                    <option value="all">Tutte le categorie</option>
+                    <option value="smartphone">Smartphones</option>
+                </select>
+            </form>
             <nav>
                 <div id=navMain>
-                    <div id=navClose class=hidden>X</div>
-                    <form class=menuSearch name=searchProducts method=POST>
-                        <input type='hidden' name='_token' value='{{ $csrf_token }}'>
-                        <input type="submit" value=""/>
-                        <input type="text" placeholder='Cerca un prodotto'>
-                        <select name=categories>
-                            <option value="all">Tutte le categorie</option>
-                            <option value="smartphone">Smartphones</option>
-                        </select>
-                    </form>
                     <div class=buttonContainer>
                         @if(isset($username))
                             <div class=profileContainer>
                                 <span>Benvenuto, {{$username}}</span>
-                                <a class=navButton>Visita la tua pagina</a>
+                                <a class=navButton href="/{{$app_folder}}/public/seller/{{$username}}">Visita la tua pagina</a>
                             </div>
                             <div id=cart>
                                 <span>{{$numCarrello}}</span>
@@ -44,7 +43,6 @@
                         @else
                             <a href="/{{$app_folder}}/public/signup" class=navButton id=signupButton>Registrati</a>
                             <a href="/{{$app_folder}}/public/login" class=navButton>Accedi</a>
-                        
                         @endif
                     </div>
                     <form name=searchProducts method=POST>
@@ -56,10 +54,9 @@
                             <option value="smartphone">Smartphones</option>
                         </select>
                     </form>
-                    <div class=buttonContainer>
-                        <a class=navButton>Home</a>
-                        <a class=navButton id=contactsButton>Contatti</a>
-                    </div>
+                    <a href=/{{$app_folder}}/public/home>
+                        <img src=/{{$app_folder}}/public/assets/home.png id=homeButton />
+                    </a>
                 </div>
                 <div id=navCategories>
                     <span>Smartphone</span>

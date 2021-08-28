@@ -1,0 +1,137 @@
+.productContainer{
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.block{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 15px;
+    margin: 5px;
+    padding: 0px 20px;
+    background-color: rgba(0, 0, 0, 0.07);
+    width: 150px;
+    border-radius: 10px;
+}
+
+.noBorderBottomRadius{
+    border-bottom-left-radius:0px;
+    border-bottom-right-radius:0px;
+}
+.block h1, .block p{
+    margin: 3px 0px;
+}
+
+.block img{
+    max-width: 150px;
+    max-height: 180px;
+}
+
+.descButton{
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+.descButton:hover{
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.desc{
+    width: 150px;
+    font-size: 15px;
+    margin: auto;
+    margin-top: -5px;
+    padding: 3px 20px;
+    background-color: rgba(0, 0, 0, 0.07);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    transition: 0.5s;
+}
+
+.cuoreRosso{
+    background-image: url(../assets/cuore.png);
+    height:20px;
+    width:20px;
+}
+
+.nonDisponibile{
+    background-color: rgba(255, 0, 0, 0.2);
+}
+
+.inArrivo{
+    background-color: rgba(255, 208, 0, 0.349)
+}
+
+.containerBottoni{
+    display: flex;
+    justify-content: space-around;
+}
+
+.aumenta{
+    background-color: rgba(0, 132, 255, 0.425);;
+    width: 70px;
+    font-size: 20px;
+    line-height: 15px;
+    border-radius: 10px;
+}
+
+.aumenta:hover{
+    cursor:pointer;
+    background-color: rgba(0, 132, 255, 0.699);;
+}
+
+.diminuisci{
+    background-color: rgba(255, 0, 0, 0.425);
+    width: 70px;
+    font-size: 20px;
+    line-height: 15px;
+    border-radius: 10px;
+}
+
+.diminuisci:hover{
+    cursor:pointer;
+    background-color: rgba(255, 0, 0, 0.699);
+}
+
+
+@media(max-width: 800px){
+    .blocco{
+        font-size: 10px;
+        padding: 0px 10px;
+        margin: 2px;
+        width:90px;
+    }
+
+    .blocco img{
+        max-width: 75px;
+        max-height: 95px;
+    }
+
+    .blocco h1, .blocco p{
+        width:90px;
+    }
+
+    .aggiungiCarrello{
+        font-size: 10px;
+    }
+
+    .scheda{
+        width: 90px;
+        font-size: 10px;
+        margin-top: -2px;
+        padding: 2px 10px;
+    }
+    .aumenta{
+        width:40px;
+    }
+    .diminuisci{
+        width:40px;
+    }
+}
+
+.hidden{
+    display: none;
+}

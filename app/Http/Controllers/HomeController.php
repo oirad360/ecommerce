@@ -26,6 +26,6 @@ class HomeController extends BaseController{
             ->with('csrf_token', csrf_token())
             /* ->with('propicURL',$propicURL)
             ->with('categorieSide',$categorieSide) */
-            ->with('numCarrello',$user->numCarrello);
+            ->with('numCarrello',$user->cartItems);
     }
 }

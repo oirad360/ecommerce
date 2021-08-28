@@ -26,4 +26,11 @@ Route::get('signup/checkEmail/{email}', 'SignupController@checkEmail');
 Route::get('signup/checkUsername/{username}', 'SignupController@checkUsername');
 
 Route::get('logout', 'LoginController@logout');
+
 Route::get('home', 'HomeController@home');
+
+Route::get('seller/{seller}', 'SellerController@seller');
+Route::post('seller/newProduct', 'SellerController@newProduct');
+Route::get('fetchProducts', 'SellerController@fetchProducts');
+Route::get('layout/{seller}', 'SellerController@layout');
+Route::get('saveUsersLayout/{layoutID}', 'SellerController@saveUsersLayout');

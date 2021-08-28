@@ -4,30 +4,29 @@ use ecommerce;
 
 create table users(
 id integer primary key auto_increment,
-nome varchar(255) not null,
-cognome varchar(255) not null,
+name varchar(255) not null,
+surname varchar(255) not null,
 username varchar(16) not null unique,
 email varchar(255) not null unique,
 password varchar(255) not null,
 propic varchar(255) not null,
-dataRegistrazione timestamp default current_timestamp,
-spesaTot integer default 0,
-numCarrello integer default 0
+date timestamp default current_timestamp,
+cartPrice integer default 0,
+cartItems integer default 0
 )engine = 'InnoDB';
 
 create table products(
 id integer primary key auto_increment,
-titolo varchar(20) not null unique,
-immagine varchar(255),
-prezzo integer,
-descrizione varchar(255),
-disponibilita boolean,
-inArrivo boolean,
+title varchar(255) not null,
+image varchar(255),
+price integer,
+description varchar(255),
+quantity integer,
 user_id integer not null,
 foreign key(user_id) references users(id) on update cascade on delete cascade,
 index ind_user_id(user_id),
-categoria varchar(20) not null,
-produttore varchar(20)
+category varchar(20) not null,
+producer varchar(20)
 )engine='InnoDB';
 
 create table reviews(
@@ -38,9 +37,9 @@ index ind_user_id(user_id),
 product_id integer not null,
 foreign key(product_id) references products(id) on update cascade on delete cascade,
 index ind_product_id(product_id),
-descrizione varchar(255),
-voto integer not null,
-numLike integer default 0,
+text varchar(255),
+stars integer not null,
+likes integer default 0,
 unique(user_id,product_id),
 data timestamp default current_timestamp
 )engine='InnoDB';
@@ -66,25 +65,61 @@ product_id integer not null,
 foreign key(product_id) references products(id) on update cascade on delete cascade,
 index ind_product_id(product_id),
 wishlist boolean default false,
-carrello integer default 0,
-acquisto integer default 0,
+cart integer default 0,
+bought integer default 0,
 unique(user_id,product_id)
 )engine='InnoDB';
 
+create table layouts(
+id integer primary key auto_increment,
+display varchar(255),
+flexDirection varchar(255),
+height varchar(255),
+width varchar(255)
+)engine='InnoDB';
+
+create table childs(
+id integer primary key auto_increment,
+layout_id integer not null,
+foreign key(layout_id) references layouts(id) on update cascade on delete cascade,
+index ind_layout_id(layout_id),
+data_gen integer not null,
+data_id integer not null,
+data_parent_gen integer not null,
+data_parent_id integer not null,
+hasChilds boolean not null,
+title varchar(255),
+fontSize varchar(255),
+display varchar(255),
+flexDirection varchar(255),
+height varchar(255),
+width varchar(255),
+margin varchar(255)
+)engine='InnoDB';
+
+create table users_layouts(
+layout_id integer primary key,
+foreign key(layout_id) references layouts(id) on update cascade on delete cascade,
+index ind_layout_id(layout_id),
+user_id integer not null,
+foreign key(user_id) references users(id) on update cascade on delete cascade,
+index ind_user_id(user_id),
+unique(user_id,layout_id)
+)engine = 'InnoDB';
 
 delimiter //
 create trigger aggiorna_attributi_users
 before update on user_product
 for each row
 begin
-IF old.carrello<new.carrello THEN
-update users set numCarrello=numCarrello+(new.carrello-old.carrello) where id=new.user_id;
-update users set spesaTot=spesaTot+(select prezzo from products where id=new.product_id)*(new.carrello-old.carrello) where id=new.user_id;
-ELSEIF old.carrello>new.carrello THEN
-update users set numCarrello=numCarrello-(old.carrello-new.carrello) where id=new.user_id;
-update users set spesaTot=spesaTot-(select prezzo from products where id=new.product_id)*(old.carrello-new.carrello) where id=new.user_id;
+IF old.cart<new.cart THEN
+update users set cartItems=cartItems+(new.cart-old.cart) where id=new.user_id;
+update users set cartPrice=cartPrice+(select price from products where id=new.product_id)*(new.cart-old.cart) where id=new.user_id;
+ELSEIF old.cart>new.cart THEN
+update users set cartItems=cartItems-(old.cart-new.cart) where id=new.user_id;
+update users set cartPrice=cartPrice-(select price from products where id=new.product_id)*(old.cart-new.cart) where id=new.user_id;
 END IF;
-IF new.carrello<0 THEN
+IF new.cart<0 THEN
 signal sqlstate '45000' set message_text="Il carrello nnon può essere negativo";
 END IF;
 end //
@@ -95,9 +130,9 @@ create trigger insert_attributi_users
 before insert on user_product
 for each row
 begin
-IF new.carrello>0 THEN
-update users set numCarrello=numCarrello+(new.carrello) where id=new.user_id;
-update users set spesaTot=spesaTot+(select prezzo from products where id=new.product_id)*new.carrello where id=new.user_id;
+IF new.cart>0 THEN
+update users set cartItems=cartItems+(new.cart) where id=new.user_id;
+update users set cartPrice=cartPrice+(select price from products where id=new.product_id)*new.cart where id=new.user_id;
 END IF;
 end //
 delimiter ;
@@ -107,7 +142,7 @@ create trigger aggiorna_like
 before insert on like_review
 for each row
 begin
-update reviews set numLike=numLike+1 where id=new.review_id;
+update reviews set likes=likes+1 where id=new.review_id;
 end //
 delimiter ;
 
@@ -116,7 +151,7 @@ create trigger aggiorna_like_delete
 before delete on like_review
 for each row
 begin
-update reviews set numLike=numLike-1 where id=old.review_id;
+update reviews set likes=likes-1 where id=old.review_id;
 end //
 delimiter ;
 
@@ -152,8 +187,21 @@ update azienda set numInArrivo=numInArrivo+1 where id=new.produttore;
 END IF;
 end //
 delimiter ;
- */
+*/
 
+
+insert into products(nome,prezzo,immagine) values('iPhone12',819,'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-pro-family-hero?wid=940&hei=1112&fmt=jpeg&qlt=80&.v=1604021663000');
+insert into products(nome,prezzo,immagine) values('PlayStation 5',499,'https://fagaelectronics.it/1160-large_default/sony-playstation-5.jpg');
+insert into products(nome,prezzo,immagine) values('Xiaomi Mi Smart TV 4A 32"',210,'https://cdn.idealo.com/folder/Product/6864/3/6864373/s10_produktbild_gross/xiaomi-mi-smart-tv-4a-32.jpg');
+SMART TV LED 32'' HD
+Risoluzione: 1366x768 pixel
+Frequenza: 60 Hz - WiFi + Ethernet
+Tuner Digitale Terrestre: DVB-T2 HEVC e Satellitare DVB-S2
+Casse integrate - Potenza in uscita: 10 W
+Classe efficienza energetica: F
+Distribuito da Xiaomi Italia
+insert into products(nome,prezzo,immagine) values('Xbox Series X',499,'https://m.media-amazon.com/images/I/61CLCiCNtaL._AC_SX466_.jpg');
+insert into products(nome,prezzo,immagine) values('MSI GF63',1249,'https://m.media-amazon.com/images/I/719QyW89YDL._AC_SL1500_.jpg');
 
 
 insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 

@@ -19,13 +19,11 @@
     <body>
     <div id="overlay"></div>
         <section>
-           <!--  <h1 id="titolo">GESTIONE AZIENDE</h1> -->
             <p>@yield('descrizione')</p>
         </section>
         <main>
             @yield('form')
             
         </main>
-        
     </body>
 </html>

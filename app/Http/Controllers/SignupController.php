@@ -97,8 +97,8 @@ class SignupController extends BaseController{
         }
         if(count($errors)===0){
             $user = new User;
-            $user->nome=request('nome');
-            $user->cognome=request('cognome');
+            $user->name=request('nome');
+            $user->surname=request('cognome');
             $user->username=request('username');
             $user->email=request('email');
             $user->password=$password;

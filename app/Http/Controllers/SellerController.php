@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 class SellerController extends BaseController{
 
     public function seller($seller){
+        $row=User::where('username',$seller)->first();
+        if(!isset($row)) return redirect('home');
         if(session('id')===null){
             return view('seller')
             ->with('app_folder', env('APP_FOLDER'))
@@ -90,9 +92,9 @@ class SellerController extends BaseController{
     public function layout($seller){
         $layouts_id=User::where('username',$seller)->first()->layouts()->get();
         if(count($layouts_id)>0){
-            return $layouts_id[0]["layout_id"];
+            return $layouts_id;
         } else {
-            return "error";
+            return [];
         }
     }
 
@@ -101,7 +103,18 @@ class SellerController extends BaseController{
             $usersLayout = new UsersLayout();
             $usersLayout->user_id=session('id');
             $usersLayout->layout_id=$layoutID;
+            if(UsersLayout::where('user_id',session('id'))->where('active',true)->first()===null) $usersLayout->active=true;
+            else $usersLayout->active=false;
             $usersLayout->save();
         }
+    }
+
+    public function active($layoutID){
+        $row=UsersLayout::where('user_id',session('id'))->where('active',true)->first();
+        $row->active=false;
+        $row->save();
+        $row=UsersLayout::find($layoutID);
+        $row->active=true;
+        $row->save();
     }
 }

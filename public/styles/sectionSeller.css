@@ -33,6 +33,13 @@ form[name="newProduct"] input[type="submit"]{
     align-items: flex-start;
 }
 
+.child section{
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 label{
     width: 100%;
     display: flex;
@@ -41,6 +48,15 @@ label{
     margin:5px 0px;
 }
 
+.layoutID{
+    margin: 5px;
+    font-size: 1rem;
+}
+
+.layoutID:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
 
 @media(max-width:500px){
     section{

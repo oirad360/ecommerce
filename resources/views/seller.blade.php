@@ -57,7 +57,12 @@
         </div>
         <input type=submit name=send>
     </form>
-    <button id=newLayoutButton class=hidden>Crea un layout</button>
+    <div id=layouts></div>
+    <button id=active class=hidden>Imposta come layout primario</button>
+    <button id=modifyLayoutButton class=hidden>Modifica layout</button>
+    <button id=newLayoutButton>Crea un nuovo layout</button>
+    <button id=addContentButton class=hidden>Aggiungi al layout</button>
+    <button id=removeContentButton class=hidden>Rimuovi dal layout</button>
     @endif
 </section>
 @endsection

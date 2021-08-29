@@ -46,9 +46,11 @@ class LayoutCreator {
         this.#deleteButton.id="deleteButton"
         this.#deleteButton.innerText="Svuota sezione"
 
-        this.#saveButton=saveButton
-        this.#saveButton.classList.add("hidden")
-        this.#saveButtonInnerText=saveButton.innerText
+        if(saveButton){
+            this.#saveButton=saveButton
+            this.#saveButton.classList.add("hidden")
+            this.#saveButtonInnerText=saveButton.innerText
+        }
 
         this.#addChildButton=document.createElement('button')
         this.#addChildButton.classList.add("hidden")
@@ -60,7 +62,7 @@ class LayoutCreator {
         this.#removeChildButton.id="removeChildButton"
         this.#removeChildButton.innerText="Rimuovi sezione"
 
-        this.#layoutMenu.appendChild(this.#saveButton)
+        if(saveButton)this.#layoutMenu.appendChild(this.#saveButton)
         this.#layoutMenu.appendChild(this.#levelButton)
         this.#layoutMenu.appendChild(this.#deleteButton)
         this.#layoutMenu.appendChild(this.#addChildButton)
@@ -360,7 +362,6 @@ class LayoutCreator {
     }
 
     quit(){//termina le modifiche (senza salvare)
-        this.#layoutMenu.remove()
         const childs=this.#layoutContainer.querySelectorAll('.child')
         for(const child of childs){
             child.removeEventListener('click',this.#selectBinded)
@@ -368,7 +369,7 @@ class LayoutCreator {
                 child.querySelector('.childTitle').remove()
             }
         }
-        this.#lastSelected.style.borderStyle="solid"
+        if(this.#lastSelected!==this.#layoutContainer)this.#lastSelected.style.borderStyle="solid"
     }
 
     modify(){//rende modificabile il layout (aggiunge gli event listener per poter selezionare i child e apportare le modifiche utilizzando il layoutMenu)

@@ -34,3 +34,4 @@ Route::post('seller/newProduct', 'SellerController@newProduct');
 Route::get('fetchProducts', 'SellerController@fetchProducts');
 Route::get('layout/{seller}', 'SellerController@layout');
 Route::get('saveUsersLayout/{layoutID}', 'SellerController@saveUsersLayout');
+Route::get('active/{layoutID}', 'SellerController@active');

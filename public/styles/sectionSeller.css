@@ -33,6 +33,10 @@ form[name="newProduct"] input[type="submit"]{
     align-items: flex-start;
 }
 
+button{
+    margin: 5px;
+}
+
 .child section{
     overflow: auto;
     display: flex;
@@ -57,7 +61,26 @@ label{
     cursor: pointer;
     text-decoration: underline;
 }
+.deleteLayout{
+    display: flex;
+    flex-direction: column;
+    padding: 50px;
+    align-items: center;
+    background-color: rgb(199, 199, 199);
+    border-radius: 20px;
+}
+.deleteLayout div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+}
 
+.deleteLayout span:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
 @media(max-width:500px){
     section{
         padding: 0px 25px;

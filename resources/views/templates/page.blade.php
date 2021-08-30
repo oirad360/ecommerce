@@ -13,6 +13,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Oxygen&display=swap" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src='/{{$app_folder}}/public/scripts/env.js' defer></script>
+        <script src='/{{$app_folder}}/public/scripts/modal.js' defer></script>
         <script src='/{{$app_folder}}/public/scripts/nav.js' defer></script>
         @yield('scripts')
         <title>@yield('title')</title>
@@ -84,6 +85,6 @@
                 DIEEI - Cittadella Universitaria</em>
             </p>
         </footer>
-        
+        <div id="modal" class="hidden"></div>
     </body>
 </html>

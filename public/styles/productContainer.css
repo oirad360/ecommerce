@@ -1,5 +1,4 @@
 .productContainer{
-    text-align: center;
     display: flex;
     flex-wrap: wrap;
 }
@@ -37,6 +36,27 @@
 .descButton:hover{
     cursor: pointer;
     background-color: rgba(0, 0, 0, 0.1);
+}
+
+.productButtonsContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.deleteProductButton{
+    font-size:1rem;
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 0, 0);
+    border-radius: 100%;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
+.deleteProductButton:hover{
+    cursor: pointer;
 }
 
 .desc{

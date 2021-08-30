@@ -31,7 +31,8 @@ Route::get('home', 'HomeController@home');
 
 Route::get('seller/{seller}', 'SellerController@seller');
 Route::post('seller/newProduct', 'SellerController@newProduct');
-Route::get('fetchProducts', 'SellerController@fetchProducts');
+Route::get('fetchProducts/{seller}', 'SellerController@fetchProducts');
 Route::get('layout/{seller}', 'SellerController@layout');
 Route::get('saveUsersLayout/{layoutID}', 'SellerController@saveUsersLayout');
-Route::get('active/{layoutID}', 'SellerController@active');
+Route::get('active/{layoutID}/{val}', 'SellerController@active');
+Route::get('deleteProduct/{productID}', 'SellerController@deleteProduct');

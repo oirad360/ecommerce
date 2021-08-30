@@ -84,8 +84,8 @@ class SellerController extends BaseController{
         }
     }
 
-    public function fetchProducts(){
-        $user=User::find(session('id'));
+    public function fetchProducts($seller){
+        $user=User::where('username',$seller)->first();
         return $user->products;
     }
 
@@ -109,12 +109,25 @@ class SellerController extends BaseController{
         }
     }
 
-    public function active($layoutID){
-        $row=UsersLayout::where('user_id',session('id'))->where('active',true)->first();
-        $row->active=false;
-        $row->save();
-        $row=UsersLayout::find($layoutID);
-        $row->active=true;
-        $row->save();
+    public function active($layoutID,$val){
+        if($val==="true"){
+            $row=UsersLayout::where('user_id',session('id'))->where('active',true)->first();
+            if(isset($row)){
+                $row->active=false;
+                $row->save();
+            }
+            $row=UsersLayout::find($layoutID);
+            $row->active=true;
+            $row->save();
+        } else if($val==="false"){
+            $row=UsersLayout::find($layoutID);
+            $row->active=false;
+            $row->save();
+        }
+    }
+
+    public function deleteProduct($productID){
+        $product=Product::find($productID);
+        $product->delete();
     }
 }

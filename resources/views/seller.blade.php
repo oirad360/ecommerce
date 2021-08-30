@@ -58,8 +58,9 @@
         <input type=submit name=send>
     </form>
     <div id=layouts></div>
-    <button id=active class=hidden>Imposta come layout primario</button>
+    <button id=active class=hidden></button>
     <button id=modifyLayoutButton class=hidden>Modifica layout</button>
+    <button id=deleteLayoutButton class=hidden>Elimina layout</button>
     <button id=newLayoutButton>Crea un nuovo layout</button>
     <button id=addContentButton class=hidden>Aggiungi al layout</button>
     <button id=removeContentButton class=hidden>Rimuovi dal layout</button>

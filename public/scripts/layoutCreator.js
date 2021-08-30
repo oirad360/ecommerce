@@ -245,7 +245,7 @@ class LayoutCreator {
                 }
             }
             this.#content=json["content"]
-            console.log(this.#content)
+            
             this.#layoutContainer.dataset.layout=layoutID
             this.#layoutContainer.classList.add("hasChilds")
             this.#layoutContainer.innerHTML=""
@@ -342,7 +342,7 @@ class LayoutCreator {
                 })
             }
         }
-        console.log(this.#content)
+        
         await fetch("/ecommerce/saveLayout.php",{
             method: 'POST',
             body: JSON.stringify(data),
@@ -396,6 +396,11 @@ class LayoutCreator {
         }
     }
 
+    async deleteLayout(layoutID){
+        if(layoutID) await fetch('/ecommerce/deleteLayout.php?layoutID='+layoutID)
+        else await fetch('/ecommerce/deleteLayout.php?layoutID='+this.#layoutContainer.dataset.layout)
+    }
+
     addContent(sectionContent,gen,id){//aggiunge un nuovo oggetto (sectionContent) nella lista dei contenuti del child scelto
         if(gen && id){
             const child=this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']")
@@ -410,7 +415,7 @@ class LayoutCreator {
         } else {
             console.log("scegli una sezione")
         }
-        console.log(this.#content)
+        
     }
 
     removeContent(index,gen,id){//rimuove un oggetto dalla lista dei contenuti del child scelto, tramite la sua posizione in lista
@@ -427,7 +432,7 @@ class LayoutCreator {
         } else {
             console.log("scegli una sezione")
         }
-        console.log(this.#content)
+        
     }
 
     getContent(gen,id){//ritorna la lista dei contenuti del child scelto
@@ -586,7 +591,7 @@ class LayoutCreator {
         }
         const click= new Event('click') //adesso seleziono il primo figlio, come se, dopo aver generato tutti i figli, facessi click sul primo
         this.#lastSelected.querySelector('.child[data-id=\'1\']').dispatchEvent(click)//dunque dopo questa istruzione lastSelected diventerà il primo figlio che è stato generato dentro il padre (l'ex lastSelected, vedi il funzionamento di select())
-        console.log(this.#content)
+        
     }
     
     #selectLevel(){//è la funzione che mi permette di selezionare il padre del div attualmente selezionato
@@ -702,7 +707,7 @@ class LayoutCreator {
         this.#lastSelected.appendChild(child) //lo inserisco nel padre
         this.#content["[data-gen=\'"+child.dataset.gen+"\']"]["[data-id=\'"+child.dataset.id+"\']"]=[]
         this.#counter.innerText++
-        console.log(this.#content)
+        
     }
 
     #removeChild(){//rimuove un div figlio dal div selezionato (solo se contiene più di 2 figli)
@@ -714,7 +719,7 @@ class LayoutCreator {
         this.#counter.innerText-=length
         const click=new Event('click')
         parent.querySelector('.child').dispatchEvent(click)
-        console.log(this.#content)
+        
 
     }
 
@@ -747,7 +752,7 @@ class LayoutCreator {
         }
         this.#deleteButton.classList.add("hidden")
         this.#splitCommands.classList.remove("hidden")
-        console.log(this.#content)
+        
     }
 
 }

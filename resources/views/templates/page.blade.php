@@ -53,6 +53,14 @@
                         <select name=categories>
                             <option value="all">Tutte le categorie</option>
                             <option value="smartphone">Smartphones</option>
+                            <option value="laptop">Laptop</span>
+                            <option value="pc">PC</option>
+                            <option value="audio">Audio</option>
+                            <option value="tv">TV</option>
+                            <option value="photography">Fotografia</option>
+                            <option value="console">Console</option>
+                            <option value="smartwatch">Smartwatch</option>
+                            <option value="accessories">Accessori</option>
                         </select>
                     </form>
                     <a href=/{{$app_folder}}/public/home>
@@ -65,6 +73,7 @@
                     <span>PC</span>
                     <span>Audio</span>
                     <span>TV</span>
+                    <span>Fotografia</span>
                     <span>Console</span>
                     <span>Smartwatch</span>
                     <span>Accessori</span>

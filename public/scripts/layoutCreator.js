@@ -25,6 +25,7 @@ class LayoutCreator {
     #titleUpdateBinded
     #fontUpdateBinded
     #sizeUpdateBinded
+    #layoutHeightUpdateBinded
     #marginUpdateBinded
     #flexDirectionUpdateBinded
     #deleteChildsBinded
@@ -88,6 +89,7 @@ class LayoutCreator {
         this.#splitCommands.id="splitCommands"
 
         const labelsText=[
+            "Modifica altezza layout (px):",
             "Modifica larghezza (%):",
             "Modifica altezza (%):",
             "Modifica margine sup (px):",
@@ -101,6 +103,10 @@ class LayoutCreator {
         ]
         const inputsInfos=[
             {
+                "name":"layoutHeight",
+                "type":"number",
+                "min":0
+            },{
                 "min":0,
                 "name":"width",
                 "type":"number",
@@ -135,17 +141,18 @@ class LayoutCreator {
                 "value":2
             }
         ]
-        for(let i=0;i<10;i++){
+        for(let i=0;i<11;i++){
             const labels=document.createElement('label')
             labels.innerText=labelsText[i]
-            if(i<9){
+            if(i<10){
                 const input=document.createElement('input')
                 for(let key of Object.keys(inputsInfos[i])){
                     input[key]=inputsInfos[i][key]
                 }
                 labels.appendChild(input)
-                if(i<6) this.#sizeCommands.appendChild(labels)
-                else if(i===6 || i===7) {
+                if(i===0) this.#formLayout.appendChild(labels)
+                else if(i>0 && i<7) this.#sizeCommands.appendChild(labels)
+                else if(i===7 || i===8) {
                     labels.classList.add("titleCommand","hidden")
                     this.#splitCommands.appendChild(labels)
                 } else {
@@ -220,6 +227,9 @@ class LayoutCreator {
         this.#sizeUpdateBinded=this.#sizeUpdate.bind(this)
         this.#formLayout.width.addEventListener('change',this.#sizeUpdateBinded)
         this.#formLayout.height.addEventListener('change',this.#sizeUpdateBinded)
+
+        this.#layoutHeightUpdateBinded=this.#layoutHeightUpdate.bind(this)
+        this.#formLayout.layoutHeight.addEventListener('change',this.#layoutHeightUpdateBinded)
 
         this.#marginUpdateBinded=this.#marginUpdate.bind(this)
         this.#formLayout.marginTop.addEventListener('change',this.#marginUpdateBinded)
@@ -447,6 +457,11 @@ class LayoutCreator {
         } else console.log("scegli una sezione")
     }
 
+    getSection(gen,id){
+        if(gen && id) return this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']").querySelector('section')
+        else return this.#lastSelected.querySelector('section')
+    }
+
     getLastSelected(){//ritorna l'ultimo child selezionato
         return this.#lastSelected
     }
@@ -620,6 +635,11 @@ class LayoutCreator {
         this.#lastSelected.style.width="calc("+this.#formLayout.width.value+"% - "+(parseInt(this.#formLayout.marginRight.value)+parseInt(this.#formLayout.marginLeft.value)+2*border)+"px)"
         this.#lastSelected.style.height="calc("+this.#formLayout.height.value+"% - "+(parseInt(this.#formLayout.marginBottom.value)+parseInt(this.#formLayout.marginTop.value)+2*border)+"px)"
         
+    }
+
+    #layoutHeightUpdate(event){
+        this.#showSaveButton()
+        this.#layoutContainer.style.height=event.currentTarget.value+"px"
     }
     
     #marginUpdate(){//aggiorna le dimensioni dei margini del div selezionato

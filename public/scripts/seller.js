@@ -2,14 +2,42 @@ function onResponse(response){
     return response.json()
 }
 
-function showForm(){
-    if(newProductForm.classList.contains("hidden")) {
+function showForm(event){
+    if(event.currentTarget.id==="newProductButton"){
+        newProductForm.productID.value=""
+        if(newProductForm.classList.contains("hidden")) {
+            newProductForm.classList.remove("hidden")
+            newProductButton.innerText="Annulla"
+        } else{
+            newProductForm.classList.add("hidden")
+            newProductButton.innerText="Inserisci un nuovo prodotto"
+        }
+    } else {
+        const product=event.currentTarget.parentNode.parentNode
         newProductForm.classList.remove("hidden")
-        newProductButton.innerText="Annulla"
-    } else{
-        newProductForm.classList.add("hidden")
-        newProductButton.innerText="Inserisci un nuovo prodotto"
+        quitModifyProductButton.classList.remove("hidden")
+        newProductButton.classList.add("hidden")
+        newProductForm.productID.value=product.parentNode.dataset.product_id
+        newProductForm.title.value=product.childNodes[0].innerText
+        newProductForm.price.value=parseInt(product.childNodes[2].innerText.split("€")[0])
+        newProductForm.category.querySelector("option[value="+product.dataset.category+"]").selected="selected"
+        newProductForm.quantity.value=parseInt(product.childNodes[3].childNodes[0].innerText.substring(15,product.childNodes[3].childNodes[0].innerText.length))
+        newProductForm.producer.value=product.dataset.producer
+        newProductForm.desc.value=product.parentNode.childNodes[1].innerText
+        if(!product.childNodes[1].childNodes[0].src.includes(app_url)) {
+            newProductForm.imgOption.querySelector("option[value=url]").selected="selected"
+            newProductForm.url.value=product.childNodes[1].childNodes[0].src
+            newProductForm.image.classList.add("hidden")
+            newProductForm.url.classList.remove("hidden")
+        }
+        else {
+            newProductForm.imgOption.querySelector("option[value=upload]").selected="selected"
+            newProductForm.url.value=""
+            newProductForm.image.classList.remove("hidden")
+            newProductForm.url.classList.add("hidden")
+        }
     }
+    
 }
 
 function checkImage(){
@@ -64,6 +92,13 @@ function changeImgOption(){
     }
 }
 
+function quitModifyProduct(event){
+    event.currentTarget.classList.add("hidden")
+    newProductForm.classList.add("hidden")
+    newProductButton.classList.remove("hidden")
+    newProductForm.productID.value=""
+}
+
 function newProduct(event){
     event.preventDefault()
     const errors=document.querySelectorAll('error')
@@ -80,7 +115,22 @@ function newProduct(event){
         newProductForm.send.value="     "
         newProductForm.send.style.backgroundImage="url(../assets/loading.gif)"
         fetch(app_url+"/seller/newProduct",formData).then(function(response){
-            if(response.ok) fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
+            if(response.ok) fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(function(json){
+                onJsonProducts(json)
+                if(newProductForm.productID.value && layoutContainer){
+                    const product=document.querySelector('.productContainer').querySelector("[data-product_id=\'"+newProductForm.productID.value+"\']")
+                    const products=layoutContainer.querySelectorAll("[data-product_id=\'"+newProductForm.productID.value+"\']")
+                    if(products) for(const item of products){
+                        item.childNodes[0].dataset.producer=product.childNodes[0].dataset.producer
+                        item.childNodes[0].dataset.category=product.childNodes[0].dataset.category
+                        item.childNodes[0].childNodes[0].innerText=product.childNodes[0].childNodes[0].innerText
+                        item.childNodes[0].childNodes[1].childNodes[0].src=product.childNodes[0].childNodes[1].childNodes[0].src
+                        item.childNodes[0].childNodes[2].innerText=product.childNodes[0].childNodes[2].innerText
+                        item.childNodes[0].childNodes[3].childNodes[0].innerText=product.childNodes[0].childNodes[3].childNodes[0].innerText
+                        item.childNodes[1].innerText=product.childNodes[1].innerText
+                    }
+                }
+            })
         })
     }
 }
@@ -89,6 +139,7 @@ function onJsonProducts(json){
     if(newProductForm){
         newProductForm.send.value="Invia"
         newProductForm.send.style.backgroundImage=""
+        newProductForm.addEventListener('submit', newProduct)
     }
     if(json.errors){
         const errorContainer=document.querySelector('#errorsPhp')
@@ -112,6 +163,10 @@ function onJsonProducts(json){
         if(newProductForm){
             container=document.querySelector('.productContainer')
             container.innerHTML=""
+            newProductForm.classList.add("hidden")
+            newProductButton.classList.remove("hidden")
+            newProductButton.innerText="Inserisci un nuovo prodotto"
+            quitModifyProductButton.classList.add("hidden")
         }
         for(const item of json){
             const block=document.createElement('div')
@@ -131,20 +186,31 @@ function onJsonProducts(json){
             block.appendChild(price)
             const quantity=document.createElement('p')
             quantity.innerText="Disponibilità: "+item.quantity
-            block.appendChild(quantity)
+            quantity.classList.add('quantity')
+            const modify=document.createElement('img')
+            modify.classList.add('modifyButton')
+            modify.src="../assets/modify.png"
+            modify.addEventListener('click',showForm)
             const buttonContainer=document.createElement('div')
             buttonContainer.classList.add('productButtonsContainer')
+            buttonContainer.appendChild(quantity)
+            buttonContainer.appendChild(modify)
+            block.appendChild(buttonContainer)
+            const buttonContainer1=document.createElement('div')
+            buttonContainer1.classList.add('productButtonsContainer')
             const descButton=document.createElement('p')
             descButton.innerText="Scheda tecnica"
             descButton.classList.add('descButton')
             descButton.addEventListener('click',showDesc)
-            buttonContainer.appendChild(descButton)
+            buttonContainer1.appendChild(descButton)
             const deleteProductButton=document.createElement('span')
             deleteProductButton.innerText="X"
             deleteProductButton.classList.add('deleteProductButton')
-            buttonContainer.appendChild(deleteProductButton)
-            deleteProductButton.addEventListener('click',deleteProduct)
-            block.appendChild(buttonContainer)
+            buttonContainer1.appendChild(deleteProductButton)
+            deleteProductButton.addEventListener('click',modalDelete)
+            block.appendChild(buttonContainer1)
+            block.dataset.producer=item.producer
+            block.dataset.category=item.category
             const desc=document.createElement('p')
             desc.innerText=item.description
             desc.classList.add('desc','hidden')
@@ -156,16 +222,12 @@ function onJsonProducts(json){
             if(newProductForm)container.appendChild(parentBlock)
             else productList.push(parentBlock)
         }
-        if(newProductForm){
-            newProductForm.classList.add("hidden")
-            newProductButton.innerText="Inserisci un nuovo prodotto"
-        }
-        if(firstLoading)fetch(app_url+"/layout/"+seller).then(onResponse).then(onLayouts)
-        firstLoading=false
-    } else {
+    } else if(newProductForm){
         const text=document.querySelector('#yourProducts')
         text.innerText="Non hai nessun prodotto in vendita"
     }
+    if(firstLoading)fetch(app_url+"/layout/"+seller).then(onResponse).then(onLayouts)
+    firstLoading=false
 }
 
 function showDesc(event){
@@ -239,6 +301,7 @@ function newLayout(event){
     modifyFlag=true
     saveButton.innerText="Salva"
     modifyLayoutButton.classList.add("hidden")
+    deleteLayoutButton.classList.add("hidden")
     event.currentTarget.classList.remove('hidden')
     if(layoutContainer)layoutContainer.remove()
     if(layoutMenu)layoutMenu.remove()
@@ -317,6 +380,7 @@ function active(){
 function modify(event){
     modifyFlag=true
     newLayoutButton.classList.add("hidden")
+    deleteLayoutButton.classList.add("hidden")
     event.currentTarget.classList.remove('hidden')
     event.currentTarget.innerText="Annulla"
     layoutMenu.classList.remove("hidden")
@@ -374,7 +438,8 @@ function quit(event){
     modifyFlag=false
     productsToInsert=[]
     productsToRemove=[]
-
+    const products=document.querySelector('.productContainer').querySelectorAll('div')
+    if(products)for(const product of products) product.style.border=""
     addContentButton.classList.add("hidden")
     removeContentButton.classList.add("hidden")
     if(event.currentTarget.id==="newLayoutButton"){
@@ -386,6 +451,7 @@ function quit(event){
         }else{
             layoutMenu.classList.add("hidden")
             modifyLayoutButton.classList.remove("hidden")
+            deleteLayoutButton.classList.remove("hidden")
             let layoutID
             for(const key of Object.keys(layoutsList)){
                 if(layoutsList[key].style.border!=="") layoutID=layoutsList[key].innerText
@@ -396,6 +462,7 @@ function quit(event){
         newLayoutButton.classList.remove("hidden")
         event.currentTarget.innerText="Modifica layout"
         event.currentTarget.addEventListener('click',modify)
+        deleteLayoutButton.classList.remove("hidden")
         layoutMenu.classList.add("hidden")
         layoutCreator.loadLayout(layoutCreator.getLayoutID()).then(onJsonContent)
     }
@@ -445,7 +512,9 @@ function addContent(){
                 clone.style.border=""
                 clone.addEventListener('click',select)
                 clone.querySelector('.descButton').addEventListener('click',showDesc)
-                layoutCreator.getLastSelected().querySelector('section').appendChild(clone)
+                clone.querySelector('.deleteProductButton').remove()
+                clone.querySelector('.modifyButton').remove()
+                layoutCreator.getSection().appendChild(clone)
             }
         }
     } else {
@@ -484,12 +553,13 @@ function modalDelete(event){
             break
         }
     }
-    if(event.currentTarget.classList.contains('layoutID')) msg.innerText="Sei sicuro di voler eliminare il layout "+layoutID+"?"
+    if(event.currentTarget.id==='deleteLayoutButton') msg.innerText="Sei sicuro di voler eliminare il layout "+layoutID+"?"
     else msg.innerText="Sei sicuro di voler eliminare il prodotto "+event.currentTarget.parentNode.parentNode.childNodes[0].innerText+"?"
     div.appendChild(msg)
     const options=document.createElement('div')
     const yes=document.createElement('span')
     yes.innerText="Si"
+    if(event.currentTarget.id!=='deleteLayoutButton') yes.dataset.product_id=event.currentTarget.parentNode.parentNode.parentNode.dataset.product_id 
     const no=document.createElement('span')
     no.innerText="No"
     options.appendChild(yes)
@@ -499,8 +569,14 @@ function modalDelete(event){
     modalView.style.top = window.pageYOffset + 'px'
     modalView.appendChild(div)
     modalView.classList.remove('hidden')
-    if(event.currentTarget.classList.contains('layoutID')) yes.addEventListener('click',deleteLayout)
-    else yes.addEventListener('click',deleteProduct)
+    if(event.currentTarget.id==='deleteLayoutButton') {
+        yes.addEventListener('click',deleteLayout)
+        yes.removeEventListener('click',deleteProduct)
+    }
+    else {
+        yes.addEventListener('click',deleteProduct)
+        yes.removeEventListener('click',deleteLayout)
+    }
 }
 
 function deleteLayout(){
@@ -539,17 +615,12 @@ function deleteLayout(){
 }
 
 function deleteProduct(event){
-    fetch(app_url+"/deleteProduct/"+event.currentTarget.parentNode.parentNode.parentNode.dataset.product_id).then(function(){
-        const layouts=document.querySelector('#layouts').querySelectorAll('span')
-        for(const layout of layouts){
-            fetch("/ecommerce/layout"+layout.innerText+".json").then(onResponse).then(function(json){
-                console.log(layout.innerText)
-                console.log(json)
-            })
+    const productID=event.currentTarget.dataset.product_id
+    fetch(app_url+"/deleteProduct/"+productID).then(function(){
+        if(layoutCreator){
+            const products=layoutContainer.querySelectorAll("[data-product_id=\'"+productID+"\']")
+            if(products) for(const product of products) product.remove()
         }
-        firstLoading=true
-        if(layoutContainer)layoutContainer.remove()
-        if(layoutMenu)layoutMenu.remove()
         fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
     })
 }
@@ -558,25 +629,29 @@ function onJsonContent(content){
     const productContainer=document.querySelector('.productContainer')
     for(const gen of Object.keys(content)){
         for(const id of Object.keys(content[gen])){
-            const childSection=layoutContainer.querySelector('.child'+gen+id).querySelector('section')
+            const genn=gen.substring(11,gen.length-2)
+            const idd=id.substring(10,id.length-2)
+            const childSection=layoutCreator.getSection(genn,idd)
             childSection.innerHTML=""
             for(const productID of content[gen][id]){
                 let product
-                const node=productContainer.querySelector("[data-product_id=\'"+productID+"\']")
-                if(productContainer && node) product=node.cloneNode(true)
+                if(productContainer) {
+                    const node=productContainer.querySelector("[data-product_id=\'"+productID+"\']")
+                    product=node.cloneNode(true)
+                    node.classList.add("inLayout")
+                }
                 else for(const item of productList){
                     if(item.dataset.product_id==productID){
                         product=item
                         break
                     }
                 }
-                if(product){
-                    product.style.border=""
-                    product.addEventListener('click',select)
-                    product.querySelector('.descButton').addEventListener('click',showDesc)
-                    childSection.appendChild(product)
-                }
-                
+                product.style.border=""
+                product.addEventListener('click',select)
+                product.querySelector('.descButton').addEventListener('click',showDesc)
+                product.querySelector('.deleteProductButton').remove()
+                product.querySelector('.modifyButton').remove()
+                childSection.appendChild(product)
             }
         }
     }
@@ -603,6 +678,7 @@ const newLayoutButton=document.querySelector('#newLayoutButton')
 const modifyLayoutButton=document.querySelector('#modifyLayoutButton')
 const deleteLayoutButton=document.querySelector('#deleteLayoutButton')
 const activeButton=document.querySelector('#active')
+const quitModifyProductButton=document.querySelector('#quitModifyProduct')
 const title=document.querySelector('h1').innerText
 const seller=title.substring(10,title.length)
 fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
@@ -621,4 +697,5 @@ if(newProductForm){
     modifyLayoutButton.addEventListener('click',modify)
     newLayoutButton.addEventListener('click',newLayout)
     deleteLayoutButton.addEventListener('click',modalDelete)
+    quitModifyProductButton.addEventListener('click',quitModifyProduct)
 }

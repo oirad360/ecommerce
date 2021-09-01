@@ -12,7 +12,7 @@ form{
 }
 
 textarea{
-    font-size:15px;
+    font-size:1rem;
     resize: none;
     height: 5em; /*em è relativo al font size, se metto width 51em vuol dire che è larga 51 caratteri*/
     width: 20em;
@@ -61,7 +61,7 @@ label{
     cursor: pointer;
     text-decoration: underline;
 }
-.deleteLayout{
+.modalDelete{
     display: flex;
     flex-direction: column;
     padding: 50px;
@@ -69,7 +69,7 @@ label{
     background-color: rgb(199, 199, 199);
     border-radius: 20px;
 }
-.deleteLayout div{
+.modalDelete div{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -77,7 +77,7 @@ label{
     width: 50%;
 }
 
-.deleteLayout span:hover{
+.modalDelete span:hover{
     cursor: pointer;
     text-decoration: underline;
 }

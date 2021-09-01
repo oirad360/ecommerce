@@ -33,6 +33,7 @@ class SellerController extends BaseController{
     public function newProduct(Request $request){
         $errors=array();
         $fileName="defaultProductImage.png";
+        $noImgUpload=false;
         if($request->imgOption==="upload"){
             if($request->image){
                 $file = $request->image;
@@ -51,7 +52,7 @@ class SellerController extends BaseController{
                     $pathArray=explode("/",$path);
                     $fileName=$pathArray[count($pathArray)-1];
                 }
-            }
+            } else $noImgUpload=true;
         } else if($request->url!=="") $fileName=$request->url;
         
         if(floatval($request->price)<=0){
@@ -70,11 +71,15 @@ class SellerController extends BaseController{
             $result["errors"]=$errors;
             return $result;
         } else {
-            $newProduct=new Product;
+            $newProduct;
+            if($request->productID) $newProduct=Product::find($request->productID);
+            else $newProduct=new Product;
             $newProduct->title=$request->title;
             $newProduct->price=$request->price;
             $newProduct->quantity=$request->quantity;
-            $newProduct->image=$fileName;
+            if($request->productID!==""){
+                if(!$noImgUpload) $newProduct->image=$fileName;
+            } else $newProduct->image=$fileName;
             if($request->desc!=="")$newProduct->description=$request->desc;
             $newProduct->category=$request->category;
             $newProduct->producer=$request->producer;
@@ -82,6 +87,10 @@ class SellerController extends BaseController{
             $newProduct->save();
             return array($newProduct);
         }
+    }
+
+    public function modifyProduct(Request $request){
+        
     }
 
     public function fetchProducts($seller){
@@ -129,5 +138,27 @@ class SellerController extends BaseController{
     public function deleteProduct($productID){
         $product=Product::find($productID);
         $product->delete();
+        $rows=User::find(session('id'))->layouts;
+        $layoutsIDs=array();
+        if(isset($rows)){
+            foreach($rows as $row) $layoutsIDs[]=$row["layout_id"];
+        }
+        $newContent=array();
+        foreach($layoutsIDs as $layoutID){
+            $file=fopen("C:/xampp/htdocs/ecommerce/layout$layoutID.json","r");
+            $content=json_decode(fread($file,filesize("C:/xampp/htdocs/ecommerce/layout$layoutID.json")),true);
+            foreach($content as $key=>$value){
+                foreach($content[$key] as $id=>$value){
+                    unset($value[array_search($productID,$value)]);
+                    $newContent[$key][$id]=array_values($value);
+                }
+            }
+            unlink("C:/xampp/htdocs/ecommerce/layout$layoutID.json");
+            fclose($file);
+            $file=fopen("C:/xampp/htdocs/ecommerce/layout$layoutID.json","w");
+            fwrite($file,json_encode($newContent));
+            fclose($file);
+            $newContent=array();
+        }
     }
 }

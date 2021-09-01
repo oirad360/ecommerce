@@ -35,7 +35,7 @@ nav{
 
 #navClose{
     cursor: pointer;
-    font-size: 3em;
+    font-size: 3rem;
     display: none;
 }
 
@@ -60,11 +60,11 @@ form[name=searchProducts].menuSearch{
     flex-direction: column;
     align-items: center;
     margin: 5px;
-    font-size: 1em;
+    font-size: 1rem;
     white-space: nowrap;
 }
 .profileContainer .navButton{
-    font-size: 1em;
+    font-size: 1rem;
     padding: 5px;
     
 }
@@ -90,7 +90,7 @@ form[name=searchProducts].menuSearch{
 }
 
 .navButton{
-    font-size: 1.3em;
+    font-size: 1.3rem;
     padding: 10px;
     border-radius: 20px;
     margin: 5px;
@@ -108,7 +108,7 @@ form[name=searchProducts].menuSearch{
     background-color: white;
     border: 3px solid #0004ff;
     color: #0004ff;
-    font-size: 1.5em;
+    font-size: 1.5rem;
 }
 
 #signupButton:hover{
@@ -161,7 +161,7 @@ select[name=categories]:hover{
 }
 
 #contactsButton{
-    font-size: 1em;
+    font-size: 1rem;
 }
 #homeButton{
     max-width: 60px;
@@ -171,7 +171,7 @@ select[name=categories]:hover{
 #navCategories{
     display: flex;
     align-items: center;
-    font-size: 1em;
+    font-size: 1rem;
 }
 
 #navCategories span{
@@ -201,7 +201,7 @@ footer{
 }
 
 footer p{
-    font-size: 15px;
+    font-size: 1rem;
     line-height: 30px;
     text-align: center;
     margin: 20px;
@@ -282,7 +282,7 @@ footer p{
     }
     .profileContainer *{
         margin:10px;
-        font-size:1.5em;
+        font-size:1.5rem;
     }
     #navCategories{
         overflow: auto;
@@ -317,7 +317,7 @@ footer p{
     }  
     footer p{
         margin: 0px;
-        font-size: 10px;
+        font-size: 0.8rem;
         line-height: 20px;
     }
 }

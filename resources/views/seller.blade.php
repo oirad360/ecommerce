@@ -19,9 +19,11 @@
     <h3 id=yourProducts>I tuoi prodotti</h3>
     <div class=productContainer>
     </div>
+    <button id=quitModifyProduct class=hidden>Annulla</button>
     <button id=newProductButton>Inserisci un nuovo prodotto</button>
     <form method='POST' class=hidden name=newProduct id=newProductForm>
         <input type='hidden' name='_token' value='{{ $csrf_token }}'>
+        <input type='hidden' name='productID'>
         <label>Titolo: <input type=text name=title></label>
         <span id=titleError class="error hidden">Questo campo è obbligatorio</span>
         <label>Prezzo: <input type=number value=0 min=0 step=any name=price></label>
@@ -33,6 +35,7 @@
                 <option value="pc">PC</option>
                 <option value="audio">Audio</option>
                 <option value="tv">TV</option>
+                <option value="photography">Fotografia</option>
                 <option value="console">Console</option>
                 <option value="smartwatch">Smartwatch</option>
                 <option value="accessories">Accessori</option>

@@ -26,7 +26,8 @@ user_id integer not null,
 foreign key(user_id) references users(id) on update cascade on delete cascade,
 index ind_user_id(user_id),
 category varchar(20) not null,
-producer varchar(20)
+producer varchar(20),
+date timestamp default current_timestamp
 )engine='InnoDB';
 
 create table reviews(
@@ -191,22 +192,32 @@ delimiter ;
 */
 
 
-insert into products(nome,prezzo,immagine) values('iPhone12',819,'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-pro-family-hero?wid=940&hei=1112&fmt=jpeg&qlt=80&.v=1604021663000');
-insert into products(nome,prezzo,immagine) values('PlayStation 5',499,'https://fagaelectronics.it/1160-large_default/sony-playstation-5.jpg');
-insert into products(nome,prezzo,immagine) values('Xiaomi Mi Smart TV 4A 32"',210,'https://cdn.idealo.com/folder/Product/6864/3/6864373/s10_produktbild_gross/xiaomi-mi-smart-tv-4a-32.jpg');
-SMART TV LED 32'' HD
-Risoluzione: 1366x768 pixel
-Frequenza: 60 Hz - WiFi + Ethernet
-Tuner Digitale Terrestre: DVB-T2 HEVC e Satellitare DVB-S2
-Casse integrate - Potenza in uscita: 10 W
-Classe efficienza energetica: F
-Distribuito da Xiaomi Italia
-insert into products(nome,prezzo,immagine) values('Xbox Series X',499,'https://m.media-amazon.com/images/I/61CLCiCNtaL._AC_SX466_.jpg');
-insert into products(nome,prezzo,immagine) values('MSI GF63',1249,'https://m.media-amazon.com/images/I/719QyW89YDL._AC_SL1500_.jpg');
+insert into products(title,price,quantity,category,user_id,producer,image,description) 
+values('iPhone 12',819,100,'smartphone',1,'Apple',
+'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-pro-family-hero?wid=940&hei=1112&fmt=jpeg&qlt=80&.v=1604021663000',
+'DISPLAY 6,1" 1170 x 2532 px. FOTOCAMERA 12 Mpx f/1.6. FRONTALE 12 Mpx f/2.2. CPU esa. RAM 4 GB. MEMORIA 64/128/256 GB. BATTERIA 2815 mAh. iOS 14.');
+insert into products(title,price,quantity,category,user_id,producer,image,description) 
+values('PlayStation 5',499,80,'console',1,'Sony',
+'https://fagaelectronics.it/1160-large_default/sony-playstation-5.jpg',
+'CPU: 8x Zen 2 Cores at 3.5GHz. GPU: 10.28 TFLOPs, 36 CUs at 2.23GHz (frequenza variabile) Architettura GPU: RDNA 2 personalizzata. Memoria: 16GB GDDR6/256-bit.');
+insert into products(title,price,quantity,category,user_id,producer,image,description) 
+values('Xiaomi Mi Smart TV 4A 32"',210,130,'tv',1,'Xiaomi',
+'https://cdn.idealo.com/folder/Product/6864/3/6864373/s10_produktbild_gross/xiaomi-mi-smart-tv-4a-32.jpg',
+'SMART TV LED 32" HD Risoluzione: 1366x768 pixel Frequenza: 60 Hz - WiFi + Ethernet Tuner Digitale Terrestre: DVB-T2 HEVC e Satellitare DVB-S2 Casse integrate - Potenza in uscita: 10 W Classe efficienza energetica: F Distribuito da Xiaomi Italia');
+insert into products(title,price,quantity,category,user_id,producer,image,description) 
+values('Xbox Series X',499,90,'console',1,'Microsoft',
+'https://m.media-amazon.com/images/I/61CLCiCNtaL._AC_SX466_.jpg',
+'CPU 8 core Zen 2, 3,8 GHz. GPU 12 TFLOPS, 52 CU a 1825 MHz. MEMORIA 16 GB GDDR6. SSD NVMe personalizzato da 1 TB. 4K a 60 FPS – fino a 120FPS');
+insert into products(title,price,quantity,category,user_id,producer,image,description) 
+values('MSI GF63',1249,50,'laptop',1,'MSI',
+'https://m.media-amazon.com/images/I/719QyW89YDL._AC_SL1500_.jpg',
+'MSI GF63 Thin 10SC-054IT, Notebook Gaming FHD 15,6", 144Hz, Intel I7-10750H, Nvidia GTX 1650 Max-Q 4GB GDDR6, 16GB RAM DDR4, 512GB SS M.2 PCIe NVMe, WiFi 6 AX Win 10 Home');
 
 
-insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 
-values('iPhone 12','iphone12.png',1189,'DISPLAY 6,1" 1170 x 2532 px. FOTOCAMERA 12 Mpx f/1.6. FRONTALE 12 Mpx f/2.2. CPU esa. RAM 4 GB. MEMORIA 64/128/256 GB. BATTERIA 2815 mAh. iOS 14.',true,false,1,'iphone12','Smartphone');
+
+
+
+
 insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 
 values('MacBook Air','macbookair.png',1159,'Chip Apple M1 con CPU 8‑core, GPU 7‑core e Neural Engine 16‑core. 8GB di memoria unificata. Unità SSD da 256GB. Display Retina con True Tone. Magic Keyboard retroilluminata - Italiano. Touch ID. Trackpad Force Touch. Due porte Thunderbolt/USB.',true,false,1,'macbookair','Portatili');
 insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 
@@ -219,5 +230,3 @@ insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,p
 values('AirPods Max','airpodsmax.png',629,'PESO 384,8 g. DIMENSIONI 187,8 mm x 168,6 mm x 83,4 mm. SENSORI ottico, posizione, rilevamento custodia, accelerometro, giroscopio. BATTERIA Fino a 20 ore di ascolto. Ricarica tramite connettore Lightning.',true,false,1,null,'Cuffie');
 insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 
 values('Surface Pro 7','surface.png',919,'DIMENSIONI 292 mm x 201 mm x 8,5 mm. SCHERMO da 12,3" 2736x1824. MEMORIA 4 GB, 8 GB o 16 GB LPDDR4x. PROCESSORE Intel® Core™ i7-1065G7 Quad-Core di decima generazione. Windows 10 Home',true,false,2,null,'Portatili');
-insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 
-values('Xbox Series X','xbox.png',499,'CPU 8 core Zen 2, 3,8 GHz. GPU 12 TFLOPS, 52 CU a 1825 MHz. MEMORIA 16 GB GDDR6. SSD NVMe personalizzato da 1 TB. 4K a 60 FPS – fino a 120FPS',true,false,2,null,'Console');

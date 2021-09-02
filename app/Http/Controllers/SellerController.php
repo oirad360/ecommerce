@@ -21,13 +21,13 @@ class SellerController extends BaseController{
             ->with('seller', $seller)
             ->with('yourPage',true)
             ->with('csrf_token', csrf_token())
-            ->with('numCarrello',$user->cartItems);
+            ->with('cartItems',$user->cartItems);
         else return view('seller')
             ->with('app_folder', env('APP_FOLDER'))
             ->with('username',$user->username)
             ->with('seller', $seller)
             ->with('csrf_token', csrf_token())
-            ->with('numCarrello',$user->cartItems);
+            ->with('cartItems',$user->cartItems);
     }
 
     public function newProduct(Request $request){

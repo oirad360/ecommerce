@@ -13,20 +13,15 @@
     background-color: rgba(0, 0, 0, 0.07);
     width: 150px;
     border-radius: 10px;
+    text-align: center;
 }
 
 .noBorderBottomRadius{
     border-bottom-left-radius:0px;
     border-bottom-right-radius:0px;
 }
-.block h1, .block p{
+.block h3, .block p{
     margin: 3px 0px;
-}
-.quantity{
-    text-align: center;
-}
-.productButtonsContainer p{
-    font-size: 1rem;
 }
 
 .block img{
@@ -35,7 +30,6 @@
 }
 
 .descButton{
-    font-size: 1rem;
     border: 1px solid black;
     border-radius: 5px;
 }
@@ -54,7 +48,6 @@
 }
 
 .deleteProductButton{
-    font-size:1rem;
     color: rgb(255, 255, 255);
     background-color: rgb(255, 0, 0);
     border-radius: 100%;
@@ -78,8 +71,42 @@
     transition: 0.5s;
 }
 
-.cuoreRosso{
-    background-image: url(../assets/cuore.png);
+.wishlistButton{
+    background-image: url(../assets/emptyheart.png);
+    height:20px;
+    width:20px;
+}
+
+.wishlistButton:hover{
+    background-image: url(../assets/heart.png);
+    cursor: pointer;
+}
+
+.wishlistRemoveButton{
+    background-image: url(../assets/heart.png);
+    height:20px;
+    width:20px;
+}
+
+.wishlistRemoveButton:hover{
+    background-image: url(../assets/brokenheart.png);
+    cursor: pointer;
+}
+.addCart{
+    background-color: rgb(0, 132, 255);
+    border-radius: 5px;
+    color:white;
+    padding:2px;
+    border: 1px solid black;
+}
+
+.addCart:hover{
+    cursor:pointer;
+    background-color: rgba(0, 132, 255, 0.514);
+}
+
+.redHeart{
+    background-image: url(../assets/heart.png);
     height:20px;
     width:20px;
 }
@@ -92,33 +119,29 @@
     background-color: rgba(255, 208, 0, 0.349)
 }
 
-.containerBottoni{
-    display: flex;
-    justify-content: space-around;
-}
 
-.aumenta{
+.increment{
     background-color: rgba(0, 132, 255, 0.425);;
-    width: 70px;
+    width: 40px;
     font-size: 1.2rem;
     line-height: 15px;
     border-radius: 10px;
 }
 
-.aumenta:hover{
+.increment:hover{
     cursor:pointer;
     background-color: rgba(0, 132, 255, 0.699);;
 }
 
-.diminuisci{
+.decrement{
     background-color: rgba(255, 0, 0, 0.425);
-    width: 70px;
+    width: 40px;
     font-size: 1.2rem;
     line-height: 15px;
     border-radius: 10px;
 }
 
-.diminuisci:hover{
+.decrement:hover{
     cursor:pointer;
     background-color: rgba(255, 0, 0, 0.699);
 }
@@ -132,37 +155,37 @@
 
 
 @media(max-width: 800px){
-    .blocco{
-        font-size: 0.9rem;
+    .block{
+        font-size: 0.7rem;
         padding: 0px 10px;
         margin: 2px;
         width:90px;
     }
 
-    .blocco img{
+    .addCart{
+        font-size:0.62rem;
+    }
+
+    .block img{
         max-width: 75px;
         max-height: 95px;
     }
 
-    .blocco h1, .blocco p{
+    .block h3, .block p{
         width:90px;
     }
 
-    .aggiungiCarrello{
-        font-size: 0.9rem;
-    }
-
-    .scheda{
+    .desc{
         width: 90px;
-        font-size: 0.9rem;
+        font-size:0.8rem;
         margin-top: -2px;
         padding: 2px 10px;
     }
-    .aumenta{
-        width:40px;
+    .increment{
+        width:27px;
     }
-    .diminuisci{
-        width:40px;
+    .decrement{
+        width:27px;
     }
 }
 

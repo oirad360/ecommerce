@@ -8,24 +8,65 @@ class HomeController extends BaseController{
         if(session('id')===null){
             return view('home')
             ->with('app_folder', env('APP_FOLDER'))
-            ->with('csrf_token', csrf_token())
-            /* ->with('propicURL',$propicURL)
-            ->with('categorieSide',$categorieSide) */;
+            ->with('csrf_token', csrf_token());
         }
 
         $user=User::find(session('id'));
-        /* if($user->propic==="defaultAvatar.jpg"){
-            $propicURL="/".env('APP_FOLDER')."/public/assets/defaultAvatar.jpg";
-        } else {
-            $propicURL="/".env('APP_FOLDER')."/public/uploads/".$user->propic;
-        }
-        $categorieSide=Prodotto::select('categoria')->distinct()->get(); */
         return view('home')
             ->with('app_folder', env('APP_FOLDER'))
             ->with('username',$user->username)
             ->with('csrf_token', csrf_token())
-            /* ->with('propicURL',$propicURL)
-            ->with('categorieSide',$categorieSide) */
-            ->with('numCarrello',$user->cartItems);
+            ->with('cartItems',$user->cartItems);
+    }
+
+    public function fetchProducts(){
+        $products=Product::all();
+        $userProducts=UserProduct::where('user_id',session('id'))->get();
+        foreach($products as $product){
+            if(session('id')){
+                $flag=false;
+                foreach($userProducts as $userProduct){
+                    if($userProduct->product_id===$product->id){
+                        if($userProduct->wishlist) $product["wishlist"]=true;
+                        else $product["wishlist"]=false;
+                        $flag=true;
+                    }
+                }
+                if(!$flag) $product["wishlist"]=false;
+            }  
+            if($product->quantity<=10) $product["lastAvailables"]=true;
+            else $product["lastAvailables"]=false;
+            if($product->quantity===0) {
+                $product["soonAvailables"]=true;
+                $product["lastAvailables"]=false;
+            }
+            else $product["soonAvailables"]=false;
+            $time=date("Y-m-d G:i:s", strtotime("+2 hour -1 hour -55 minutes"));
+            if($product->date>$time) $product["newArrivals"]=true;
+            else $product["newArrivals"]=false;
+        }
+        return $products;
+    }
+
+    public function addWishlist($productID,$val){
+        $row=UserProduct::where('user_id',session('id'))->where('product_id',$productID)->first();
+        if($val==="true"){
+            if(isset($row)){
+                $row->wishlist=true;
+                $row->save();
+            } else {
+                $row=new UserProduct;
+                $row->user_id=session('id');
+                $row->product_id=$productID;
+                $row->wishlist=true;
+                $row->save();
+            }
+        } else {
+            $row->wishlist=false;
+            $row->save();
+            $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->where('wishlist',false)->where('cart',0)->where('bought',0)->first();
+            if(isset($row)) $row->delete();
+        }
+        
     }
 }

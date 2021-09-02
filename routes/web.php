@@ -28,6 +28,9 @@ Route::get('signup/checkUsername/{username}', 'SignupController@checkUsername');
 Route::get('logout', 'LoginController@logout');
 
 Route::get('home', 'HomeController@home');
+Route::get('home/fetchProducts', 'HomeController@fetchProducts');
+
+Route::get('addWishlist/{productID}/{val}', 'HomeController@addWishlist');
 
 Route::get('seller/{seller}', 'SellerController@seller');
 Route::post('seller/newProduct', 'SellerController@newProduct');
@@ -36,3 +39,15 @@ Route::get('layout/{seller}', 'SellerController@layout');
 Route::get('saveUsersLayout/{layoutID}', 'SellerController@saveUsersLayout');
 Route::get('active/{layoutID}/{val}', 'SellerController@active');
 Route::get('deleteProduct/{productID}', 'SellerController@deleteProduct');
+
+Route::get('addCart/{productID}/{val}','CartController@addCart');
+Route::get('cart','CartController@cart');
+Route::get('cart/buy','CartController@buy');
+Route::get('cart/fetchCart','CartController@fetchCart');
+
+Route::get('reviews/{productID}', 'ReviewsController@reviews');
+Route::get('reviews/fetchReviews/{productID}', 'ReviewsController@fetchReviews');
+Route::get('reviews/fetchProduct/{productID}', 'ReviewsController@fetchProduct');
+Route::post('reviews/postReview/{productID}', 'ReviewsController@postReview');
+Route::get('like/{reviewID}', 'ReviewsController@like');
+Route::get('dislike/{reviewID}', 'ReviewsController@dislike');

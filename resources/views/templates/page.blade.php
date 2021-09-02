@@ -28,6 +28,14 @@
                 <select name=categories>
                     <option value="all">Tutte le categorie</option>
                     <option value="smartphone">Smartphones</option>
+                    <option value="laptop">Laptop</span>
+                    <option value="pc">PC</option>
+                    <option value="audio">Audio</option>
+                    <option value="tv">TV</option>
+                    <option value="photography">Fotografia</option>
+                    <option value="console">Console</option>
+                    <option value="smartwatch">Smartwatch</option>
+                    <option value="accessories">Accessori</option>
                 </select>
             </form>
             <nav>
@@ -38,9 +46,9 @@
                                 <span>Benvenuto, {{$username}}</span>
                                 <a class=navButton href="/{{$app_folder}}/public/seller/{{$username}}">Visita la tua pagina</a>
                             </div>
-                            <div id=cart>
-                                <span>{{$numCarrello}}</span>
-                            </div>
+                            <a href="/{{$app_folder}}/public/cart" id=cart>
+                                <span>{{$cartItems}}</span>
+                            </a>
                         @else
                             <a href="/{{$app_folder}}/public/signup" class=navButton id=signupButton>Registrati</a>
                             <a href="/{{$app_folder}}/public/login" class=navButton>Accedi</a>

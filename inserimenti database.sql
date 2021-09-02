@@ -213,10 +213,9 @@ values('MSI GF63',1249,50,'laptop',1,'MSI',
 'https://m.media-amazon.com/images/I/719QyW89YDL._AC_SL1500_.jpg',
 'MSI GF63 Thin 10SC-054IT, Notebook Gaming FHD 15,6", 144Hz, Intel I7-10750H, Nvidia GTX 1650 Max-Q 4GB GDDR6, 16GB RAM DDR4, 512GB SS M.2 PCIe NVMe, WiFi 6 AX Win 10 Home');
 
-
-
-
-
+insert into user_product(user_id,product_id,wishlist,cart,bought) values(1,1,true,2,0);
+insert into user_product(user_id,product_id,wishlist,cart,bought) values(1,2,true,1,0);
+insert into user_product(user_id,product_id,wishlist,cart,bought) values(1,3,false,0,1);
 
 insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 
 values('MacBook Air','macbookair.png',1159,'Chip Apple M1 con CPU 8‑core, GPU 7‑core e Neural Engine 16‑core. 8GB di memoria unificata. Unità SSD da 256GB. Display Retina con True Tone. Magic Keyboard retroilluminata - Italiano. Touch ID. Trackpad Force Touch. Due porte Thunderbolt/USB.',true,false,1,'macbookair','Portatili');

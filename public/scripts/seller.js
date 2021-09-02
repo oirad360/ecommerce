@@ -171,7 +171,7 @@ function onJsonProducts(json){
         for(const item of json){
             const block=document.createElement('div')
             block.classList.add('block')
-            const title=document.createElement('h1')
+            const title=document.createElement('h3')
             title.innerText=item.title
             block.appendChild(title)
             const img=document.createElement('img')
@@ -181,7 +181,7 @@ function onJsonProducts(json){
             link.href=app_url+"/reviews/"+item.title
             link.appendChild(img)
             block.appendChild(link)
-            const price=document.createElement('p')
+            const price=document.createElement('span')
             price.innerText=item.price+"€"
             block.appendChild(price)
             const quantity=document.createElement('p')

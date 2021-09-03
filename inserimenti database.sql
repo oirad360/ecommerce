@@ -42,7 +42,7 @@ text varchar(255),
 stars integer not null,
 likes integer default 0,
 unique(user_id,product_id),
-data timestamp default current_timestamp
+date timestamp default current_timestamp
 )engine='InnoDB';
 
 create table like_review(
@@ -76,7 +76,11 @@ id integer primary key auto_increment,
 display varchar(255),
 flexDirection varchar(255),
 height varchar(255),
-width varchar(255)
+width varchar(255),
+borderColor varchar(255),
+borderWidth varchar(255),
+borderRadius varchar(255),
+backgroundColor varchar(255)
 )engine='InnoDB';
 
 create table childs(
@@ -95,7 +99,11 @@ display varchar(255),
 flexDirection varchar(255),
 height varchar(255),
 width varchar(255),
-margin varchar(255)
+margin varchar(255),
+borderColor varchar(255),
+borderWidth varchar(255),
+borderRadius varchar(255),
+backgroundColor varchar(255)
 )engine='InnoDB';
 
 create table users_layouts(

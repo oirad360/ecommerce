@@ -10,7 +10,7 @@ class User extends Model
 
     public function reviews()
     {
-        return $this->belongsToMany('Product','user_review');
+        return $this->belongsToMany('Product','reviews');
     }
     public function like()
     {

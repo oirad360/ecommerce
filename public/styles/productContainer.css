@@ -16,6 +16,19 @@
     text-align: center;
 }
 
+.block a{
+    text-decoration: none;
+    color: black;
+}
+.seller{
+    margin:3px;
+    color: black;
+    text-decoration: none;
+}
+.seller:hover{
+    text-decoration: underline;
+}
+
 .noBorderBottomRadius{
     border-bottom-left-radius:0px;
     border-bottom-right-radius:0px;

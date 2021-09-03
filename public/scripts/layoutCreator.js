@@ -26,6 +26,10 @@ class LayoutCreator {
     #fontUpdateBinded
     #sizeUpdateBinded
     #layoutHeightUpdateBinded
+    #borderColorUpdateBinded
+    #borderWidthUpdateBinded
+    #borderRadiusUpdateBinded
+    #backgroundColorUpdateBinded
     #marginUpdateBinded
     #flexDirectionUpdateBinded
     #deleteChildsBinded
@@ -90,6 +94,10 @@ class LayoutCreator {
 
         const labelsText=[
             "Modifica altezza layout (px):",
+            "Modifica colore di sfondo: ",
+            "Modifica colore del bordo: ",
+            "Modifica raggio del bordo (px): ",
+            "Modifica spessore del bordo (px): ",
             "Modifica larghezza (%):",
             "Modifica altezza (%):",
             "Modifica margine sup (px):",
@@ -106,6 +114,22 @@ class LayoutCreator {
                 "name":"layoutHeight",
                 "type":"number",
                 "min":0
+            },{
+                "name":"backgroundColor",
+                "type":"color",
+                "value":"#ffffff"
+            },{
+                "name":"borderColor",
+                "type":"color",
+                "value":"#ffffff"
+            },{
+                "min":0,
+                "name":"borderRadius",
+                "type":"number"
+            },{
+                "min":0,
+                "name":"borderWidth",
+                "type":"number"
             },{
                 "min":0,
                 "name":"width",
@@ -141,18 +165,18 @@ class LayoutCreator {
                 "value":2
             }
         ]
-        for(let i=0;i<11;i++){
+        for(let i=0;i<15;i++){
             const labels=document.createElement('label')
             labels.innerText=labelsText[i]
-            if(i<10){
+            if(i<14){
                 const input=document.createElement('input')
                 for(let key of Object.keys(inputsInfos[i])){
                     input[key]=inputsInfos[i][key]
                 }
                 labels.appendChild(input)
-                if(i===0) this.#formLayout.appendChild(labels)
-                else if(i>0 && i<7) this.#sizeCommands.appendChild(labels)
-                else if(i===7 || i===8) {
+                if(i<=4) this.#formLayout.appendChild(labels)
+                else if(i>4 && i<10) this.#sizeCommands.appendChild(labels)
+                else if(i===10 || i===11) {
                     labels.classList.add("titleCommand","hidden")
                     this.#splitCommands.appendChild(labels)
                 } else {
@@ -201,6 +225,11 @@ class LayoutCreator {
         this.#layoutContainer.dataset.gen=0
         this.#layoutContainer.style.flexShrink=0
         this.#layoutContainer.style.overflow="auto"
+        this.#layoutContainer.style.borderColor="#ffffff"
+        this.#layoutContainer.style.borderRadius="0px"
+        this.#layoutContainer.style.borderWidth="1px"
+        this.#layoutContainer.style.borderStyle="solid"
+        this.#layoutContainer.style.backgroundColor="#ffffff"
         
         this.#lastSelected=this.#layoutContainer
 
@@ -231,6 +260,18 @@ class LayoutCreator {
         this.#layoutHeightUpdateBinded=this.#layoutHeightUpdate.bind(this)
         this.#formLayout.layoutHeight.addEventListener('change',this.#layoutHeightUpdateBinded)
 
+        this.#borderColorUpdateBinded=this.#borderColorUpdate.bind(this)
+        this.#formLayout.borderColor.addEventListener('change',this.#borderColorUpdateBinded)
+
+        this.#borderWidthUpdateBinded=this.#borderWidthUpdate.bind(this)
+        this.#formLayout.borderWidth.addEventListener('change',this.#borderWidthUpdateBinded)
+
+        this.#borderRadiusUpdateBinded=this.#borderRadiusUpdate.bind(this)
+        this.#formLayout.borderRadius.addEventListener('change',this.#borderRadiusUpdateBinded)
+
+        this.#backgroundColorUpdateBinded=this.#backgroundColorUpdate.bind(this)
+        this.#formLayout.backgroundColor.addEventListener('change',this.#backgroundColorUpdateBinded)
+
         this.#marginUpdateBinded=this.#marginUpdate.bind(this)
         this.#formLayout.marginTop.addEventListener('change',this.#marginUpdateBinded)
         this.#formLayout.marginRight.addEventListener('change',this.#marginUpdateBinded)
@@ -243,6 +284,7 @@ class LayoutCreator {
         this.#deleteChildsBinded=this.#deleteChilds.bind(this)
         this.#deleteButton.addEventListener('click',this.#deleteChildsBinded)
 
+        this.#setBorderAndBackground(this.#lastSelected)
     }
     
     async loadLayout(layoutID,modify){//carica il layout per mostrarlo e ritorna il json per i contenuti
@@ -270,7 +312,7 @@ class LayoutCreator {
                 if(child.data_gen!==lastGen){
                     color=this.getRandomColor()
                 }
-                childNode.style.border="1px solid "+color
+                //childNode.style.border="1px solid "+color
                 lastGen=child.data_gen
                 childNode.dataset.gen=child.data_gen
                 childNode.dataset.id=child.data_id
@@ -279,6 +321,7 @@ class LayoutCreator {
                 for(let i=9;i<Object.keys(child).length;i++){
                     childNode.style[Object.keys(child)[i]]=child[Object.keys(child)[i]]
                 }
+                childNode.style.borderStyle="solid"
                 if(child.hasChilds==1) {
                     childNode.classList.add("hasChilds")
                 } else if(child.title) this.#setChild(childNode,child.title,child.fontSize.split('px')[0])
@@ -313,6 +356,10 @@ class LayoutCreator {
             "flexDirection": this.#layoutContainer.style.flexDirection,
             "height": this.#layoutContainer.style.height,
             "width": this.#layoutContainer.style.width,
+            "borderColor": this.#layoutContainer.style.borderColor,
+            "borderRadius": this.#layoutContainer.style.borderRadius,
+            "borderWidth": this.#layoutContainer.style.borderWidth,
+            "backgroundColor": this.#layoutContainer.style.backgroundColor,
             "childs": []
         }
         for(let i=1;i<=this.#gen;i++){
@@ -348,7 +395,11 @@ class LayoutCreator {
                     "flexDirection": child.style.flexDirection,
                     "height": child.style.height,
                     "width": child.style.width,
-                    "margin": child.style.margin
+                    "margin": child.style.margin,
+                    "borderColor": child.style.borderColor,
+                    "borderRadius": child.style.borderRadius,
+                    "borderWidth": child.style.borderWidth,
+                    "backgroundColor": child.style.backgroundColor,
                 })
             }
         }
@@ -492,39 +543,54 @@ class LayoutCreator {
     }
 
     #showSaveButton(){//mostra il bottone per salvare, è necessario averlo dentro ogni metodo della classe che apporta modifiche
-        this.#saveButton.classList.remove("hidden")
-        this.#saveButton.innerText=this.#saveButtonInnerText
-        this.#saved=false
+        if(this.#layoutContainer.querySelector(".child")){
+            this.#saveButton.classList.remove("hidden")
+            this.#saveButton.innerText=this.#saveButtonInnerText
+            this.#saved=false
+        }
     }
 
-    #setSize(lastSelected, formLayout){//è una funzione che chiamo ogni qualvolta voglio mostrare i campi per l'inserimento
+    #setSize(lastSelected){//è una funzione che chiamo ogni qualvolta voglio mostrare i campi per l'inserimento
         //della larghezza, altezza e margini che mostreranno inizialmente le dimensioni attuali del div selezionato
-    let lastSelectedFlexDirection=lastSelected.style.flexDirection
-    formLayout.flexDirection.value=lastSelectedFlexDirection
-    
-    formLayout.querySelector('#sizeCommands').classList.remove("hidden")
-    let lastSelectedWidth=lastSelected.style.width.substring(5,lastSelected.style.width.length)
-    lastSelectedWidth=lastSelectedWidth.split("%")[0]
-    formLayout.width.value=lastSelectedWidth
-    
-    let lastSelectedHeight=lastSelected.style.height.substring(5,lastSelected.style.height.length)
-    lastSelectedHeight=lastSelectedHeight.split("%")[0]
-    formLayout.height.value=lastSelectedHeight
-    
-    let lastSelectedMarginTop=parseInt(lastSelected.style.marginTop.split("%")[0])
-    formLayout.marginTop.value=lastSelectedMarginTop
-    
-    let lastSelectedMarginRight=parseInt(lastSelected.style.marginRight.split("%")[0])
-    formLayout.marginRight.value=lastSelectedMarginRight
-    
-    let lastSelectedMarginBottom=parseInt(lastSelected.style.marginBottom.split("%")[0])
-    formLayout.marginBottom.value=lastSelectedMarginBottom
-    
-    let lastSelectedMarginLeft=parseInt(lastSelected.style.marginLeft.split("%")[0])
-    formLayout.marginLeft.value=lastSelectedMarginLeft
-    
+        const lastSelectedFlexDirection=lastSelected.style.flexDirection
+        this.#formLayout.flexDirection.value=lastSelectedFlexDirection
+
+        this.#formLayout.querySelector('#sizeCommands').classList.remove("hidden")
+        let lastSelectedWidth=lastSelected.style.width.substring(5,lastSelected.style.width.length)
+        lastSelectedWidth=lastSelectedWidth.split("%")[0]
+        this.#formLayout.width.value=lastSelectedWidth
+
+        let lastSelectedHeight=lastSelected.style.height.substring(5,lastSelected.style.height.length)
+        lastSelectedHeight=lastSelectedHeight.split("%")[0]
+        this.#formLayout.height.value=lastSelectedHeight
+
+        const lastSelectedMarginTop=parseInt(lastSelected.style.marginTop.split("%")[0])
+        this.#formLayout.marginTop.value=lastSelectedMarginTop
+
+        const lastSelectedMarginRight=parseInt(lastSelected.style.marginRight.split("%")[0])
+        this.#formLayout.marginRight.value=lastSelectedMarginRight
+
+        const lastSelectedMarginBottom=parseInt(lastSelected.style.marginBottom.split("%")[0])
+        this.#formLayout.marginBottom.value=lastSelectedMarginBottom
+
+        const lastSelectedMarginLeft=parseInt(lastSelected.style.marginLeft.split("%")[0])
+        this.#formLayout.marginLeft.value=lastSelectedMarginLeft
     }
     
+    #setBorderAndBackground(lastSelected){
+        const lastSelectedBackgroundColor=lastSelected.style.backgroundColor
+        this.#formLayout.backgroundColor.value=lastSelectedBackgroundColor
+
+        const lastSelectedborderColor=lastSelected.style.borderColor
+        this.#formLayout.borderColor.value=lastSelectedborderColor
+        
+        const lastSelectedborderWidth=parseInt(lastSelected.style.borderWidth.split("px")[0])
+        this.#formLayout.borderWidth.value=lastSelectedborderWidth
+
+        const lastSelectedborderRadius=parseInt(lastSelected.style.borderRadius.split("px")[0])
+        this.#formLayout.borderRadius.value=lastSelectedborderRadius
+    }
+
     #setChild(child,titleText,titleSize){//è una funzione che chiamo ogni qualvolta voglio inserire titolo e sezione in un div
         child.style.display="flex"
         child.style.flexDirection="column"
@@ -543,13 +609,14 @@ class LayoutCreator {
         this.#addChildButton.classList.add("hidden")
         this.#removeChildButton.classList.add("hidden")
         if(this.#lastSelected!==this.#layoutContainer)this.#lastSelected.style.borderStyle="solid"
-        else this.#lastSelected.style.borderStyle=""
+        else this.#lastSelected.style.borderStyle="solid"
         this.#lastSelected=event.currentTarget
         const gen=this.#lastSelected.dataset.gen
         if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) this.#removeChildButton.classList.remove("hidden")
         else this.#removeChildButton.classList.add("hidden")
         this.#lastSelected.style.borderStyle="dashed"
-        this.#setSize(this.#lastSelected, this.#formLayout)
+        this.#setSize(this.#lastSelected)
+        this.#setBorderAndBackground(this.#lastSelected)
         this.#levelButton.classList.remove("hidden")
         this.#titleCommands[0].classList.remove("hidden")
         this.#titleCommands[1].classList.remove("hidden")
@@ -586,9 +653,14 @@ class LayoutCreator {
             child.dataset.parent_gen=this.#lastSelected.dataset.gen
             child.dataset.parent_id=this.#lastSelected.dataset.id
             child.style.margin="1px"
-            child.style.border="1px solid "+color
+            child.style.borderColor=color
+            child.style.borderWidth="1px"
+            child.style.borderStyle="solid"
+            child.style.borderRadius="0px"
             child.style.flexShrink="0"
             child.style.overflow="auto"
+            child.style.backgroundColor="#ffffff"
+            child.style.borderRadius="0px"
             const size1="calc("+100/N+"% - 4px)"//sottraggo dalla percentuale la quantità 2*(larghezzaMargine+larghezzaBordo)
             const size2="calc("+100+"% - 4px)"
             if(this.#formLayout.flexDirection.value.split("-")[0]==="row"){
@@ -617,8 +689,9 @@ class LayoutCreator {
         const gen=this.#lastSelected.dataset.gen
         if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) this.#removeChildButton.classList.remove("hidden")
         else this.#removeChildButton.classList.add("hidden")
+        this.#setBorderAndBackground(this.#lastSelected)
         if(this.#lastSelected!==this.#layoutContainer) {
-            this.#setSize(this.#lastSelected, this.#formLayout)
+            this.#setSize(this.#lastSelected)
         }else{
             const lastSelectedFlexDirection=this.#lastSelected.style.flexDirection
             this.#formLayout.flexDirection.value=lastSelectedFlexDirection
@@ -640,6 +713,26 @@ class LayoutCreator {
     #layoutHeightUpdate(event){
         this.#showSaveButton()
         this.#layoutContainer.style.height=event.currentTarget.value+"px"
+    }
+
+    #borderColorUpdate(){
+        this.#showSaveButton()
+        this.#lastSelected.style.borderColor=this.#formLayout.borderColor.value
+    }
+
+    #borderWidthUpdate(){
+        this.#showSaveButton()
+        this.#lastSelected.style.borderWidth=this.#formLayout.borderWidth.value+"px"
+    }
+
+    #borderRadiusUpdate(){
+        this.#showSaveButton()
+        this.#lastSelected.style.borderRadius=this.#formLayout.borderRadius.value+"px"
+    }
+
+    #backgroundColorUpdate(){
+        this.#showSaveButton()
+        this.#lastSelected.style.backgroundColor=this.#formLayout.backgroundColor.value
     }
     
     #marginUpdate(){//aggiorna le dimensioni dei margini del div selezionato
@@ -709,9 +802,13 @@ class LayoutCreator {
         child.dataset.parent_gen=this.#lastSelected.dataset.gen
         child.dataset.parent_id=this.#lastSelected.dataset.id
         child.style.margin="1px"
-        child.style.border="1px solid "+this.#lastSelected.childNodes[1].style.borderColor
+        child.style.borderColor=this.#lastSelected.childNodes[1].style.borderColor
+        child.style.borderWidth="1px"
+        child.style.borderStyle="solid"
+        child.style.borderRadius="0px"
         child.style.flexShrink="0"
         child.style.overflow="auto"
+        child.style.backgroundColor="#ffffff"
         const N=this.#lastSelected.childNodes.length+1
         const size1="calc("+100/N+"% - 4px)"//sottraggo dalla percentuale la quantità 2*(larghezzaMargine+larghezzaBordo)
         const size2="calc("+100+"% - 4px)"
@@ -755,6 +852,7 @@ class LayoutCreator {
         if(!this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"] && this.#lastSelected!==this.#layoutContainer) this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]=[]
         if(this.#lastSelected!==this.#layoutContainer)this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"]=[]
         this.#lastSelected.classList.remove("hasChilds")
+        this.#setBorderAndBackground(this.#lastSelected)
         if(this.#counter.innerText==0){
             this.#saveButton.classList.add("hidden")
             this.#titleCommands[0].classList.add("hidden")
@@ -768,7 +866,7 @@ class LayoutCreator {
             this.#formLayout.fontSize.value=24
             this.#titleCommands[0].classList.remove("hidden")
             this.#titleCommands[1].classList.remove("hidden")
-            this.#setSize(this.#lastSelected, this.#formLayout)
+            this.#setSize(this.#lastSelected)
         }
         this.#deleteButton.classList.add("hidden")
         this.#splitCommands.classList.remove("hidden")

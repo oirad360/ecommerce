@@ -161,4 +161,39 @@ class SellerController extends BaseController{
             $newContent=array();
         }
     }
+    public function fetchReviews($seller){
+        $userID=User::where('username',$seller)->first()->id;
+        $products=User::find($userID)->reviews;
+        $reviews=[];
+        if($products){
+            foreach($products as $product){
+                $info=Review::where('product_id',$product->id)->where('user_id',$userID)->first();
+                $info['title']=$product->title;
+                $info['seller']=$product->user->username;
+                $row=LikeReview::where('user_id',session('id'))->where('review_id',$info['id'])->first();
+                if(isset($row)){
+                    $info["youLike"]=true;
+                }
+                $reviews[]=$info;
+            }
+        }
+        return $reviews;
+    }
+    public function deleteReview($id){
+        $review=Review::find($id);
+        $review->delete();
+    }
+    public function fetchPurchases(){
+        $products=User::find(session('id'))->user_product;
+        $purchases=[];
+        foreach($products as $product){
+            $row=UserProduct::where('user_id',session('id'))->where('product_id',$product['id'])->first();
+            if($row->bought>0){
+                $product['tot']=$row->bought;
+                $product['seller']=User::find($product->user_id)->username;
+                $purchases[]=$product;
+            }
+        }
+        return $purchases;
+    }
 }

@@ -70,26 +70,22 @@ function onProducts(products){
             parentBlock.appendChild(block)
             parentBlock.appendChild(desc)
             parentBlock.dataset.product_id=product.id
-            main.appendChild(parentBlock)
+            if(product.soonAvailables==1){
+                soonAvailables.parentNode.classList.remove("hidden")
+                soonAvailables.appendChild(parentBlock)
+            } else main.appendChild(parentBlock)
             productsList.push(parentBlock)
             if(!profile) {
                 cartButton.classList.add("hidden")
                 wishlistButton.classList.add("hidden")
             }
+            if(product.quantity==0) cartButton.classList.add("hidden")
             if(product.wishlist==1){
                 const clone=parentBlock.cloneNode(true)
                 clone.querySelector('.descButton').addEventListener('click',showDesc)
                 clone.childNodes[0].childNodes[2].childNodes[0].addEventListener('click',addWishlist)
                 clone.querySelector('.addCart').addEventListener('click',addCart)
                 wishlist.appendChild(clone)
-            }
-            if(product.soonAvailables==1){
-                soonAvailables.parentNode.classList.remove("hidden")
-                const clone=parentBlock.cloneNode(true)
-                clone.querySelector('.descButton').addEventListener('click',showDesc)
-                clone.childNodes[0].childNodes[2].childNodes[0].addEventListener('click',addWishlist)
-                clone.querySelector('.addCart').addEventListener('click',addCart)
-                soonAvailables.appendChild(clone)
             }
             if(product.lastAvailables==1){
                 lastAvailables.parentNode.classList.remove("hidden")
@@ -130,11 +126,12 @@ function showDesc(event){
 
 function addCart(event){
     fetch(app_url+"/addCart/"+event.currentTarget.parentNode.parentNode.dataset.product_id+"/true").then(function(response){
-        if(response.ok){
-            const num=document.querySelector('#cart span')
-            num.innerText=parseInt(num.innerText)+1
-        }
+        return response.text()
+    }).then(function(text){
+        const num=document.querySelector('#cart span')
+        num.innerText=parseInt(num.innerText)+parseInt(text)
     })
+    
 }
 
 function addWishlist(event){

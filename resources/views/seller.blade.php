@@ -3,6 +3,7 @@
 @section('style')
 <link rel=stylesheet href=/{{$app_folder}}/public/styles/productContainer.css>
 <link rel=stylesheet href=/{{$app_folder}}/public/styles/sectionSeller.css>
+<link rel=stylesheet href=/{{$app_folder}}/public/styles/reviews.css>
 @endsection
 
 @section('scripts')
@@ -16,8 +17,11 @@
 <section id=mainSection>
     <h1>Pagina di {{$seller}}</h1>
     @if(isset($yourPage))
+    <h3 class=hidden id=yourPurchases>I tuoi acquisti</h3>
+    <div class=productContainer id=yourPurchasesContainer>
+    </div>
     <h3 id=yourProducts>I tuoi prodotti</h3>
-    <div class=productContainer>
+    <div class=productContainer id=yourProductsContainer>
     </div>
     <button id=quitModifyProduct class=hidden>Annulla</button>
     <button id=newProductButton>Inserisci un nuovo prodotto</button>
@@ -68,5 +72,7 @@
     <button id=addContentButton class=hidden>Aggiungi al layout</button>
     <button id=removeContentButton class=hidden>Rimuovi dal layout</button>
     @endif
+    <h3 id=reviewTitle class=hidden>Recensioni pubblicate da {{$seller}}</h3>
+    <div id=reviews></div>
 </section>
 @endsection

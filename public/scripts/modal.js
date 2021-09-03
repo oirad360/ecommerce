@@ -21,14 +21,10 @@ function onThumbnailClick(event) {
 }
 
 function onLikeClick(event){
-    const tipo=document.querySelector("section").dataset.tipo
     let id
-    if(tipo==="profilo"){
-        id=event.currentTarget.parentNode.parentNode.parentNode.dataset.id
-    }else{
-        id=event.currentTarget.parentNode.parentNode.dataset.id
-    }
-    fetch(app_url+"/fetchUtentiLike/"+id).then(onResponse).then(onJsonUtentiLike)
+    if(document.querySelector("#mainSection").dataset.product_id) id=event.currentTarget.parentNode.parentNode.dataset.id
+    else id=event.currentTarget.parentNode.parentNode.parentNode.dataset.id
+    fetch(app_url+"/fetchLikes/"+id).then(onResponse).then(onJsonUtentiLike)
 }
 
 function onJsonUtentiLike(json){ //ottengo tutti gli utenti che hanno messo like alla recensione clickata
@@ -40,7 +36,7 @@ function onJsonUtentiLike(json){ //ottengo tutti gli utenti che hanno messo like
         for(item of json){
             likeContainer.classList.add("likeContainer")
             const user=document.createElement('div')
-            user.classList.add('user')
+            user.classList.add('profile')
             const propic=document.createElement('div')
             propic.classList.add('propic')
             if(item.propic==="defaultAvatar.jpg"){
@@ -50,15 +46,8 @@ function onJsonUtentiLike(json){ //ottengo tutti gli utenti che hanno messo like
             }
             user.appendChild(propic)
             const link=document.createElement('a')
-            link.href=app_url+"/profiloEsterno/"+item.username
-            const username=document.createElement('p')
-            username.innerText=item.username
-            link.appendChild(username)
-            if(item.impiego){
-                const impiego=document.createElement('p')
-                impiego.innerText=item.impiego
-                link.appendChild(impiego)
-            }
+            link.href=app_url+"/seller/"+item.username
+            link.innerText=item.username
             user.appendChild(link)
             likeContainer.appendChild(user)
             modalView.appendChild(likeContainer)

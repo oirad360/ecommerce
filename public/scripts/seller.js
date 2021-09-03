@@ -118,7 +118,7 @@ function newProduct(event){
             if(response.ok) fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(function(json){
                 onJsonProducts(json)
                 if(newProductForm.productID.value && layoutContainer){
-                    const product=document.querySelector('.productContainer').querySelector("[data-product_id=\'"+newProductForm.productID.value+"\']")
+                    const product=document.querySelector('#yourProductsContainer').querySelector("[data-product_id=\'"+newProductForm.productID.value+"\']")
                     const products=layoutContainer.querySelectorAll("[data-product_id=\'"+newProductForm.productID.value+"\']")
                     if(products) for(const item of products){
                         item.childNodes[0].dataset.producer=product.childNodes[0].dataset.producer
@@ -161,7 +161,7 @@ function onJsonProducts(json){
     }else if(json.length>0){
         let container
         if(newProductForm){
-            container=document.querySelector('.productContainer')
+            container=document.querySelector('#yourProductsContainer')
             container.innerHTML=""
             newProductForm.classList.add("hidden")
             newProductButton.classList.remove("hidden")
@@ -178,7 +178,7 @@ function onJsonProducts(json){
             if(item.image.substring(0,4)==="http") img.src=item.image
             else img.src=app_url+"/assets/"+item.image
             const link=document.createElement('a')
-            link.href=app_url+"/reviews/"+item.title
+            link.href=app_url+"/reviews/"+item.id
             link.appendChild(img)
             block.appendChild(link)
             const price=document.createElement('span')
@@ -256,13 +256,13 @@ function onLayouts(layouts){
     }
     if(!newProductForm && !layoutID){
         const msg=document.createElement('p')
-        msg.innerText="Nessun risultato trovato"
+        msg.innerText="Nessun prodotto in esposizione"
         section.appendChild(msg)
     } else if(!newProductForm && layoutID) {
         layoutCreator=new LayoutCreator()
         layoutCreator.loadLayout(layoutID).then(onJsonContent)
         layoutContainer=layoutCreator.getLayoutContainer()
-        section.appendChild(layoutContainer)
+        section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
     }else if(newProductForm && layouts.length>0){
         activeButton.classList.remove("hidden")
         const idContainer=document.querySelector('#layouts')
@@ -291,8 +291,8 @@ function onLayouts(layouts){
         layoutMenu=layoutCreator.getLayoutMenu()
         layoutContainer=layoutCreator.getLayoutContainer()
         modifyLayoutButton.classList.remove('hidden')
-        section.appendChild(layoutMenu)
-        section.appendChild(layoutContainer)
+        section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
+        section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
         layoutMenu.classList.add("hidden")
     }
 }
@@ -309,8 +309,8 @@ function newLayout(event){
     layoutCreator=new LayoutCreator(saveButton,"600px","100%")
     layoutMenu=layoutCreator.getLayoutMenu()
     layoutContainer=layoutCreator.getLayoutContainer()
-    section.appendChild(layoutMenu)
-    section.appendChild(layoutContainer)
+    section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
+    section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
     event.currentTarget.innerText="Annulla"
     event.currentTarget.addEventListener('click',quit)
     event.currentTarget.removeEventListener('click',newLayout)
@@ -438,7 +438,7 @@ function quit(event){
     modifyFlag=false
     productsToInsert=[]
     productsToRemove=[]
-    const products=document.querySelector('.productContainer').querySelectorAll('div')
+    const products=document.querySelector('#yourProductsContainer').querySelectorAll('div')
     if(products)for(const product of products) product.style.border=""
     addContentButton.classList.add("hidden")
     removeContentButton.classList.add("hidden")
@@ -472,7 +472,7 @@ function quit(event){
 function select(event){
     if(modifyFlag){
         let list
-        const productContainer=document.querySelector('.productContainer')
+        const productContainer=document.querySelector('#yourProductsContainer')
         if(event.currentTarget.parentNode===productContainer) list=productsToInsert
         else list=productsToRemove
         if(!list.includes(event.currentTarget)){
@@ -626,7 +626,7 @@ function deleteProduct(event){
 }
 
 function onJsonContent(content){
-    const productContainer=document.querySelector('.productContainer')
+    const productContainer=document.querySelector('#yourProductsContainer')
     for(const gen of Object.keys(content)){
         for(const id of Object.keys(content[gen])){
             const genn=gen.substring(11,gen.length-2)
@@ -657,6 +657,139 @@ function onJsonContent(content){
     }
 }
 
+
+function onReviews(json){
+    const container=document.querySelector("#reviews")
+    container.innerHTML=""
+    const reviewTitle=document.querySelector('#reviewTitle')
+    if(json.length>0){
+        reviewTitle.classList.remove("hidden")
+        for(item of json){
+            const blocco=document.createElement('div')
+            blocco.dataset.id=item.id
+            blocco.classList.add("review")
+            const riga=document.createElement('div')
+            riga.classList.add("row")
+            const prodotto=document.createElement('a')
+            prodotto.classList.add("productTitle")
+            prodotto.innerText=item.title
+            prodotto.href=app_url+"/reviews/"+item.product_id
+            riga.appendChild(prodotto)
+            const data=document.createElement('p')
+            data.innerText=item.data
+            riga.appendChild(data)
+            blocco.appendChild(riga)
+            const seller=document.createElement('a')
+            seller.innerText="Venditore: "+item.seller
+            seller.href=app_url+"/seller/"+item.seller
+            seller.classList.add('seller')
+            blocco.appendChild(seller)
+            const voto=document.createElement('img')
+            voto.classList.add("rating")
+            voto.src=app_url+"/assets/"+item.stars+".png"
+            blocco.appendChild(voto)
+            const descrizione=document.createElement('p')
+            descrizione.innerText=item.text
+            blocco.appendChild(descrizione)
+            const bloccoLike=document.createElement('div')
+            bloccoLike.classList.add("likeBlock")
+            if(document.querySelector('.profileContainer')){
+                const bottoneLike=document.createElement('div')
+                if(item.youLike){
+                    bottoneLike.classList.add('dislikeButton')
+                    bottoneLike.addEventListener('click',dislike)
+                } else {
+                    bottoneLike.classList.add('likeButton')
+                    bottoneLike.addEventListener('click',like)
+                }
+                bloccoLike.appendChild(bottoneLike)
+            }
+            const numLike=document.createElement('span')
+            if(item.likes===1){
+                numLike.innerText=item.likes+" utente ha trovato utile questa recensione"
+            } else {
+                numLike.innerText=item.likes+" utenti hanno trovato utile questa recensione"
+            }
+            if(item.likes!==0){
+                numLike.addEventListener('click', onLikeClick)
+                numLike.classList.add("hover")
+            }
+            bloccoLike.appendChild(numLike)
+            const riga1=document.createElement('div')
+            riga1.classList.add('row')
+            riga1.appendChild(bloccoLike)
+            if(newProductForm){
+                const bottoneEliminaRecensione=document.createElement('span')
+                bottoneEliminaRecensione.classList.add('deleteReviewButton')
+                bottoneEliminaRecensione.innerText="Elimina recensione"
+                bottoneEliminaRecensione.addEventListener('click',deleteReview)
+                riga1.appendChild(bottoneEliminaRecensione)
+            }
+            blocco.appendChild(riga1)
+            container.appendChild(blocco)
+        }
+    } else reviewTitle.classList.add("hidden")
+}
+
+function like(event){
+    const id=event.currentTarget.parentNode.parentNode.parentNode.dataset.id
+    fetch(app_url+"/like/"+id).then(function(response){
+        if(response.ok){
+            fetch(app_url+"/seller/"+seller+"/fetchReviews").then(onResponse).then(onReviews)
+        }
+    })
+}
+function dislike(event){
+    const id=event.currentTarget.parentNode.parentNode.parentNode.dataset.id
+    fetch(app_url+"/dislike/"+id).then(function(response){
+        if(response.ok){
+            fetch(app_url+"/seller/"+seller+"/fetchReviews").then(onResponse).then(onReviews)
+        }
+    })
+}
+
+function deleteReview(event){
+    const id=event.currentTarget.parentNode.parentNode.dataset.id
+    fetch(app_url+"/deleteReview/"+id).then(function(response){
+        if(response.ok){
+            fetch(app_url+"/seller/"+seller+"/fetchReviews").then(onResponse).then(onReviews)
+        }
+    })
+}
+
+function onPurchases(purchases){
+    const purchasesTitle=document.querySelector("#yourPurchases")
+    if(purchases.length>0){
+        purchasesTitle.classList.remove("hidden")
+        const container=document.querySelector("#yourPurchasesContainer")
+        for(item of purchases){
+            const blocco=document.createElement('div')
+            blocco.classList.add('block')
+            const titolo=document.createElement('h3')
+            titolo.innerText=item.title
+            blocco.appendChild(titolo)
+            const img=document.createElement('img')
+            if(item.image.substring(0,4)==="http") img.src=item.image
+            else img.src=app_url+"/assets/"+item.image
+            const link=document.createElement('a')
+            link.href=app_url+"/reviews/"+item.id
+            link.appendChild(img)
+            blocco.appendChild(link)
+            const quantita=document.createElement('p')
+            quantita.innerText="Quantità: "+item.tot
+            blocco.appendChild(quantita)
+            const seller=document.createElement('a')
+            seller.innerText="Venditore: "+item.seller
+            seller.href=app_url+"/seller/"+item.seller
+            seller.classList.add('seller')
+            blocco.appendChild(seller)
+            container.appendChild(blocco)
+        }
+    } else {
+        purchasesTitle.classList.add("hidden")
+    }
+}
+
 let saveButton=document.createElement('button')
 saveButton.addEventListener('click', saveLayout)
 saveButton.innerText="Salva"
@@ -682,7 +815,9 @@ const quitModifyProductButton=document.querySelector('#quitModifyProduct')
 const title=document.querySelector('h1').innerText
 const seller=title.substring(10,title.length)
 fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
+fetch(app_url+"/seller/"+seller+"/fetchReviews").then(onResponse).then(onReviews)
 if(newProductForm){
+    fetch(app_url+"/fetchPurchases").then(onResponse).then(onPurchases)
     newProductButton.addEventListener('click',showForm)
     newProductForm.title.addEventListener('blur',check)
     newProductForm.price.addEventListener('blur',check)

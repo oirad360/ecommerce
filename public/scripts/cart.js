@@ -81,7 +81,7 @@ function buy(){
     fetch(app_url+"/cart/buy").then(function(response){
         if(response.ok){
             const title=document.querySelector('#description').innerText
-            const username=title.substring(11,title.length)
+            const username=title.substring(12,title.length)
             window.location.replace(app_url+"/seller/"+username)
         }
     })

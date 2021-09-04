@@ -30,7 +30,9 @@ Route::get('logout', 'LoginController@logout');
 Route::get('home', 'HomeController@home');
 Route::get('home/fetchProducts', 'HomeController@fetchProducts');
 
+Route::post('searchProducts', 'HomeController@searchProducts');
 Route::get('addWishlist/{productID}/{val}', 'HomeController@addWishlist');
+Route::get('search', 'SearchController@search');
 
 Route::get('seller/{seller}', 'SellerController@seller');
 Route::get('seller/{seller}/fetchReviews', 'SellerController@fetchReviews');

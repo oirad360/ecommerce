@@ -21,23 +21,25 @@
     <body>
         <header>
             <img id=navOpen src=/{{$app_folder}}/public/assets/menuButton.png>
-            <form class=menuSearch name=searchProducts method=POST>
-                <input type='hidden' name='_token' value='{{ $csrf_token }}'>
-                <input type="submit" value=""/>
-                <input type="text" placeholder='Cerca un prodotto'>
-                <select name=categories>
-                    <option value="all">Tutte le categorie</option>
-                    <option value="smartphone">Smartphones</option>
-                    <option value="laptop">Laptop</span>
-                    <option value="pc">PC</option>
-                    <option value="audio">Audio</option>
-                    <option value="tv">TV</option>
-                    <option value="photography">Fotografia</option>
-                    <option value="console">Console</option>
-                    <option value="smartwatch">Smartwatch</option>
-                    <option value="accessories">Accessori</option>
-                </select>
-            </form>
+            <div class=searchBox >
+                <form class=menuSearch name=searchProducts method=GET action="/{{$app_folder}}/public/search">
+                    <input type="submit" value=""/>
+                    <input name=q type="text" placeholder='Cerca un prodotto'>
+                    <select name=c>
+                        <option value="all">Tutte le categorie</option>
+                        <option value="smartphone">Smartphones</option>
+                        <option value="laptop">Laptop</span>
+                        <option value="pc">PC</option>
+                        <option value="audio">Audio</option>
+                        <option value="tv">TV</option>
+                        <option value="photography">Fotografia</option>
+                        <option value="console">Console</option>
+                        <option value="smartwatch">Smartwatch</option>
+                        <option value="accessories">Accessori</option>
+                    </select>
+                </form>
+                <div class="searchResults hidden" ></div>
+            </div>
             <nav>
                 <div id=navMain>
                     <div class=buttonContainer>
@@ -54,23 +56,7 @@
                             <a href="/{{$app_folder}}/public/login" class=navButton>Accedi</a>
                         @endif
                     </div>
-                    <form name=searchProducts method=POST>
-                        <input type='hidden' name='_token' value='{{ $csrf_token }}'>
-                        <input type="submit" value=""/>
-                        <input type="text" placeholder='Cerca un prodotto'>
-                        <select name=categories>
-                            <option value="all">Tutte le categorie</option>
-                            <option value="smartphone">Smartphones</option>
-                            <option value="laptop">Laptop</span>
-                            <option value="pc">PC</option>
-                            <option value="audio">Audio</option>
-                            <option value="tv">TV</option>
-                            <option value="photography">Fotografia</option>
-                            <option value="console">Console</option>
-                            <option value="smartwatch">Smartwatch</option>
-                            <option value="accessories">Accessori</option>
-                        </select>
-                    </form>
+                    
                     <a href=/{{$app_folder}}/public/home>
                         <img src=/{{$app_folder}}/public/assets/home.png id=homeButton />
                     </a>

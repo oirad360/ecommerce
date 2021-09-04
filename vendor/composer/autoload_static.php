@@ -4334,6 +4334,7 @@ class ComposerStaticInitbc731169ade49d21f332ff232f3e6760
         'ReturnTypeWillChange' => __DIR__ . '/..' . '/symfony/polyfill-php81/Resources/stubs/ReturnTypeWillChange.php',
         'Review' => __DIR__ . '/../..' . '/app/Models/Review.php',
         'ReviewsController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReviewsController.php',
+        'SearchController' => __DIR__ . '/../..' . '/app/Http/Controllers/SearchController.php',
         'SebastianBergmann\\CliParser\\AmbiguousOptionException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/AmbiguousOptionException.php',
         'SebastianBergmann\\CliParser\\Exception' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/Exception.php',
         'SebastianBergmann\\CliParser\\OptionDoesNotAllowArgumentException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/OptionDoesNotAllowArgumentException.php',

@@ -67,6 +67,22 @@ class HomeController extends BaseController{
             $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->where('wishlist',false)->where('cart',0)->where('bought',0)->first();
             if(isset($row)) $row->delete();
         }
-        
+    }
+
+    public function searchProducts(){
+        $results=array();
+        $text=request('q');
+        if(request('c')==="all") $results=Product::where('title','like',"%$text%")->orWhere('description','like',"%$text%")->get();
+        else {
+            $products=Product::where('category',request("c"))->get();
+            foreach($products as $product){
+                if(str_contains(strtolower($product["title"]),strtolower($text)) || str_contains(strtolower($product["description"]),strtolower($text)))
+                $results[]=$product;
+            }
+        }
+        foreach($results as $result){
+            $result["seller"]=User::find($result["user_id"])->username;
+        }
+        return $results;
     }
 }

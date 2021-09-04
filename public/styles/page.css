@@ -13,6 +13,9 @@ header{
     background-size: cover;
     background-position: center;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 nav{
@@ -44,9 +47,6 @@ nav{
     display: none;
 }
 
-form[name=searchProducts].menuSearch{
-    display: none;
-}
 
 #navMain{
     display: flex;
@@ -153,7 +153,7 @@ form[name=searchProducts] input[type=submit]:hover{
     background-color: rgb(189, 189, 189);
 }
 
-select[name=categories]{
+select[name=c]{
     height: 40px;
     margin: 0px;
     border:0px solid white;
@@ -162,8 +162,42 @@ select[name=categories]{
     border-bottom-right-radius: 10px;
 }
 
-select[name=categories]:hover{
+select[name=c]:hover{
     background-color: rgb(145, 145, 145);
+}
+
+.searchBox{
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top:17px;
+    z-index: 2;
+}
+
+.searchResults{
+    background-color: white;
+    border-radius: 2px;
+    border: 1px solid black;
+    position: fixed;
+    width: 420px;
+    top: 57px;
+}
+
+
+
+.result{
+    padding: 5px 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 4px);
+    font-size: 1rem;
+    color:black;
+    text-decoration: none;
+}
+
+.result:hover{
+    background-color: rgba(0, 0, 0, 0.082);
 }
 
 #contactsButton{
@@ -246,7 +280,6 @@ footer p{
     header{
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
     }
     
@@ -262,21 +295,25 @@ footer p{
         margin-right: 10px;
     }
 
-    form[name=searchProducts].menuSearch{
-        display: flex;
+    .searchBox{
+        position: absolute;
+        top: 150px;
+        z-index: 1;
+    }
 
+    .searchResults{
+        position: absolute;
+        top: 40px;
     }
     #navOpen{
         display: block;
         transition: 0.5s;
     }
-    form[name=searchProducts]{
-        display: none;
-    }
+
     #navMain{
         margin-top: 80px;
     }
-    #navMain,#navCategories,.buttonContainer,.profileContainer{
+    #navMain,.buttonContainer,.profileContainer{
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -287,6 +324,13 @@ footer p{
     }
     #navCategories{
         overflow: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #navCategories span{
+        margin: 0px 10px 20px 30px;
+        font-size: 1.7rem;
     }
     #homeButton{
         margin: 10px 0px 0px 0px;
@@ -297,7 +341,7 @@ footer p{
     form[name=searchProducts] input[type=text]{
         width:200px;
     }
-    select[name=categories]{
+    select[name=c]{
         width: 100px;
     }
     header{
@@ -306,7 +350,12 @@ footer p{
     #navOpen{
         max-width: 55px;
     }
-
+    .searchBox{
+        top: 100px;
+    }
+    .searchResults{
+        width:342px;
+    }
     footer{
         flex-direction: column;
         align-items: center;

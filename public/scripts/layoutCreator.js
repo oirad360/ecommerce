@@ -175,8 +175,8 @@ class LayoutCreator {
                 }
                 labels.appendChild(input)
                 if(i<=4) this.#formLayout.appendChild(labels)
-                else if(i>4 && i<10) this.#sizeCommands.appendChild(labels)
-                else if(i===10 || i===11) {
+                else if(i>4 && i<11) this.#sizeCommands.appendChild(labels)
+                else if(i===11 || i===12) {
                     labels.classList.add("titleCommand","hidden")
                     this.#splitCommands.appendChild(labels)
                 } else {
@@ -225,9 +225,10 @@ class LayoutCreator {
         this.#layoutContainer.dataset.gen=0
         this.#layoutContainer.style.flexShrink=0
         this.#layoutContainer.style.overflow="auto"
-        this.#layoutContainer.style.borderColor="#ffffff"
+        this.#layoutContainer.style.borderColor="#000000"
         this.#layoutContainer.style.borderRadius="0px"
-        this.#layoutContainer.style.borderWidth="1px"
+        this.#layoutContainer.style.borderWidth="0px"
+        this.#layoutContainer.dataset.noBorder=true
         this.#layoutContainer.style.borderStyle="solid"
         this.#layoutContainer.style.backgroundColor="#ffffff"
         
@@ -297,7 +298,6 @@ class LayoutCreator {
                 }
             }
             this.#content=json["content"]
-            
             this.#layoutContainer.dataset.layout=layoutID
             this.#layoutContainer.classList.add("hasChilds")
             this.#layoutContainer.innerHTML=""
@@ -312,7 +312,6 @@ class LayoutCreator {
                 if(child.data_gen!==lastGen){
                     color=this.getRandomColor()
                 }
-                //childNode.style.border="1px solid "+color
                 lastGen=child.data_gen
                 childNode.dataset.gen=child.data_gen
                 childNode.dataset.id=child.data_id
@@ -322,6 +321,8 @@ class LayoutCreator {
                     childNode.style[Object.keys(child)[i]]=child[Object.keys(child)[i]]
                 }
                 childNode.style.borderStyle="solid"
+                if(childNode.style.borderWidth==="0px") childNode.dataset.noBorder=true
+                else childNode.dataset.noBorder=false
                 if(child.hasChilds==1) {
                     childNode.classList.add("hasChilds")
                 } else if(child.title) this.#setChild(childNode,child.title,child.fontSize.split('px')[0])
@@ -366,6 +367,7 @@ class LayoutCreator {
             const childs=this.#layoutContainer.querySelectorAll(".child[data-gen=\'"+i+"\']")
             let fontSize,title
             for(let child of childs){
+                let content
                 if(child.classList.contains("hasChilds")){
                     title=null
                     fontSize=null
@@ -373,15 +375,15 @@ class LayoutCreator {
                     title=child.childNodes[0].innerText
                     if(title) fontSize=child.childNodes[0].style.fontSize
                     else fontSize=null
-                }
-                let content
-                if(!child.classList.contains("hasChilds")){
                     if(!this.#content["[data-gen=\'"+child.dataset.gen+"\']"]["[data-id=\'"+child.dataset.id+"\']"]){
                         content=[]
                     } else {
                         content=this.#content["[data-gen=\'"+child.dataset.gen+"\']"]["[data-id=\'"+child.dataset.id+"\']"]
                     }
                 }
+                let borderWidth
+                if(child.dataset.noBorder==="true") borderWidth="0px"
+                else borderWidth=child.style.borderWidth
                 data.childs.push({
                     "data_gen": child.dataset.gen,
                     "data_id": child.dataset.id,
@@ -398,7 +400,7 @@ class LayoutCreator {
                     "margin": child.style.margin,
                     "borderColor": child.style.borderColor,
                     "borderRadius": child.style.borderRadius,
-                    "borderWidth": child.style.borderWidth,
+                    "borderWidth": borderWidth,
                     "backgroundColor": child.style.backgroundColor,
                 })
             }
@@ -608,13 +610,14 @@ class LayoutCreator {
     #select(event){//è la funzione che mi permette di selezionare il div che clicco
         this.#addChildButton.classList.add("hidden")
         this.#removeChildButton.classList.add("hidden")
-        if(this.#lastSelected!==this.#layoutContainer)this.#lastSelected.style.borderStyle="solid"
-        else this.#lastSelected.style.borderStyle="solid"
+        this.#lastSelected.style.borderStyle="solid"
+        if(this.#lastSelected.dataset.noBorder==="true") this.#lastSelected.style.borderWidth="0px"
         this.#lastSelected=event.currentTarget
         const gen=this.#lastSelected.dataset.gen
         if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) this.#removeChildButton.classList.remove("hidden")
         else this.#removeChildButton.classList.add("hidden")
         this.#lastSelected.style.borderStyle="dashed"
+        if(this.#lastSelected.style.borderWidth==="0px") this.#lastSelected.style.borderWidth="1px"
         this.#setSize(this.#lastSelected)
         this.#setBorderAndBackground(this.#lastSelected)
         this.#levelButton.classList.remove("hidden")
@@ -685,6 +688,7 @@ class LayoutCreator {
         this.#addChildButton.classList.remove("hidden")
         this.#deleteButton.classList.remove("hidden")
         this.#lastSelected.style.borderStyle="solid"
+        if(this.#lastSelected.dataset.noBorder==="true") this.#lastSelected.style.borderWidth="0px"
         this.#lastSelected=this.#lastSelected.parentNode
         const gen=this.#lastSelected.dataset.gen
         if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) this.#removeChildButton.classList.remove("hidden")
@@ -699,6 +703,7 @@ class LayoutCreator {
             this.#sizeCommands.classList.add("hidden")
         }
         this.#lastSelected.style.borderStyle="dashed"
+        if(this.#lastSelected.style.borderWidth==="0px") this.#lastSelected.style.borderWidth="1px"
         this.#splitCommands.classList.add("hidden")
     }
     
@@ -723,6 +728,13 @@ class LayoutCreator {
     #borderWidthUpdate(){
         this.#showSaveButton()
         this.#lastSelected.style.borderWidth=this.#formLayout.borderWidth.value+"px"
+        if(this.#lastSelected!==this.#layoutContainer){
+            const border=parseInt(this.#lastSelected.style.borderWidth.split("px")[0])
+            this.#lastSelected.style.width="calc("+this.#formLayout.width.value+"% - "+(parseInt(this.#formLayout.marginRight.value)+parseInt(this.#formLayout.marginLeft.value)+2*border)+"px)"
+            this.#lastSelected.style.height="calc("+this.#formLayout.height.value+"% - "+(parseInt(this.#formLayout.marginBottom.value)+parseInt(this.#formLayout.marginTop.value)+2*border)+"px)"
+        }
+        if(this.#formLayout.borderWidth.value==0)this.#lastSelected.dataset.noBorder=true
+        else this.#lastSelected.dataset.noBorder=false
     }
 
     #borderRadiusUpdate(){

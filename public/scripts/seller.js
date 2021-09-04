@@ -642,7 +642,7 @@ function onJsonContent(content){
                 }
                 else for(const item of productList){
                     if(item.dataset.product_id==productID){
-                        product=item
+                        product=item.cloneNode(true)
                         break
                     }
                 }

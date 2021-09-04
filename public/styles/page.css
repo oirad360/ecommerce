@@ -18,8 +18,13 @@ header{
 nav{
     color: white;
     display: flex;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index:1;
+    width: 100%;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.85);
 }
 
 #navOpen{
@@ -250,11 +255,6 @@ footer p{
         width: 0;
         overflow: hidden;
         transition: 0.5s;
-        position: fixed;
-        top: 0px;
-        left: 0px;
-        z-index:1;
-        background-color: rgba(0, 0, 0, 0.8);
     }
     #navClose{
         display: block;

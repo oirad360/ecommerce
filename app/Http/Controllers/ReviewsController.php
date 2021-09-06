@@ -8,8 +8,8 @@ class ReviewsController extends BaseController{
         $product=Product::find($productID);
         $seller=User::find($product->user_id);
         $propicUrl;
-        if(substr($seller->propic,0,4)==="http") $propicUrl=$seller->propic;
-        else $propicUrl="/".env('APP_FOLDER')."/public/assets/".$seller->propic;
+        if($seller->propic==="defaultAvatar.jpg") $propicUrl="/".env('APP_FOLDER')."/public/assets/defaultAvatar.jpg";
+        else $propicUrl="/".env('APP_FOLDER')."/storage/app/propics/".$seller->propic;
         if(session('id')){
             $user=User::find(session('id'));
             return view('reviews')
@@ -36,25 +36,25 @@ class ReviewsController extends BaseController{
     }
 
     public function fetchReviews($productID){
-        $utentiRecensione=Product::find($productID)->reviews;
-        $recensioni=array("contents"=>[],"disattivaRecensione"=>false);
-        if($utentiRecensione){
-            foreach($utentiRecensione as $utenteRecensione){
-                $info=Review::where('product_id',$productID)->where('user_id',$utenteRecensione->id)->first();
-                $info["propic"]=$utenteRecensione->propic;
-                $info["username"]=$utenteRecensione->username;
+        $reviewUsers=Product::find($productID)->reviews;
+        $reviews=array("contents"=>[],"disable"=>false);
+        if($reviewUsers){
+            foreach($reviewUsers as $reviewUser){
+                $info=Review::where('product_id',$productID)->where('user_id',$reviewUser->id)->first();
+                $info["propic"]=$reviewUser->propic;
+                $info["username"]=$reviewUser->username;
                 $row=LikeReview::where('user_id',session('id'))->where('review_id',$info['id'])->first();
                 if(isset($row)){
                     $info["youLike"]=true;
                 }
-                $recensioni["contents"][]=$info;
-                if($utenteRecensione->id===session('id')){
-                    $recensioni["disattivaRecensione"]=true;
+                $reviews["contents"][]=$info;
+                if($reviewUser->id===session('id')){
+                    $reviews["disable"]=true;
                 }
             }
         }
-        if(!session('id')) $recensioni["disattivaRecensione"]=true;
-        return $recensioni;
+        if(!session('id')) $reviews["disable"]=true;
+        return $reviews;
     }
 
     public function fetchProduct($productID){
@@ -65,10 +65,6 @@ class ReviewsController extends BaseController{
         } else {
             $product['wishlist']=false;
         }
-        /* $seller=User::find($product->user_id);
-        $product["seller"]=array("username"=>$seller->username,
-        "propic"=>$seller->propic,
-        "products"=>count($seller->products)); */
         return $product;
     }
 

@@ -1,7 +1,9 @@
 function onResponse(response){
     return response.json()
 }
-
+function onResponseText(response){
+    return response.text()
+}
 function showForm(event){
     if(event.currentTarget.id==="newProductButton"){
         newProductForm.productID.value=""
@@ -232,8 +234,8 @@ function onJsonProducts(json){
 
 function showDesc(event){
     const descButton=event.currentTarget
-    const parentBlock=descButton.parentNode.parentNode.parentNode //tramite il currentTarget (bottone appena premuto) risalgo all'intero blocco del prodotto utilizzando parentNode e lo salvo in una costante
-    const desc=parentBlock.querySelector('.desc') //ottengo la scheda tecnica del prodotto grazie a una query nel blocco
+    const parentBlock=descButton.parentNode.parentNode.parentNode
+    const desc=parentBlock.querySelector('.desc')
     if(desc.classList.contains("hidden")){
         desc.classList.remove('hidden')
         descButton.innerText='Nascondi'
@@ -248,10 +250,28 @@ function showDesc(event){
 function onLayouts(layouts){
     const section=document.querySelector('section')
     let layoutID
+    let flag=false
     for(const layout of layouts){
-        if(layout.active==1) {
-            layoutID=layout.layout_id
-            break
+        if(vw>width){
+            if(layout.active==1 && layout.mobile==0) {
+                layoutID=layout.layout_id
+                flag=true
+                break
+            }
+        } else {
+            if(layout.active==1 && layout.mobile==1) {
+                layoutID=layout.layout_id
+                flag=true
+                break
+            }
+        }
+    }
+    if(!flag){
+        for(const layout of layouts){
+            if(layout.active==1){
+                layoutID=layout.layout_id
+                break
+            }
         }
     }
     if(!newProductForm && !layoutID){
@@ -262,9 +282,18 @@ function onLayouts(layouts){
         layoutCreator=new LayoutCreator()
         layoutCreator.loadLayout(layoutID).then(onJsonContent)
         layoutContainer=layoutCreator.getLayoutContainer()
+        for(const layout of layouts){
+            layoutsList[layout.layout_id]={
+                "mobile": layout.mobile,
+                "active": layout.active
+            }
+        }
         section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
     }else if(newProductForm && layouts.length>0){
+        mobile.classList.remove("hidden")
         activeButton.classList.remove("hidden")
+        deleteLayoutButton.classList.remove("hidden")
+        modifyLayoutButton.classList.remove('hidden')
         const idContainer=document.querySelector('#layouts')
         idContainer.innerHTML=""
         for(const layout of layouts){
@@ -272,25 +301,33 @@ function onLayouts(layouts){
             span.innerText=layout.layout_id
             span.classList.add('layoutID')
             span.addEventListener('click',selectLayout)
-            if(layout.layout_id===layoutID) {
-                span.style.color="red"
-                span.style.border="1px solid black"
-            }
+            if(layout.active==1) span.style.color="red"
+            if(layout.layout_id===layoutID) span.style.border="1px solid black"
             idContainer.appendChild(span)
             const id=layout.layout_id
-            layoutsList[id]=span
-            deleteLayoutButton.classList.remove("hidden")
+            layoutsList[id]={
+                "span":span, 
+                "mobile": layout.mobile,
+                "active": layout.active
+            }
         }
         if(!layoutID) {
             layoutID=layouts[0].layout_id
-            layoutsList[Object.keys(layoutsList)[0]].style.border="1px solid black"
-            activeButton.innerText="Imposta come layout primario"
-        } else activeButton.innerText="Disabilita layout primario"
+            layoutsList[Object.keys(layoutsList)[0]].span.style.border="1px solid black"
+            activeButton.innerText="Imposta come layout attivo"
+        } else activeButton.innerText="Disabilita layout attivo"
         layoutCreator=new LayoutCreator(saveButton)
-        layoutCreator.loadLayout(layoutID).then(onJsonContent)
+        layoutCreator.loadLayout(layoutID).then(function(json){
+            for(const layout of layouts){
+                if(layout.layout_id==layoutID) {
+                    if(layout.mobile==1) mobile.childNodes[0].checked=true
+                    break
+                }
+            }
+            onJsonContent(json)
+        })
         layoutMenu=layoutCreator.getLayoutMenu()
         layoutContainer=layoutCreator.getLayoutContainer()
-        modifyLayoutButton.classList.remove('hidden')
         section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
         section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
         layoutMenu.classList.add("hidden")
@@ -303,6 +340,8 @@ function newLayout(event){
     modifyLayoutButton.classList.add("hidden")
     deleteLayoutButton.classList.add("hidden")
     event.currentTarget.classList.remove('hidden')
+    mobile.classList.remove("hidden")
+    activeButton.classList.add("hidden")
     if(layoutContainer)layoutContainer.remove()
     if(layoutMenu)layoutMenu.remove()
     const section=document.querySelector('section')
@@ -326,19 +365,23 @@ function selectLayout(event){
         layoutCreator.quit()
         addContentButton.classList.add("hidden")
         removeContentButton.classList.add("hidden")
+        deleteLayoutButton.classList.remove("hidden")
+        activeButton.classList.remove("hidden")
         layoutMenu.classList.add("hidden")
         modifyFlag=false
         for(const product of productsToInsert) product.style.border=""
         productsToInsert=[]
         productsToRemove=[]
+        mobile.childNodes[0].checked=layoutsList[selectedID].mobile
         modifyLayoutButton.innerText="Modifica layout"
         newLayoutButton.innerText="Crea un nuovo layout"
         modifyLayoutButton.classList.remove('hidden')
         newLayoutButton.classList.remove('hidden')
-        if(layoutsList[lastID])layoutsList[lastID].style.border=""
+        if(layoutsList[lastID])
+        layoutsList[lastID].span.style.border=""
         selected.style.border="1px solid black"
-        if(selected.style.color==="red") activeButton.innerText="Disabilita layout primario"
-        else activeButton.innerText="Imposta come layout primario"
+        if(selected.style.color==="red") activeButton.innerText="Disabilita layout attivo"
+        else activeButton.innerText="Imposta come layout attivo"
         onJsonContent(content)
         selected.addEventListener('click',selectLayout)
         selected.innerText=selectedID
@@ -354,26 +397,28 @@ function active(){
     activeButton.appendChild(loading)
     let layoutID
     for(const key of Object.keys(layoutsList)){
-        if(layoutsList[key].style.border!=="") layoutID=layoutsList[key]
+        if(layoutsList[key].span.style.border!=="") layoutID=layoutsList[key].span
     }
     let val
     if(layoutID.style.color==="red") val=false
     else val=true
-    fetch(app_url+"/active/"+layoutID.innerText+"/"+val).then(function(response){
-        if(response.ok){
+    fetch(app_url+"/active/"+layoutID.innerText+"/"+val).then(onResponseText).then(function(text){
+        if(text!=="0"){
             if(val){
-                activeButton.innerText="Disabilita layout primario"
-                for(const key of Object.keys(layoutsList)){
-                    if(layoutsList[key].style.color==="red") layoutsList[key].style.color=""
-                }
+                activeButton.innerText="Disabilita layout attivo"
                 layoutID.style.color="red"
+                layoutsList[layoutID.innerText].active=1
             } else {
-                activeButton.innerText="Imposta come layout primario"
+                activeButton.innerText="Imposta come layout attivo"
                 layoutID.style.color=""
+                layoutsList[layoutID.innerText].active=0
             }
-            //activeButton.querySelector('img').remove()
-            activeButton.addEventListener('click',active)
+        } else {
+            console.log("Hai già un layout attivo per la versione "+(mobile.childNodes[0].checked ? "mobile" : "desktop"))
+            activeButton.querySelector('img').remove()
         }
+            
+            activeButton.addEventListener('click',active)
     })
 }
 
@@ -384,6 +429,7 @@ function modify(event){
     event.currentTarget.classList.remove('hidden')
     event.currentTarget.innerText="Annulla"
     layoutMenu.classList.remove("hidden")
+    
     layoutCreator.modify()
     event.currentTarget.addEventListener('click',quit)
 }
@@ -399,7 +445,7 @@ function saveLayout(){
         saveButton.appendChild(loading)
         if(layoutCreator.getLayoutID()==="new"){
             layoutCreator.save().then(function(layoutID){
-                fetch(app_url+"/saveUsersLayout/"+layoutID).then(function(response){
+                fetch(app_url+"/saveUsersLayout/"+layoutID+"/"+mobile.childNodes[0].checked).then(function(response){
                     if(response.ok){
                         const idContainer=document.querySelector('#layouts')
                         const span=document.createElement('span')
@@ -407,16 +453,25 @@ function saveLayout(){
                         span.innerText=layoutID
                         span.addEventListener('click',selectLayout)
                         idContainer.appendChild(span)
+                        let active
                         if((Object.keys(layoutsList)).length===0){
                             span.style.color="red"
                             activeButton.classList.remove("hidden")
-                            activeButton.innerText="Disabilita layout primario"
+                            activeButton.innerText="Disabilita layout attivo"
+                            active=1
                         }
-                        else activeButton.innerText="Imposta come layout primario"
+                        else {
+                            activeButton.innerText="Imposta come layout attivo"
+                            active=0
+                        }
                         for(const key of Object.keys(layoutsList)){
-                            layoutsList[key].style.border=""
+                            layoutsList[key].span.style.border=""
                         }
-                        layoutsList[layoutID]=span
+                        layoutsList[layoutID]={
+                            "span":span,
+                            "mobile":mobile.childNodes[0].checked ? 1 : 0,
+                            "active": active
+                        }
                         span.style.border="1px solid black"
                         saveButton.querySelector('img').remove()
                         saveButton.innerText="Salvataggio effettuato"
@@ -425,12 +480,32 @@ function saveLayout(){
                     }
                 })
             })
-        } else layoutCreator.save().then(function(){
+        } else layoutCreator.save().then(function(layoutID){
             saveButton.querySelector('img').remove()
             saveButton.innerText="Salvataggio effettuato"
             saveButton.addEventListener('click',saveLayout)
         })
     }
+}
+
+function mobileVersion(event){
+    const val=event.currentTarget.checked
+    const currentTarget=event.currentTarget
+    const layoutID=layoutCreator.getLayoutID()
+    if(layoutID!=="new")
+    fetch(app_url+"/mobile/"+layoutID+"/"+val).then(onResponseText).then(function(text){
+        if(text==="0") {
+            console.log("Hai già un layout attivo per la versione "+(mobile.childNodes[0].checked ? "mobile" : "desktop"))
+            currentTarget.checked=!val
+        } else {
+            for(const key of Object.keys(layoutsList)){
+                if(key==layoutID){
+                    layoutsList[key].mobile=val ? 1 : 0
+                    break
+                }
+            }
+        }
+    })
 }
 
 function quit(event){
@@ -442,6 +517,7 @@ function quit(event){
     if(products)for(const product of products) product.style.border=""
     addContentButton.classList.add("hidden")
     removeContentButton.classList.add("hidden")
+    activeButton.classList.remove("hidden")
     if(event.currentTarget.id==="newLayoutButton"){
         event.currentTarget.innerText="Crea un nuovo layout"
         event.currentTarget.addEventListener('click',newLayout)
@@ -454,7 +530,11 @@ function quit(event){
             deleteLayoutButton.classList.remove("hidden")
             let layoutID
             for(const key of Object.keys(layoutsList)){
-                if(layoutsList[key].style.border!=="") layoutID=layoutsList[key].innerText
+                if(layoutsList[key].span.style.border!==""){
+                    layoutID=layoutsList[key].span.innerText
+                    mobile.childNodes[0].checked=layoutsList[key].mobile
+                    break
+                }
             }
             layoutCreator.loadLayout(layoutID).then(onJsonContent)
         }
@@ -548,8 +628,8 @@ function modalDelete(event){
     const msg=document.createElement('p')
     let layoutID
     for(const key of Object.keys(layoutsList)){
-        if(layoutsList[key].style.border!==""){
-            layoutID=layoutsList[key].innerText
+        if(layoutsList[key].span.style.border!==""){
+            layoutID=layoutsList[key].span.innerText
             break
         }
     }
@@ -582,8 +662,8 @@ function modalDelete(event){
 function deleteLayout(){
     let layoutID
     for(const key of Object.keys(layoutsList)){
-        if(layoutsList[key].style.border!=="") {
-            layoutID=layoutsList[key].innerText
+        if(layoutsList[key].span.style.border!=="") {
+            layoutID=layoutsList[key].span.innerText
             break
         }
     }
@@ -591,10 +671,11 @@ function deleteLayout(){
         document.body.classList.remove('noScroll')
         modalView.classList.add('hidden')
         modalView.innerHTML = ''
-        layoutsList[layoutID].remove()
+        layoutsList[layoutID].span.remove()
         delete layoutsList[layoutID]
         if(Object.keys(layoutsList).length===0){
             activeButton.classList.add("hidden")
+            mobile.classList.add("hidden")
             activeButton.innerText=""
             modifyLayoutButton.classList.add("hidden")
             modifyLayoutButton.innerText="Modifica layout"
@@ -608,7 +689,7 @@ function deleteLayout(){
         } else {
             layoutMenu.classList.add("hidden")
             const event=new Event('click')
-            layoutsList[Object.keys(layoutsList)[0]].dispatchEvent(event)
+            layoutsList[Object.keys(layoutsList)[0]].span.dispatchEvent(event)
         }
     })
     
@@ -657,7 +738,6 @@ function onJsonContent(content){
     }
 }
 
-
 function onReviews(json){
     const container=document.querySelector("#reviews")
     container.innerHTML=""
@@ -665,68 +745,68 @@ function onReviews(json){
     if(json.length>0){
         reviewTitle.classList.remove("hidden")
         for(item of json){
-            const blocco=document.createElement('div')
-            blocco.dataset.id=item.id
-            blocco.classList.add("review")
-            const riga=document.createElement('div')
-            riga.classList.add("row")
-            const prodotto=document.createElement('a')
-            prodotto.classList.add("productTitle")
-            prodotto.innerText=item.title
-            prodotto.href=app_url+"/reviews/"+item.product_id
-            riga.appendChild(prodotto)
-            const data=document.createElement('p')
-            data.innerText=item.data
-            riga.appendChild(data)
-            blocco.appendChild(riga)
+            const block=document.createElement('div')
+            block.dataset.id=item.id
+            block.classList.add("review")
+            const row=document.createElement('div')
+            row.classList.add("row")
+            const product=document.createElement('a')
+            product.classList.add("productTitle")
+            product.innerText=item.title
+            product.href=app_url+"/reviews/"+item.product_id
+            row.appendChild(product)
+            const date=document.createElement('p')
+            date.innerText=item.date
+            row.appendChild(date)
+            block.appendChild(row)
             const seller=document.createElement('a')
             seller.innerText="Venditore: "+item.seller
             seller.href=app_url+"/seller/"+item.seller
             seller.classList.add('seller')
-            blocco.appendChild(seller)
-            const voto=document.createElement('img')
-            voto.classList.add("rating")
-            voto.src=app_url+"/assets/"+item.stars+".png"
-            blocco.appendChild(voto)
-            const descrizione=document.createElement('p')
-            descrizione.innerText=item.text
-            blocco.appendChild(descrizione)
-            const bloccoLike=document.createElement('div')
-            bloccoLike.classList.add("likeBlock")
+            block.appendChild(seller)
+            const rating=document.createElement('img')
+            rating.classList.add("rating")
+            rating.src=app_url+"/assets/"+item.stars+".png"
+            block.appendChild(rating)
+            const desc=document.createElement('p')
+            desc.innerText=item.text
+            block.appendChild(desc)
+            const likeBlock=document.createElement('div')
+            likeBlock.classList.add("likeBlock")
             if(document.querySelector('.profileContainer')){
-                const bottoneLike=document.createElement('div')
+                const likeButton=document.createElement('div')
                 if(item.youLike){
-                    bottoneLike.classList.add('dislikeButton')
-                    bottoneLike.addEventListener('click',dislike)
+                    likeButton.classList.add('dislikeButton')
+                    likeButton.addEventListener('click',dislike)
                 } else {
-                    bottoneLike.classList.add('likeButton')
-                    bottoneLike.addEventListener('click',like)
+                    likeButton.classList.add('likeButton')
+                    likeButton.addEventListener('click',like)
                 }
-                bloccoLike.appendChild(bottoneLike)
+                likeBlock.appendChild(likeButton)
             }
-            const numLike=document.createElement('span')
+            const likes=document.createElement('span')
             if(item.likes===1){
-                numLike.innerText=item.likes+" utente ha trovato utile questa recensione"
+                likes.innerText=item.likes+" utente ha trovato utile questa recensione"
             } else {
-                numLike.innerText=item.likes+" utenti hanno trovato utile questa recensione"
+                likes.innerText=item.likes+" utenti hanno trovato utile questa recensione"
             }
             if(item.likes!==0){
-                numLike.addEventListener('click', onLikeClick)
-                numLike.classList.add("hover")
+                likes.addEventListener('click', onLikeClick)
+                likes.classList.add("hover")
             }
-            bloccoLike.appendChild(numLike)
-            const riga1=document.createElement('div')
-            riga1.classList.add('row')
-            riga1.appendChild(bloccoLike)
+            likeBlock.appendChild(likes)
+            const row1=document.createElement('div')
+            row1.classList.add('row')
+            row1.appendChild(likeBlock)
             if(newProductForm){
                 const bottoneEliminaRecensione=document.createElement('span')
-                bottoneEliminaRecensione.classList.add('deleteReviewButton')
+                bottoneEliminaRecensione.classList.add('redButton')
                 bottoneEliminaRecensione.innerText="Elimina recensione"
                 bottoneEliminaRecensione.addEventListener('click',deleteReview)
-                riga1.appendChild(bottoneEliminaRecensione)
+                row1.appendChild(bottoneEliminaRecensione)
             }
-            blocco.appendChild(riga1)
-            container.appendChild(blocco)
+            block.appendChild(row1)
+            container.appendChild(block)
         }
     } else reviewTitle.classList.add("hidden")
 }
@@ -763,30 +843,102 @@ function onPurchases(purchases){
         purchasesTitle.classList.remove("hidden")
         const container=document.querySelector("#yourPurchasesContainer")
         for(item of purchases){
-            const blocco=document.createElement('div')
-            blocco.classList.add('block')
-            const titolo=document.createElement('h3')
-            titolo.innerText=item.title
-            blocco.appendChild(titolo)
+            const block=document.createElement('div')
+            block.classList.add('block')
+            const title=document.createElement('h3')
+            title.innerText=item.title
+            block.appendChild(title)
             const img=document.createElement('img')
             if(item.image.substring(0,4)==="http") img.src=item.image
             else img.src=app_url+"/assets/"+item.image
             const link=document.createElement('a')
             link.href=app_url+"/reviews/"+item.id
             link.appendChild(img)
-            blocco.appendChild(link)
-            const quantita=document.createElement('p')
-            quantita.innerText="Quantità: "+item.tot
-            blocco.appendChild(quantita)
+            block.appendChild(link)
+            const quantity=document.createElement('p')
+            quantity.innerText="Quantità: "+item.tot
+            block.appendChild(quantity)
             const seller=document.createElement('a')
             seller.innerText="Venditore: "+item.seller
             seller.href=app_url+"/seller/"+item.seller
             seller.classList.add('seller')
-            blocco.appendChild(seller)
-            container.appendChild(blocco)
+            block.appendChild(seller)
+            container.appendChild(block)
         }
     } else {
         purchasesTitle.classList.add("hidden")
+    }
+}
+
+function reportWindowSize(){
+    vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+    document.querySelector('#vw').innerText=vw
+    if(layoutContainer){
+        let flag=false
+        if(vw<width){
+            for(const key of Object.keys(layoutsList)){
+                if(layoutsList[key].mobile==1 && layoutsList[key].active==1){
+                    layoutCreator.loadLayout(key).then(onJsonContent)
+                    flag=true
+                    break
+                }
+            }
+        } else {
+            for(const key of Object.keys(layoutsList)){
+                if(layoutsList[key].mobile==0 && layoutsList[key].active==1){
+                    layoutCreator.loadLayout(key).then(onJsonContent)
+                    flag=true
+                    break
+                }
+            }
+        }
+        if(!flag)
+        for(const key of Object.keys(layoutsList)){
+            if(layoutsList[key].active==1){
+                layoutCreator.loadLayout(key).then(onJsonContent)
+                break
+            }
+        }
+    }
+}
+
+function showEditor(event){
+    const editor=document.querySelector('#editor')
+    if(editor.classList.contains("hidden")){
+        editor.classList.remove("hidden")
+        event.currentTarget.innerText="Chiudi il layout editor"
+        window.removeEventListener('resize', reportWindowSize)
+    } else {
+        editor.classList.add("hidden")
+        event.currentTarget.innerText="Apri il layout editor"
+        window.addEventListener('resize', reportWindowSize)
+        let flag=false
+        let layoutID
+        for(const key of Object.keys(layoutsList)){
+            if(vw>width){
+                if(layoutsList[key].active==1 && layoutsList[key].mobile==0) {
+                    layoutID=layoutsList[key].span
+                    flag=true
+                    break
+                }
+            } else {
+                if(layoutsList[key].active==1 && layoutsList[key].mobile==1) {
+                    layoutID=layoutsList[key].span
+                    flag=true
+                    break
+                }
+            }
+        }
+        if(!flag){
+            for(const key of Object.keys(layoutsList)){
+                if(layoutsList[key].active==1){
+                    layoutID=layoutsList[key].span
+                    break
+                }
+            }
+        }
+        const newEvent=new Event('click')
+        layoutID.dispatchEvent(newEvent)
     }
 }
 
@@ -802,7 +954,7 @@ let productsToRemove=[]
 let modifyFlag=false
 let productList=[]
 let firstLoading=true
-
+const width=800
 const newProductButton=document.querySelector('#newProductButton')
 const newProductForm=document.forms["newProduct"]
 const addContentButton=document.querySelector('#addContentButton')
@@ -812,10 +964,14 @@ const modifyLayoutButton=document.querySelector('#modifyLayoutButton')
 const deleteLayoutButton=document.querySelector('#deleteLayoutButton')
 const activeButton=document.querySelector('#active')
 const quitModifyProductButton=document.querySelector('#quitModifyProduct')
+const mobile=document.querySelector('#mobile')
+const editorButton=document.querySelector('#editorButton')
 const title=document.querySelector('h1').innerText
 const seller=title.substring(10,title.length)
+let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
 fetch(app_url+"/seller/"+seller+"/fetchReviews").then(onResponse).then(onReviews)
+window.addEventListener('resize', reportWindowSize)
 if(newProductForm){
     fetch(app_url+"/fetchPurchases").then(onResponse).then(onPurchases)
     newProductButton.addEventListener('click',showForm)
@@ -833,4 +989,7 @@ if(newProductForm){
     newLayoutButton.addEventListener('click',newLayout)
     deleteLayoutButton.addEventListener('click',modalDelete)
     quitModifyProductButton.addEventListener('click',quitModifyProduct)
+    mobile.childNodes[0].addEventListener('change', mobileVersion)
+    editorButton.addEventListener('click',showEditor)
 }
+

@@ -3,73 +3,72 @@ function onResponse(response){
 }
 function onProduct(json){
     container.innerHTML=""
-    const blocco=document.createElement('div') 
-    blocco.classList.add('horizontalBlock')
-    const bloccoInterno=document.createElement('div')
-    bloccoInterno.classList.add('block')
-    bloccoInterno.dataset.product_id=json.id
-    const titolo=document.createElement('h3')
-    titolo.innerText=json.title
-    bloccoInterno.appendChild(titolo)
+    const block=document.createElement('div') 
+    block.classList.add('horizontalBlock')
+    const childBlock=document.createElement('div')
+    childBlock.classList.add('block')
+    childBlock.dataset.product_id=json.id
+    const title=document.createElement('h3')
+    title.innerText=json.title
+    childBlock.appendChild(title)
     const img=document.createElement('img')
     if(json.image.substring(0,4)==="http") img.src=json.image
     else img.src=app_url+"/assets/"+json.image
-    bloccoInterno.appendChild(img)
+    childBlock.appendChild(img)
     const buttonContainer=document.createElement('div')
     if(document.querySelector('.profileContainer')){
         buttonContainer.classList.add('productButtonsContainer')
-        const bottoneWishlist=document.createElement('div')
-        bottoneWishlist.addEventListener('click',addWishlist)
+        const wishlistButton=document.createElement('div')
+        wishlistButton.addEventListener('click',addWishlist)
         if(json.wishlist==1){
-            bottoneWishlist.classList.add('wishlistRemoveButton')
+            wishlistButton.classList.add('wishlistRemoveButton')
         } else {
-            bottoneWishlist.classList.add('wishlistButton')
+            wishlistButton.classList.add('wishlistButton')
         }
-        buttonContainer.appendChild(bottoneWishlist)
+        buttonContainer.appendChild(wishlistButton)
     }
-    const prezzo=document.createElement('span')
-    prezzo.innerText=json.price+"€"
-    buttonContainer.appendChild(prezzo)
-    bloccoInterno.appendChild(buttonContainer)
+    const price=document.createElement('span')
+    price.innerText=json.price+"€"
+    buttonContainer.appendChild(price)
+    childBlock.appendChild(buttonContainer)
     const quantity=document.createElement('p')
     quantity.innerText="Disponibilità: "+json.quantity
-    bloccoInterno.appendChild(quantity)
+    childBlock.appendChild(quantity)
     if(json.quantity>0) {
-        const bottoneCarrello=document.createElement('p')
-        bottoneCarrello.innerText="Aggiungi al carrello"
-        bottoneCarrello.addEventListener('click',addCart)
-        bottoneCarrello.classList.add("addCart")
-        bloccoInterno.appendChild(bottoneCarrello)
+        const cartButton=document.createElement('p')
+        cartButton.innerText="Aggiungi al carrello"
+        cartButton.addEventListener('click',addCart)
+        cartButton.classList.add("addCart")
+        childBlock.appendChild(cartButton)
     }
-    const bloccoScheda=document.createElement('div')
-    bloccoScheda.classList.add('sideDesc'/*,'hidden'*/)//la descrizione deve essere invisibile sin dall'inizio, poichè deve essere mostrata solo al click del pulsante apposito
-    const scheda=document.createElement('p')
-    scheda.innerText=json.description
-    const descrizione=document.createElement('h2')
-    descrizione.innerText="Scheda tecnica"
-    bloccoScheda.appendChild(descrizione)
-    bloccoScheda.appendChild(scheda)
-    blocco.appendChild(bloccoInterno)
-    blocco.appendChild(bloccoScheda)
-    container.appendChild(blocco)
+    const sideDesc=document.createElement('div')
+    sideDesc.classList.add('sideDesc')
+    const desc=document.createElement('p')
+    desc.innerText=json.description
+    const descTitle=document.createElement('h2')
+    descTitle.innerText="Scheda tecnica"
+    sideDesc.appendChild(descTitle)
+    sideDesc.appendChild(desc)
+    block.appendChild(childBlock)
+    block.appendChild(sideDesc)
+    container.appendChild(block)
 }
 
-function onReviews(json){//carico tutte le recensioni di quel prodotto, se è presente una mia recensione elimino l'area per pubblicare una recensione (ognuno può pubblicare max 1 recensione)
+function onReviews(json){
     const container=document.querySelector("#reviews")
     container.innerHTML=""
-    if(json.disattivaRecensione){
+    if(json.disable){
         document.querySelector("#reviewArea").classList.add("hidden")
         document.querySelector("#writeReviewButton").classList.add("hidden")
     } else {
-        document.querySelector("#reviewArea").classList.remove("hidden")
         document.querySelector("#writeReviewButton").classList.remove("hidden")
     }
     if(json.contents.length>0){
-        let somma=0
+        let sum=0
         for(item of json.contents){
-            const blocco=document.createElement('div')
-            blocco.dataset.id=item.id
-            blocco.classList.add("review")
+            const block=document.createElement('div')
+            block.dataset.id=item.id
+            block.classList.add("review")
             const profile=document.createElement('div')
             profile.classList.add("profile")
             const propic=document.createElement('div')
@@ -77,7 +76,7 @@ function onReviews(json){//carico tutte le recensioni di quel prodotto, se è pr
             if(item.propic==="defaultAvatar.jpg"){
                 propic.style="background-image: url("+app_url+"/assets/defaultAvatar.jpg);"
             } else {
-                propic.style="background-image: url("+app_url+"/uploads/"+item.propic+");"
+                propic.style="background-image: url(/ecommerce/storage/app/propics/"+item.propic+");"
             }
             propic.addEventListener('click',onProPicClick)
             profile.appendChild(propic)
@@ -85,57 +84,57 @@ function onReviews(json){//carico tutte le recensioni di quel prodotto, se è pr
             link.href=app_url+"/seller/"+item.username
             link.innerText=item.username
             profile.appendChild(link)
-            const riga=document.createElement('div')
-            riga.classList.add("row")
-            riga.appendChild(profile)
-            const data=document.createElement('p')
-            data.innerText=item.data
-            riga.appendChild(data)
-            blocco.appendChild(riga)
-            const voto=document.createElement('img')
-            voto.classList.add("rating")
-            voto.src=app_url+"/assets/"+item.stars+".png"
-            blocco.appendChild(voto)
-            somma+=item.stars
-            const descrizione=document.createElement('p')
-            descrizione.innerText=item.text
-            blocco.appendChild(descrizione)
-            const bloccoLike=document.createElement('div')
-            bloccoLike.classList.add("likeBlock")
+            const row=document.createElement('div')
+            row.classList.add("row")
+            row.appendChild(profile)
+            const date=document.createElement('p')
+            date.innerText=item.date
+            row.appendChild(date)
+            block.appendChild(row)
+            const rating=document.createElement('img')
+            rating.classList.add("rating")
+            rating.src=app_url+"/assets/"+item.stars+".png"
+            block.appendChild(rating)
+            sum+=item.stars
+            const desc=document.createElement('p')
+            desc.innerText=item.text
+            block.appendChild(desc)
+            const likeBlock=document.createElement('div')
+            likeBlock.classList.add("likeBlock")
             if(document.querySelector('.profileContainer')){
-                const bottoneLike=document.createElement('div')
+                const likeButton=document.createElement('div')
                 if(item.youLike){
-                    bottoneLike.classList.add('dislikeButton')
-                    bottoneLike.addEventListener('click',dislike)
+                    likeButton.classList.add('dislikeButton')
+                    likeButton.addEventListener('click',dislike)
                 } else {
-                    bottoneLike.classList.add('likeButton')
-                    bottoneLike.addEventListener('click',like)
+                    likeButton.classList.add('likeButton')
+                    likeButton.addEventListener('click',like)
                 }
-                bloccoLike.appendChild(bottoneLike)
+                likeBlock.appendChild(likeButton)
             }
-            const numLike=document.createElement('span')
+            const likes=document.createElement('span')
             if(item.likes===1){
-                numLike.innerText=item.likes+" utente ha trovato utile questa recensione"
+                likes.innerText=item.likes+" utente ha trovato utile questa recensione"
             } else {
-                numLike.innerText=item.likes+" utenti hanno trovato utile questa recensione"
+                likes.innerText=item.likes+" utenti hanno trovato utile questa recensione"
             }
             if(item.likes!==0){
-                numLike.addEventListener('click', onLikeClick)
-                numLike.classList.add("hover")
+                likes.addEventListener('click', onLikeClick)
+                likes.classList.add("hover")
             }
-            bloccoLike.appendChild(numLike)
-            blocco.appendChild(bloccoLike)
-            container.appendChild(blocco)
+            likeBlock.appendChild(likes)
+            block.appendChild(likeBlock)
+            container.appendChild(block)
 
         }
-        const media=somma/json.contents.length
-        const votoMedio=document.querySelector('#rating')
+        const average=sum/json.contents.length
+        const averageRating=document.querySelector('#rating')
         if(json.contents.length>1){
-            votoMedio.innerText="Voto medio: "+media+"/5, "+json.contents.length+" recensioni."
+            averageRating.innerText="Voto medio: "+average+"/5, "+json.contents.length+" recensioni."
         } else{
-            votoMedio.innerText="Voto medio: "+media+"/5, "+json.contents.length+" recensione."
+            averageRating.innerText="Voto medio: "+average+"/5, "+json.contents.length+" recensione."
         }
-        document.querySelector('section').insertBefore(votoMedio,container)
+        document.querySelector('section').insertBefore(averageRating,container)
     } else {
         const p=document.createElement('p')
         p.innerText="Non è stata pubblicata nessuna recensione."
@@ -171,7 +170,6 @@ function showReviewArea(){
         reviewArea.classList.add("hidden")
         writeReviewButton.innerText="Scrivi una recensione"
         document.querySelector("textarea").value=""
-        reviewForm.voto.value=1
 
     }
 }
@@ -204,6 +202,7 @@ function like(event){
         }
     })
 }
+
 function dislike(event){
     const id=event.currentTarget.parentNode.parentNode.dataset.id
     fetch(app_url+"/dislike/"+id).then(function(response){
@@ -220,5 +219,7 @@ writeReviewButton.addEventListener('click',showReviewArea)
 const reviewForm=document.forms['reviewForm']
 reviewForm.addEventListener('submit',postReview)
 reviewForm.reviewText.addEventListener('blur',deleteError)
+const sellerPropic=document.querySelector('#seller .propic')
+sellerPropic.addEventListener('click', onProPicClick)
 fetch(app_url+"/reviews/fetchProduct/"+product).then(onResponse).then(onProduct)
 fetch(app_url+"/reviews/fetchReviews/"+product).then(onResponse).then(onReviews)

@@ -1,9 +1,4 @@
-#mainSection{
-    padding: 0px 50px;
-    /* display: flex;
-    flex-direction: column;
-    align-items: flex-start; */
-}
+
 
 form{
     display: flex;
@@ -52,6 +47,10 @@ label{
     margin:5px 0px;
 }
 
+#mobile{
+    justify-content: start;
+}
+
 .layoutID{
     margin: 5px;
     font-size: 1rem;
@@ -76,7 +75,13 @@ label{
     align-items: center;
     width: 50%;
 }
-
+button.redButton{
+    margin:30px;
+    height: 40px;
+    width: 80px;
+    border: 0px;
+    font-size: 1rem;
+}
 .modalDelete span:hover{
     cursor: pointer;
     text-decoration: underline;

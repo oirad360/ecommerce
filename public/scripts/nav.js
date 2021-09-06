@@ -26,9 +26,15 @@ function searchProducts(event){
     box.innerHTML=""
     box.classList.add("hidden")
     if(form.q.value!==""){
-        const data={method:'POST', body: new FormData(form)}
+        const data={
+            method:'POST',
+            body: new FormData(form),
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+            }
+        }
         fetch(app_url+"/searchProducts",data).then(onResponse).then(function(json){
-            if(json.length>0 && form.search.value!==""){
+            if(json.length>0 && form.q.value!==""){
                 for(const item of json){
                     const row=document.createElement('a')
                     row.classList.add('result')
@@ -47,6 +53,9 @@ function searchProducts(event){
                 box.classList.add("hidden")
             }
         })
+    } else {
+        box.innerHTML=""
+        box.classList.add("hidden")
     }
 }
 

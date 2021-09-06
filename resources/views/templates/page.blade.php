@@ -12,6 +12,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Oxygen&display=swap" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ $csrf_token }}">
         <script src='/{{$app_folder}}/public/scripts/env.js' defer></script>
         <script src='/{{$app_folder}}/public/scripts/modal.js' defer></script>
         <script src='/{{$app_folder}}/public/scripts/nav.js' defer></script>
@@ -21,14 +22,14 @@
     <body>
         <header>
             <img id=navOpen src=/{{$app_folder}}/public/assets/menuButton.png>
-            <div class=searchBox >
+            <div class=searchBox>
                 <form class=menuSearch name=searchProducts method=GET action="/{{$app_folder}}/public/search">
                     <input type="submit" value=""/>
                     <input name=q type="text" placeholder='Cerca un prodotto'>
                     <select name=c>
                         <option value="all">Tutte le categorie</option>
                         <option value="smartphone">Smartphones</option>
-                        <option value="laptop">Laptop</span>
+                        <option value="laptop">Laptop</option>
                         <option value="pc">PC</option>
                         <option value="audio">Audio</option>
                         <option value="tv">TV</option>
@@ -62,15 +63,15 @@
                     </a>
                 </div>
                 <div id=navCategories>
-                    <span>Smartphone</span>
-                    <span>Laptop</span>
-                    <span>PC</span>
-                    <span>Audio</span>
-                    <span>TV</span>
-                    <span>Fotografia</span>
-                    <span>Console</span>
-                    <span>Smartwatch</span>
-                    <span>Accessori</span>
+                    <a href="/{{$app_folder}}/public/search?c=smartphone" data-value=smartphone>Smartphone</a>
+                    <a href="/{{$app_folder}}/public/search?c=laptop" data-value=laptop>Laptop</a>
+                    <a href="/{{$app_folder}}/public/search?c=pc" data-value=pc>PC</a>
+                    <a href="/{{$app_folder}}/public/search?c=audio" data-value=audio>Audio</a>
+                    <a href="/{{$app_folder}}/public/search?c=tv" data-value=tv>TV</a>
+                    <a href="/{{$app_folder}}/public/search?c=photography" data-value=photography>Fotografia</a>
+                    <a href="/{{$app_folder}}/public/search?c=console" data-value=console>Console</a>
+                    <a href="/{{$app_folder}}/public/search?c=smartwatch" data-value=smartwatch>Smartwatch</a>
+                    <a href="/{{$app_folder}}/public/search?c=accessories" data-value=accessories>Accessori</a>
                 </div>
             </nav>
         </header>
@@ -81,12 +82,13 @@
             <a href="https://www.unict.it">
                 <img id="logoUNICT" src="/{{$app_folder}}/public/assets/logoUNICT.jpg">
             </a>
-            <p>
-                Dario Anzalone <br>
-                O46002090 <br>
-                <em>Web Programming 2021 <br>
-                DIEEI - Cittadella Universitaria</em>
-            </p>
+            <div>
+                <h3>Contatti</h3>
+                <ul>
+                    <li>darioanzalone@live.it</li>
+                    <li><a href=https://github.com/oirad360>github.com/oirad360</a></li>
+                </ul>
+            </div>
         </footer>
         <div id="modal" class="hidden"></div>
     </body>

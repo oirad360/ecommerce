@@ -82,13 +82,15 @@
     cursor: pointer;
 }
 
-.deleteReviewButton{
+.redButton{
     padding: 3px;
     border-radius: 4px;
+    color: white;
+    text-decoration: none;
     background-color: rgba(255, 0, 0, 0.719);
 }
 
-.deleteReviewButton:hover{
+.redButton:hover{
     cursor:pointer;
     background-color: rgba(255, 0, 0, 0.432);
 }
@@ -111,9 +113,13 @@
 }
 
 @media(max-width: 600px){
+    .propic{
+        height: 50px;
+        width: 50px;
+    }
     .review{
-        font-size: 12px;
-        padding:10px;
+        font-size: 0.85rem;
+        padding: 10px;
     }
     .rating{
         max-width: 100px;
@@ -122,8 +128,7 @@
         flex-direction: column;
         align-items: flex-start;
     }
-    #reviews .profile p{
-        font-size: 15px;
-        margin:3px;
+    .profile{
+        font-size: 0.8rem;
     }
 }

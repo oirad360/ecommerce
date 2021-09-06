@@ -42,7 +42,7 @@ function onJsonUtentiLike(json){ //ottengo tutti gli utenti che hanno messo like
             if(item.propic==="defaultAvatar.jpg"){
                 propic.style="background-image: url("+app_url+"/assets/defaultAvatar.jpg);"
             } else {
-                propic.style="background-image: url("+app_url+"/uploads/"+item.propic+");"
+                propic.style="background-image: url(/ecommerce/storage/app/propics/"+item.propic+");"
             }
             user.appendChild(propic)
             const link=document.createElement('a')

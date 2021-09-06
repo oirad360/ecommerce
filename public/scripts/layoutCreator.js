@@ -351,6 +351,9 @@ class LayoutCreator {
     }
 
     async save(){//salva il layout e il file json per i contenuti di quel layout
+        let borderWidth
+        if(this.#layoutContainer.dataset.noBorder==="true") borderWidth="0px"
+        else borderWidth=this.#layoutContainer.style.borderWidth
         const data={
             "id": this.#layoutContainer.dataset.layout,
             "display": this.#layoutContainer.style.display,
@@ -359,7 +362,7 @@ class LayoutCreator {
             "width": this.#layoutContainer.style.width,
             "borderColor": this.#layoutContainer.style.borderColor,
             "borderRadius": this.#layoutContainer.style.borderRadius,
-            "borderWidth": this.#layoutContainer.style.borderWidth,
+            "borderWidth": borderWidth,
             "backgroundColor": this.#layoutContainer.style.backgroundColor,
             "childs": []
         }
@@ -544,6 +547,10 @@ class LayoutCreator {
         return color;
     }
 
+    rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
     #showSaveButton(){//mostra il bottone per salvare, è necessario averlo dentro ogni metodo della classe che apporta modifiche
         if(this.#layoutContainer.querySelector(".child")){
             this.#saveButton.classList.remove("hidden")
@@ -580,10 +587,14 @@ class LayoutCreator {
     }
     
     #setBorderAndBackground(lastSelected){
-        const lastSelectedBackgroundColor=lastSelected.style.backgroundColor
+        let lastSelectedBackgroundColor=lastSelected.style.backgroundColor
+        const components=lastSelectedBackgroundColor.substring(4,lastSelectedBackgroundColor.length-1).split(", ")
+        lastSelectedBackgroundColor=this.rgbToHex(parseInt(components[0]),parseInt(components[1]),parseInt(components[2]))
         this.#formLayout.backgroundColor.value=lastSelectedBackgroundColor
 
-        const lastSelectedborderColor=lastSelected.style.borderColor
+        let lastSelectedborderColor=lastSelected.style.borderColor
+        const components1=lastSelectedborderColor.substring(4,lastSelectedborderColor.length-1).split(", ")
+        lastSelectedborderColor=this.rgbToHex(parseInt(components1[0]),parseInt(components1[1]),parseInt(components1[2]))
         this.#formLayout.borderColor.value=lastSelectedborderColor
         
         const lastSelectedborderWidth=parseInt(lastSelected.style.borderWidth.split("px")[0])
@@ -637,7 +648,6 @@ class LayoutCreator {
 
     #split(event){//è la funzione che mi permette di generare gli N figli dentro il div attualmente selezionato
         event.preventDefault()
-        this.#showSaveButton()
         this.#gen++
         this.#content["[data-gen=\'"+this.#gen+"\']"]=[]
         if(this.#lastSelected.dataset.gen!=0)delete this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"]
@@ -681,7 +691,7 @@ class LayoutCreator {
         }
         const click= new Event('click') //adesso seleziono il primo figlio, come se, dopo aver generato tutti i figli, facessi click sul primo
         this.#lastSelected.querySelector('.child[data-id=\'1\']').dispatchEvent(click)//dunque dopo questa istruzione lastSelected diventerà il primo figlio che è stato generato dentro il padre (l'ex lastSelected, vedi il funzionamento di select())
-        
+        this.#showSaveButton()
     }
     
     #selectLevel(){//è la funzione che mi permette di selezionare il padre del div attualmente selezionato

@@ -114,7 +114,8 @@ user_id integer not null,
 foreign key(user_id) references users(id) on update cascade on delete cascade,
 index ind_user_id(user_id),
 unique(user_id,layout_id),
-active boolean not null
+active boolean not null,
+mobile boolean not null
 )engine = 'InnoDB';
 
 delimiter //

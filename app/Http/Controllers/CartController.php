@@ -32,21 +32,24 @@ class CartController extends BaseController{
         $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->first();
         $quantity=Product::find($productID)->quantity;
         if($val==="true"){
-            if(isset($row)){
-                $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->first();
-                if($row->cart<$quantity){
-                    $row->cart=$row->cart + 1;
+            if($quantity>0){
+                if(isset($row)){
+                    $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->first();
+                    if($row->cart<$quantity){
+                        $row->cart=$row->cart + 1;
+                        $row->save();
+                        return 1;
+                    } else return 0;
+                } else {
+                    $row=new UserProduct;
+                    $row->user_id=session('id');
+                    $row->product_id=$productID;
+                    $row->cart=1;
                     $row->save();
                     return 1;
-                } else return 0;
-            } else {
-                $row=new UserProduct;
-                $row->user_id=session('id');
-                $row->product_id=$productID;
-                $row->cart=1;
-                $row->save();
-                return 1;
-            }
+                }
+            } else return 0;
+            
         } else {
             $row->cart=$row->cart - 1;
             $row->save();

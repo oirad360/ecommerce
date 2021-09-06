@@ -89,10 +89,6 @@ class SellerController extends BaseController{
         }
     }
 
-    public function modifyProduct(Request $request){
-        
-    }
-
     public function fetchProducts($seller){
         $user=User::where('username',$seller)->first();
         return $user->products;
@@ -107,31 +103,69 @@ class SellerController extends BaseController{
         }
     }
 
-    public function saveUsersLayout($layoutID){
-        if(UsersLayout::find($layoutID)===null){
+    public function saveUsersLayout($layoutID,$mobile){
+        $usersLayout=UsersLayout::find($layoutID);
+        if(!isset($usersLayout)){
             $usersLayout = new UsersLayout();
             $usersLayout->user_id=session('id');
             $usersLayout->layout_id=$layoutID;
             if(UsersLayout::where('user_id',session('id'))->where('active',true)->first()===null) $usersLayout->active=true;
             else $usersLayout->active=false;
+            if($mobile==="true") $usersLayout->mobile=true;
+            else $usersLayout->mobile=false;
             $usersLayout->save();
         }
     }
 
     public function active($layoutID,$val){
+        $row=UsersLayout::find($layoutID);
         if($val==="true"){
-            $row=UsersLayout::where('user_id',session('id'))->where('active',true)->first();
-            if(isset($row)){
-                $row->active=false;
+            $activeLayouts=UsersLayout::where('user_id',session('id'))->where('active',true)->get();
+            if(count($activeLayouts)===2) return 0;
+            if(count($activeLayouts)===1){
+                if($activeLayouts[0]->mobile===$row->mobile) return 0;
+                $row->active=true;
                 $row->save();
+                return 1;
             }
-            $row=UsersLayout::find($layoutID);
             $row->active=true;
             $row->save();
+            return 1;
         } else if($val==="false"){
-            $row=UsersLayout::find($layoutID);
             $row->active=false;
             $row->save();
+            return 1;
+        }
+    }
+
+    public function mobile($layoutID,$val){
+        $layout=UsersLayout::find($layoutID);
+        if($layout->active==1){
+            $activeLayouts=UsersLayout::where('user_id',session('id'))->where('active',true)->get();
+            if(count($activeLayouts)===2){
+                $otherLayout=UsersLayout::where('user_id',session('id'))->where('active',true)->where('layout_id','!=',$layoutID)->first();
+                if($val==="true"){
+                    if($otherLayout->mobile==1) return 0;
+                    $layout->mobile=true;
+                    $layout->save();
+                    return 1;
+                } else {
+                    if($otherLayout->mobile==0) return 0;
+                    $layout->mobile=false;
+                    $layout->save();
+                    return 1;
+                }
+            } else {
+                if($val==="true") $layout->mobile=true;
+                else $layout->mobile=false;
+                $layout->save();
+                return 1;
+            }
+        } else {
+            if($val==="true") $layout->mobile=true;
+                else $layout->mobile=false;
+                $layout->save();
+                return 1;
         }
     }
 

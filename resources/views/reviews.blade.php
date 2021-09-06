@@ -30,8 +30,8 @@
     </div>
     <div id="reviews">
     </div>
-    <button class=hidden id="writeReviewButton">Scrivi una recensione</button>
-    <div class=hidden id="reviewArea" class="hidden">
+    <button id="writeReviewButton">Scrivi una recensione</button>
+    <div class="hidden" id="reviewArea">
         <textarea name="reviewText" form="reviewForm" maxlength=255></textarea>
         <form name="reviewForm" id="reviewForm">
             <input type='hidden' name='_token' value='{{ $csrf_token }}'>

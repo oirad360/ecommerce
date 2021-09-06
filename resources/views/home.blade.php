@@ -2,7 +2,6 @@
 
 @section('style')
 <link rel=stylesheet href=/{{$app_folder}}/public/styles/productContainer.css>
-<link rel=stylesheet href=/{{$app_folder}}/public/styles/sectionHome.css>
 @endsection
 
 @section('scripts')

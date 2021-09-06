@@ -6,6 +6,9 @@ body{
     flex-direction: column;
     justify-content: space-between;
 }
+button{
+    font-family:'Raleway';
+}
 
 header{
     height: 380px;
@@ -214,14 +217,22 @@ select[name=c]:hover{
     font-size: 1rem;
 }
 
-#navCategories span{
+#navCategories a{
     margin: 0px 10px 10px 10px;
     text-align: center;
+    text-decoration: none;
+    color:white;
+}
+
+#navCategories a:hover{
+    text-decoration: underline;
 }
 
 #mainSection{
     flex-grow:1;
+    padding: 0px 50px;
 }
+
 footer{
     font-family: 'Merriweather', serif;
     padding: 20px;
@@ -240,11 +251,17 @@ footer{
     border-radius: 10px;
 }
 
-footer p{
-    font-size: 1rem;
-    line-height: 30px;
-    text-align: center;
-    margin: 20px;
+footer h3{
+    margin: 0px 0px 0px 20px;
+}
+
+footer ul{
+    margin: 10px 0px;
+}
+
+footer a{
+    color: white;
+    text-decoration: none;
 }
 
 #modal {
@@ -277,6 +294,9 @@ footer p{
 
 
 @media(max-width:900px){
+    #mainSection{
+        padding: 0px 35px;
+    }
     header{
         display: flex;
         flex-direction: column;
@@ -328,7 +348,7 @@ footer p{
         flex-direction: column;
         align-items: flex-start;
     }
-    #navCategories span{
+    #navCategories a{
         margin: 0px 10px 20px 30px;
         font-size: 1.7rem;
     }
@@ -338,6 +358,9 @@ footer p{
 }
 
 @media(max-width:500px){
+    #mainSection{
+        padding: 0px 20px;
+    }
     form[name=searchProducts] input[type=text]{
         width:200px;
     }

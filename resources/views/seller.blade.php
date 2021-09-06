@@ -64,15 +64,21 @@
         </div>
         <input type=submit name=send>
     </form>
-    <div id=layouts></div>
-    <button id=active class=hidden></button>
-    <button id=modifyLayoutButton class=hidden>Modifica layout</button>
-    <button id=deleteLayoutButton class=hidden>Elimina layout</button>
-    <button id=newLayoutButton>Crea un nuovo layout</button>
-    <button id=addContentButton class=hidden>Aggiungi al layout</button>
-    <button id=removeContentButton class=hidden>Rimuovi dal layout</button>
+    <button id=editorButton>Apri il layout editor</button>
+    <div id=editor class=hidden>
+        <div id=layouts></div>
+        <label id=mobile class=hidden><input type="checkbox">Versione mobile</label>
+        <button id=active class=hidden></button>
+        <button id=modifyLayoutButton class=hidden>Modifica layout</button>
+        <button id=deleteLayoutButton class=hidden>Elimina layout</button>
+        <button id=newLayoutButton>Crea un nuovo layout</button>
+        <button id=addContentButton class=hidden>Aggiungi al layout</button>
+        <button id=removeContentButton class=hidden>Rimuovi dal layout</button>
+    </div>
+    
     @endif
     <h3 id=reviewTitle class=hidden>Recensioni pubblicate da {{$seller}}</h3>
     <div id=reviews></div>
+    <a href="/{{$app_folder}}/public/logout"><button class=redButton>Logout</button></a>
 </section>
 @endsection

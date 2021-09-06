@@ -2,6 +2,7 @@
 
 @section('style')
 <link rel=stylesheet href=/{{$app_folder}}/public/styles/productContainer.css>
+<link rel=stylesheet href=/{{$app_folder}}/public/styles/sectionSearch.css>
 @endsection
 
 @section('scripts')
@@ -13,11 +14,13 @@
 
 @section('section')
 <section id="mainSection">
-    <h3>Risultati della ricerca per <span></span><h3>
+    @if(isset($show))<h3>Risultati della ricerca per "{{$text}}"</h3>@endif
+    <h3 id=category></h3>
     <div class=productContainer>
     </div>
 </section>
-<form class=hidden>
+<form method=POST class=hidden>
+    <input type='hidden' name='_token' value='{{ $csrf_token }}'>
     <input type=hidden name=q value="{{$text}}">
     <input type=hidden name=c value="{{$category}}">
 </form>

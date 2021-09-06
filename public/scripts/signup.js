@@ -141,49 +141,7 @@ function checkConfermaPass(event){
         }
     }
 }
-/* 
-function checkAssunzione(event){
-    const date = new Date();
-    const month = String(date.getMonth()+1).padStart(2,'0')//aggiunge 0 all'inizio della stringa finchè la lunghezza totale è pari a 2 
-                                                        //(in pratica se il mese è 3 lo fa diventare 03, se è 10,11 o 12 restano così)
-    const day = String(date.getDate()).padStart(2,'0')
-    const today = date.getFullYear()+'-'+month+'-'+day
-    const error=document.querySelector("#assunzione .error")
-    if(event.currentTarget.value>today) {
-        error.classList.remove("hidden")
-    }else{
-        error.classList.add("hidden")
-    }
-}
 
-function checkStipendio(event){
-    const errors=document.querySelectorAll("#stipendio .error")
-    if(event.currentTarget.value==="") {
-        errors[0].classList.remove("hidden")
-    }else{
-        errors[0].classList.add("hidden")
-    }
-    if(!/^\d+$/.test(event.currentTarget.value) && event.currentTarget.value!=="") { //if(non è un numero AND è non vuoto) togli hidden
-        errors[1].classList.remove("hidden")
-    }else{
-        errors[1].classList.add("hidden")
-    }
-}
-
-function checkType(event){ //se è selezionato l'input di tipo radio "impiegato" allora vengono mostrati campi in più nel form, altrimenti solo i campi necessari per la registrazione del cliente
-    const value=event.currentTarget.value
-    const labels = form.querySelectorAll(".impiegato");
-    if(value==="impiegato"){
-        for(label of labels){
-            label.classList.remove("hidden")
-        }
-    } else if(value==="cliente") {
-        for(label of labels){
-            label.classList.add("hidden")
-        }
-    }
-}
- */
 function checkImage(){
     const imageSize=form.image.files[0].size
     const imageExt=form.image.files[0].name.split(".").pop()
@@ -208,14 +166,9 @@ form.username.addEventListener('blur',checkUsername)
 form.email.addEventListener('blur',checkEmail)
 form.password.addEventListener('blur',checkPassword)
 form.confermaPass.addEventListener('blur',checkConfermaPass)
-form.dataAssunzione.addEventListener('blur',checkAssunzione)
-form.stipendio.addEventListener('blur',checkStipendio)
-form.image.addEventListener('change',checkImage)
+//form.image.addEventListener('change',checkImage)
 form.addEventListener('submit', validazione)
-const radios = form.elements['tipo'] //prendo i 2 input di tipo radio
-for(radio of radios){
-    radio.addEventListener('click',checkType)
-}
+
 
 if(radios[1].checked===true){
     const labels=document.querySelectorAll(".impiegato")

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Http\Request;
 
 class SignupController extends BaseController{
     public function signup(){
@@ -9,7 +10,7 @@ class SignupController extends BaseController{
             ->with('csrf_token', csrf_token());
     }
 
-    public function checkSignup(){
+    public function checkSignup(Request $request){
         $errors=array();
         // se ho mandato dati post nulli (anche uno solo fra tutti) torno la vista con errore
         if(request('nome')===null || request('cognome')===null || request('username')===null || request('email')===null || request('password')===null || request('confermaPass')===null){
@@ -76,7 +77,27 @@ class SignupController extends BaseController{
             $password=request('password');
             $password=password_hash($password,PASSWORD_BCRYPT);
         }
-        if(isset($_FILES['image'])){
+
+        if($request->image){
+            $file = $request->image;
+            $fileArray = array('image' => $file);
+            $rules = array(
+            'image' => 'mimes:jpeg,jpg,png|max:2000' //max 2000 KB
+            );
+            $validator = Validator::make($fileArray, $rules,$message=[
+                'mimes'=>"Il formato dell'immagine deve essere jpeg, jpg o png",
+                'max'=>"L'immagine non può superare i 2MB"
+            ]);
+            if ($validator->fails()){
+                $errors[]=$validator->errors();
+            } else{
+                $path = $request->file('image')->store('propics');
+                $pathArray=explode("/",$path);
+                $fileName=$pathArray[count($pathArray)-1];
+            }
+        } else $fileName="defaultAvatar.jpg";
+
+        /* if(isset($_FILES['image'])){
             if($_FILES['image']['error']===0){
                 if($_FILES['image']['size']<2000000){
                     $type = exif_imagetype($_FILES['image']['tmp_name']);
@@ -94,7 +115,7 @@ class SignupController extends BaseController{
             } else {
                 $fileName="defaultAvatar.jpg";
             }
-        }
+        } */
         if(count($errors)===0){
             $user = new User;
             $user->name=request('nome');

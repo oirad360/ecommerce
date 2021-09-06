@@ -41,7 +41,7 @@ class HomeController extends BaseController{
                 $product["lastAvailables"]=false;
             }
             else $product["soonAvailables"]=false;
-            $time=date("Y-m-d G:i:s", strtotime("+2 hour -1 hour -55 minutes"));
+            $time=date("Y-m-d G:i:s", strtotime("+2 hour -18 hour"));
             if($product->date>$time) $product["newArrivals"]=true;
             else $product["newArrivals"]=false;
         }

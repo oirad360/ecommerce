@@ -58,7 +58,7 @@ class LayoutCreator {
         }
 
         this.#addChildButton=document.createElement('button')
-        this.#addChildButton.classList.add("hidden")
+        //n this.#addChildButton.classList.add("hidden")
         this.#addChildButton.id="addChildButton"
         this.#addChildButton.innerText="Aggiungi sezione"
 
@@ -619,14 +619,14 @@ class LayoutCreator {
     }
     
     #select(event){//è la funzione che mi permette di selezionare il div che clicco
-        this.#addChildButton.classList.add("hidden")
-        this.#removeChildButton.classList.add("hidden")
+        //n this.#addChildButton.classList.add("hidden")
+        //n this.#removeChildButton.classList.add("hidden")
+        this.#removeChildButton.classList.remove("hidden")
         this.#lastSelected.style.borderStyle="solid"
         if(this.#lastSelected.dataset.noBorder==="true") this.#lastSelected.style.borderWidth="0px"
         this.#lastSelected=event.currentTarget
         const gen=this.#lastSelected.dataset.gen
         if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) this.#removeChildButton.classList.remove("hidden")
-        else this.#removeChildButton.classList.add("hidden")
         this.#lastSelected.style.borderStyle="dashed"
         if(this.#lastSelected.style.borderWidth==="0px") this.#lastSelected.style.borderWidth="1px"
         this.#setSize(this.#lastSelected)
@@ -695,14 +695,13 @@ class LayoutCreator {
     }
     
     #selectLevel(){//è la funzione che mi permette di selezionare il padre del div attualmente selezionato
-        this.#addChildButton.classList.remove("hidden")
+        //n this.#addChildButton.classList.remove("hidden")
         this.#deleteButton.classList.remove("hidden")
         this.#lastSelected.style.borderStyle="solid"
         if(this.#lastSelected.dataset.noBorder==="true") this.#lastSelected.style.borderWidth="0px"
         this.#lastSelected=this.#lastSelected.parentNode
         const gen=this.#lastSelected.dataset.gen
-        if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) this.#removeChildButton.classList.remove("hidden")
-        else this.#removeChildButton.classList.add("hidden")
+        /* //n if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) */ this.#removeChildButton.classList.remove("hidden")
         this.#setBorderAndBackground(this.#lastSelected)
         if(this.#lastSelected!==this.#layoutContainer) {
             this.#setSize(this.#lastSelected)
@@ -711,6 +710,7 @@ class LayoutCreator {
             this.#formLayout.flexDirection.value=lastSelectedFlexDirection
             this.#levelButton.classList.add("hidden")
             this.#sizeCommands.classList.add("hidden")
+            this.#removeChildButton.classList.add("hidden")
         }
         this.#lastSelected.style.borderStyle="dashed"
         if(this.#lastSelected.style.borderWidth==="0px") this.#lastSelected.style.borderWidth="1px"
@@ -819,12 +819,28 @@ class LayoutCreator {
         this.#showSaveButton()
         const child=document.createElement('div')
         child.classList.add("child")
-        child.dataset.gen=this.#lastSelected.childNodes[1].dataset.gen
-        child.dataset.id=parseInt(this.#lastSelected.childNodes[this.#lastSelected.childNodes.length-1].dataset.id)+1
+        if(this.#lastSelected.querySelector('.child')){
+            child.dataset.gen=this.#lastSelected.childNodes[0].dataset.gen
+            child.dataset.id=parseInt(this.#lastSelected.childNodes[this.#lastSelected.childNodes.length-1].dataset.id)+1
+        } else {
+            this.#lastSelected.style.display="flex"
+            this.#lastSelected.style.flexDirection=this.#formLayout.flexDirection.value
+            this.#splitCommands.classList.add("hidden")
+            this.#gen++
+            child.dataset.gen=this.#gen
+            child.dataset.id=1
+            this.#deleteButton.classList.remove("hidden")
+        }
+        
         child.dataset.parent_gen=this.#lastSelected.dataset.gen
         child.dataset.parent_id=this.#lastSelected.dataset.id
         child.style.margin="1px"
-        child.style.borderColor=this.#lastSelected.childNodes[1].style.borderColor
+        if(this.#lastSelected.querySelector('.child')){
+            child.style.borderColor=this.#lastSelected.childNodes[0].style.borderColor
+        } else {
+            child.style.borderColor=this.getRandomColor()
+        }
+        
         child.style.borderWidth="1px"
         child.style.borderStyle="solid"
         child.style.borderRadius="0px"
@@ -832,18 +848,22 @@ class LayoutCreator {
         child.style.overflow="auto"
         child.style.backgroundColor="#ffffff"
         const N=this.#lastSelected.childNodes.length+1
+
         const size1="calc("+100/N+"% - 4px)"//sottraggo dalla percentuale la quantità 2*(larghezzaMargine+larghezzaBordo)
         const size2="calc("+100+"% - 4px)"
-        if(this.#lastSelected.style.flexDirection==="row"){
+        if(this.#lastSelected.style.flexDirection.includes("row")){
+            console.log("row")
             child.style.width=size1
             child.style.height=size2
         } else {
+            console.log("col")
             child.style.height=size1
             child.style.width=size2
         }
         this.#setChild(child,"Inserisci un titolo",24)//imposto il titolo e la section nel figlio appena creato
         child.addEventListener('click',this.#selectBinded) //lo rendo selezionabile
         this.#lastSelected.appendChild(child) //lo inserisco nel padre
+        this.#content["[data-gen=\'"+child.dataset.gen+"\']"]={}
         this.#content["[data-gen=\'"+child.dataset.gen+"\']"]["[data-id=\'"+child.dataset.id+"\']"]=[]
         this.#counter.innerText++
         
@@ -851,20 +871,24 @@ class LayoutCreator {
 
     #removeChild(){//rimuove un div figlio dal div selezionato (solo se contiene più di 2 figli)
         this.#showSaveButton()
-        const parent=this.#lastSelected.parentNode
-        const length=this.#lastSelected.querySelectorAll('.child').length+1
-        this.#lastSelected.remove()
-        delete this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"]
-        this.#counter.innerText-=length
-        const click=new Event('click')
-        parent.querySelector('.child').dispatchEvent(click)
-        
-
+        if(this.#lastSelected.parentNode.querySelectorAll(".child[data-gen=\'"+this.#lastSelected.dataset.gen+"\']").length>1){
+            const parent=this.#lastSelected.parentNode
+            const length=this.#lastSelected.querySelectorAll('.child').length+1
+            this.#lastSelected.remove()
+            delete this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"]
+            this.#counter.innerText-=length
+            const click=new Event('click')
+            parent.querySelector('.child').dispatchEvent(click)
+        } else {
+            const click=new Event('click')
+            this.#levelButton.dispatchEvent(click)
+            this.#deleteButton.dispatchEvent(click)
+        }
     }
 
     #deleteChilds(){//rimuove tutti i figli del div selezionato (comprendendo anche i figli dei figli)
         const childs=this.#lastSelected.querySelectorAll(".child")
-        this.#addChildButton.classList.add("hidden")
+        //n this.#addChildButton.classList.add("hidden")
         this.#removeChildButton.classList.add("hidden")
         for(let child of childs){
             delete this.#content["[data-gen=\'"+child.dataset.gen+"\']"]
@@ -894,6 +918,5 @@ class LayoutCreator {
         this.#splitCommands.classList.remove("hidden")
         
     }
-
 }
 

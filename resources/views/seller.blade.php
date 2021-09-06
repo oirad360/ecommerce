@@ -79,6 +79,8 @@
     @endif
     <h3 id=reviewTitle class=hidden>Recensioni pubblicate da {{$seller}}</h3>
     <div id=reviews></div>
+    @if(isset($yourPage))
     <a href="/{{$app_folder}}/public/logout"><button class=redButton>Logout</button></a>
+    @endif
 </section>
 @endsection

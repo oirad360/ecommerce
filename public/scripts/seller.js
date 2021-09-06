@@ -872,7 +872,6 @@ function onPurchases(purchases){
 
 function reportWindowSize(){
     vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-    document.querySelector('#vw').innerText=vw
     if(layoutContainer){
         let flag=false
         if(vw<width){

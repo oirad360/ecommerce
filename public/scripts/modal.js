@@ -27,7 +27,7 @@ function onLikeClick(event){
     fetch(app_url+"/fetchLikes/"+id).then(onResponse).then(onJsonUtentiLike)
 }
 
-function onJsonUtentiLike(json){ //ottengo tutti gli utenti che hanno messo like alla recensione clickata
+function onJsonUtentiLike(json){ 
     if(json){
         modalView.style.top=window.pageYOffset+'px'
         modalView.classList.remove('hidden')

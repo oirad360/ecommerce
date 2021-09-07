@@ -58,7 +58,6 @@ class LayoutCreator {
         }
 
         this.#addChildButton=document.createElement('button')
-        //n this.#addChildButton.classList.add("hidden")
         this.#addChildButton.id="addChildButton"
         this.#addChildButton.innerText="Aggiungi sezione"
 
@@ -619,8 +618,6 @@ class LayoutCreator {
     }
     
     #select(event){//è la funzione che mi permette di selezionare il div che clicco
-        //n this.#addChildButton.classList.add("hidden")
-        //n this.#removeChildButton.classList.add("hidden")
         this.#removeChildButton.classList.remove("hidden")
         this.#lastSelected.style.borderStyle="solid"
         if(this.#lastSelected.dataset.noBorder==="true") this.#lastSelected.style.borderWidth="0px"
@@ -695,13 +692,12 @@ class LayoutCreator {
     }
     
     #selectLevel(){//è la funzione che mi permette di selezionare il padre del div attualmente selezionato
-        //n this.#addChildButton.classList.remove("hidden")
         this.#deleteButton.classList.remove("hidden")
         this.#lastSelected.style.borderStyle="solid"
         if(this.#lastSelected.dataset.noBorder==="true") this.#lastSelected.style.borderWidth="0px"
         this.#lastSelected=this.#lastSelected.parentNode
         const gen=this.#lastSelected.dataset.gen
-        /* //n if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2) */ this.#removeChildButton.classList.remove("hidden")
+        this.#removeChildButton.classList.remove("hidden")
         this.#setBorderAndBackground(this.#lastSelected)
         if(this.#lastSelected!==this.#layoutContainer) {
             this.#setSize(this.#lastSelected)
@@ -888,7 +884,6 @@ class LayoutCreator {
 
     #deleteChilds(){//rimuove tutti i figli del div selezionato (comprendendo anche i figli dei figli)
         const childs=this.#lastSelected.querySelectorAll(".child")
-        //n this.#addChildButton.classList.add("hidden")
         this.#removeChildButton.classList.add("hidden")
         for(let child of childs){
             delete this.#content["[data-gen=\'"+child.dataset.gen+"\']"]

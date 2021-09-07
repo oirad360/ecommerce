@@ -31,6 +31,13 @@ textarea {
     height: 5em; /*em è relativo al font size, se metto width 51em vuol dire che è larga 51 caratteri*/
     width: 45em;
 }
+#reviewArea{
+    margin: 20px;
+}
+
+#writeReviewButton{
+    margin:20px;
+}
 .error{
     color:red;
 }

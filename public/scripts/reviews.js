@@ -14,6 +14,7 @@ function onProduct(json){
     const img=document.createElement('img')
     if(json.image.substring(0,4)==="http") img.src=json.image
     else img.src=app_url+"/assets/"+json.image
+    img.addEventListener('click', onThumbnailClick)
     childBlock.appendChild(img)
     const buttonContainer=document.createElement('div')
     if(document.querySelector('.profileContainer')){
@@ -176,23 +177,16 @@ function showReviewArea(){
 
 function postReview(event){
     event.preventDefault()
-    const error=document.querySelector(".error")
-    if(reviewForm.reviewText.value!==""){//se l'area di testo per la recensione non è vuota passo alla fetch per pubblicare la recensione, altrimenti dò errore
-        error.classList.add("hidden")
+    if(reviewForm.reviewText.value!==""){
         const formData={method:'POST', body: new FormData(reviewForm)}
         fetch(app_url+"/reviews/postReview/"+product, formData).then(function(response){
             if(response.ok){
                 fetch(app_url+"/reviews/fetchReviews/"+product).then(onResponse).then(onReviews)
             }
         })
-    } else {
-        error.classList.remove("hidden")
     }
 }
 
-function deleteError(){
-    document.querySelector(".error").classList.add("hidden")
-}
 
 function like(event){
     const id=event.currentTarget.parentNode.parentNode.dataset.id
@@ -218,7 +212,6 @@ const writeReviewButton=document.querySelector('#writeReviewButton')
 writeReviewButton.addEventListener('click',showReviewArea)
 const reviewForm=document.forms['reviewForm']
 reviewForm.addEventListener('submit',postReview)
-reviewForm.reviewText.addEventListener('blur',deleteError)
 const sellerPropic=document.querySelector('#seller .propic')
 sellerPropic.addEventListener('click', onProPicClick)
 fetch(app_url+"/reviews/fetchProduct/"+product).then(onResponse).then(onProduct)

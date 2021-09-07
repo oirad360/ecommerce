@@ -44,7 +44,6 @@
             </select></label>
             <input type='submit' value="Pubblica recensione"/>
         </form>
-        <span class="error hidden">Inserisci il testo</span>
     </div>
 </section>
 @endsection

@@ -213,7 +213,10 @@
     .block h3, .block p{
         width:90px;
     }
-
+    .deleteProductButton{
+        width: 17px;
+        height: 15px;
+    }
     .desc{
         font-size: 0.7rem;
         width: 90px;

@@ -11,7 +11,7 @@ button{
 }
 
 header{
-    height: 380px;
+    height: 300px;
     background-image: url(../assets/shutterstock_1216923970SPOSTATO.jpg);
     background-size: cover;
     background-position: center;
@@ -203,9 +203,7 @@ select[name=c]:hover{
     background-color: rgba(0, 0, 0, 0.082);
 }
 
-#contactsButton{
-    font-size: 1rem;
-}
+
 #homeButton{
     max-width: 60px;
     margin: 10px 30px 0px 0px;
@@ -230,7 +228,7 @@ select[name=c]:hover{
 
 #mainSection{
     flex-grow:1;
-    padding: 0px 50px;
+    padding: 40px 50px;
 }
 
 footer{
@@ -295,9 +293,10 @@ footer a{
 
 @media(max-width:900px){
     #mainSection{
-        padding: 0px 35px;
+        padding: 40px 35px;
     }
     header{
+        height: 250px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -359,7 +358,7 @@ footer a{
 
 @media(max-width:500px){
     #mainSection{
-        padding: 0px 20px;
+        padding: 40px 20px;
     }
     form[name=searchProducts] input[type=text]{
         width:200px;
@@ -368,7 +367,7 @@ footer a{
         width: 100px;
     }
     header{
-        height: 280px;
+        height: 200px;
     }
     #navOpen{
         max-width: 55px;

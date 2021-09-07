@@ -819,6 +819,7 @@ function like(event){
         }
     })
 }
+
 function dislike(event){
     const id=event.currentTarget.parentNode.parentNode.parentNode.dataset.id
     fetch(app_url+"/dislike/"+id).then(function(response){

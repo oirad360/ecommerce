@@ -287,69 +287,79 @@ class LayoutCreator {
         this.#setBorderAndBackground(this.#lastSelected)
     }
     
-    async loadLayout(layoutID,modify){//carica il layout per mostrarlo e ritorna il json per i contenuti
-        await fetch("/ecommerce/loadLayout.php?layoutID="+layoutID).then(function (response){
-            return response.json()
-        }).then((function (json){
-            for(let property of Object.keys(json)){
-                if(property!=="id" && property!=="user_id" && property!=="childs" && property!=="content"){
-                    this.#layoutContainer.style[property]=json[property]
+
+    loadLayout(json,modify){//carica il layout per mostrarlo e ritorna il json per i contenuti
+        this.#layoutContainer.innerHTML=""
+        this.#content={}
+
+        for(let property of Object.keys(json)){
+            if(property!=="id" && property!=="childs"){
+                this.#layoutContainer.style[property]=json[property]
+            }
+        }
+        this.#layoutContainer.dataset.layout=json.id
+        this.#layoutContainer.classList.add("hasChilds")
+        
+        let flag=false
+        for(let child of json.childs){
+            const childNode=document.createElement('div')
+
+
+            for(let property of Object.keys(child.style)){
+                childNode.style[property]=child.style[property]
+            }
+            childNode.style.borderStyle="solid"
+            childNode.style.overflow="auto"
+            childNode.style.flexShrink="0";
+
+
+            if(childNode.style.borderWidth==="0px") childNode.dataset.noBorder=true
+            else childNode.dataset.noBorder=false
+            for(let data of Object.keys(child.dataset)){
+                    childNode.dataset[data]=child.dataset[data]
+            }
+
+            childNode.classList.add("child")
+            if(child.hasChilds==1) {
+                childNode.classList.add("hasChilds")
+            } else if(child.title.innerText && child.title.innerText!=="") this.#setChild(childNode,child.title.innerText,child.title.fontSize.split('px')[0])
+            else if(modify===true) this.#setChild(childNode,"",24)
+            else {
+                this.#setChild(childNode,"",24)
+                childNode.querySelector('.childTitle').remove()
+            }
+            if(child.hasChilds!=1 && modify===true) {
+                childNode.addEventListener('click',this.#selectBinded)
+                if(!flag){
+                    const click = new Event('click')
+                    childNode.dispatchEvent(click)
+                    flag=true
                 }
             }
-            this.#content=json["content"]
-            this.#layoutContainer.dataset.layout=layoutID
-            this.#layoutContainer.classList.add("hasChilds")
-            this.#layoutContainer.innerHTML=""
-            let lastGen=json.childs[0].data_gen
-            let color=this.getRandomColor()
-            let flag=false
-            for(let child of json.childs){
-                const childNode=document.createElement('div')
-                childNode.classList.add('child')
-                childNode.style.overflow="auto"
-                childNode.style.flexShrink="0";
-                if(child.data_gen!==lastGen){
-                    color=this.getRandomColor()
+
+
+            let parent
+            if(child.dataset.parent_gen==="0" && child.dataset.parent_id==="0") parent=this.#layoutContainer
+            else parent=this.#layoutContainer.querySelector("[data-gen=\'"+child.dataset.parent_gen+"\'][data-id=\'"+child.dataset.parent_id+"\']")
+            parent.appendChild(childNode)
+
+
+            this.#counter.innerText++
+            this.#gen=child.dataset.gen
+
+            if(child.hasChilds!=1){
+                if(this.#content["[data-gen=\'"+child.dataset.gen+"\']"]) this.#content["[data-gen=\'"+child.dataset.gen+"\']"]["[data-id=\'"+child.dataset.id+"\']"]=child.content
+                else{
+                    this.#content["[data-gen=\'"+child.dataset.gen+"\']"]={}
+                    this.#content["[data-gen=\'"+child.dataset.gen+"\']"]["[data-id=\'"+child.dataset.id+"\']"]=child.content
                 }
-                lastGen=child.data_gen
-                childNode.dataset.gen=child.data_gen
-                childNode.dataset.id=child.data_id
-                childNode.dataset.parent_gen=child.data_parent_gen
-                childNode.dataset.parent_id=child.data_parent_id
-                for(let i=9;i<Object.keys(child).length;i++){
-                    childNode.style[Object.keys(child)[i]]=child[Object.keys(child)[i]]
-                }
-                childNode.style.borderStyle="solid"
-                if(childNode.style.borderWidth==="0px") childNode.dataset.noBorder=true
-                else childNode.dataset.noBorder=false
-                if(child.hasChilds==1) {
-                    childNode.classList.add("hasChilds")
-                } else if(child.title) this.#setChild(childNode,child.title,child.fontSize.split('px')[0])
-                else if(modify===true) this.#setChild(childNode,"",24)
-                else {
-                    this.#setChild(childNode,"",24)
-                    childNode.querySelector('.childTitle').remove()
-                }
-                if(child.hasChilds!=1 && modify===true) {
-                    childNode.addEventListener('click',this.#selectBinded)
-                    if(!flag){
-                        const click = new Event('click')
-                        childNode.dispatchEvent(click)
-                        flag=true
-                    }
-                }
-                let parent
-                if(child.data_parent_gen==="0" && child.data_parent_id==="0") parent=this.#layoutContainer
-                else parent=this.#layoutContainer.querySelector("[data-gen=\'"+child.data_parent_gen+"\'][data-id=\'"+child.data_parent_id+"\']")
-                parent.appendChild(childNode)
-                this.#counter.innerText++
-                this.#gen=child.data_gen
             }
-        }).bind(this))
+        }
         return this.#content
     }
 
-    async save(){//salva il layout e il file json per i contenuti di quel layout
+    
+    save(){//salva il layout e il file json per i contenuti di quel layout
         let borderWidth
         if(this.#layoutContainer.dataset.noBorder==="true") borderWidth="0px"
         else borderWidth=this.#layoutContainer.style.borderWidth
@@ -374,9 +384,13 @@ class LayoutCreator {
                     title=null
                     fontSize=null
                 } else {
-                    title=child.childNodes[0].innerText
-                    if(title) fontSize=child.childNodes[0].style.fontSize
-                    else fontSize=null
+                    if(child.childNodes[0].innerText===""){
+                        title=null,
+                        fontSize=null
+                    } else {
+                        title=child.childNodes[0].innerText
+                        fontSize=child.childNodes[0].style.fontSize
+                    }
                     if(!this.#content["[data-gen=\'"+child.dataset.gen+"\']"]["[data-id=\'"+child.dataset.id+"\']"]){
                         content=[]
                     } else {
@@ -387,44 +401,36 @@ class LayoutCreator {
                 if(child.dataset.noBorder==="true") borderWidth="0px"
                 else borderWidth=child.style.borderWidth
                 data.childs.push({
-                    "data_gen": child.dataset.gen,
-                    "data_id": child.dataset.id,
-                    "data_parent_gen": child.dataset.parent_gen,
-                    "data_parent_id": child.dataset.parent_id,
+                    "dataset": {
+                        "gen": child.dataset.gen,
+                        "id": child.dataset.id,
+                        "parent_gen": child.dataset.parent_gen,
+                        "parent_id": child.dataset.parent_id
+                    },
+                    "style": {
+                        "display": child.style.display,
+                        "flexDirection": child.style.flexDirection,
+                        "height": child.style.height,
+                        "width": child.style.width,
+                        "margin": child.style.margin,
+                        "borderColor": child.style.borderColor,
+                        "borderRadius": child.style.borderRadius,
+                        "borderWidth": borderWidth,
+                        "backgroundColor": child.style.backgroundColor
+                    },
+                    "title": {
+                        "innerText": title,
+                        "fontSize": fontSize
+                    },
                     "hasChilds": child.classList.contains("hasChilds"),
-                    "title": title,
-                    "fontSize": fontSize,
                     "content": content,
-                    "display": child.style.display,
-                    "flexDirection": child.style.flexDirection,
-                    "height": child.style.height,
-                    "width": child.style.width,
-                    "margin": child.style.margin,
-                    "borderColor": child.style.borderColor,
-                    "borderRadius": child.style.borderRadius,
-                    "borderWidth": borderWidth,
-                    "backgroundColor": child.style.backgroundColor,
                 })
             }
         }
-        
-        await fetch("/ecommerce/saveLayout.php",{
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers:
-            {
-                'Content-Type': 'application/json'
-            }
-        }).then(function(response){
-            return response.text()
-        }).then((function(layoutID){
-            console.log(layoutID)
-            this.#layoutContainer.dataset.layout=layoutID
-        }).bind(this))
-
         this.#saved=true
-        return parseInt(this.#layoutContainer.dataset.layout)
+        return data
     }
+
 
     quit(){//termina le modifiche (senza salvare)
         const childs=this.#layoutContainer.querySelectorAll('.child')
@@ -513,6 +519,8 @@ class LayoutCreator {
     }
 
     getSection(gen,id){
+        console.log("gen: "+gen)
+        console.log("id: "+id)
         if(gen && id) return this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']").querySelector('section')
         else return this.#lastSelected.querySelector('section')
     }
@@ -531,6 +539,10 @@ class LayoutCreator {
 
     getLayoutID(){
         return this.#layoutContainer.dataset.layout
+    }
+
+    setLayoutID(layoutID){
+        this.#layoutContainer.dataset.layout=layoutID
     }
 
     isSaved(){//ritorna vero se il layout è salvato, falso altrimenti (ovvero quando sono apportate modifiche dopo l'ultimo salvataggio)
@@ -848,11 +860,9 @@ class LayoutCreator {
         const size1="calc("+100/N+"% - 4px)"//sottraggo dalla percentuale la quantità 2*(larghezzaMargine+larghezzaBordo)
         const size2="calc("+100+"% - 4px)"
         if(this.#lastSelected.style.flexDirection.includes("row")){
-            console.log("row")
             child.style.width=size1
             child.style.height=size2
         } else {
-            console.log("col")
             child.style.height=size1
             child.style.width=size2
         }

@@ -108,8 +108,6 @@ backgroundColor varchar(255)
 
 create table users_layouts(
 layout_id integer primary key,
-foreign key(layout_id) references layouts(id) on update cascade on delete cascade,
-index ind_layout_id(layout_id),
 user_id integer not null,
 foreign key(user_id) references users(id) on update cascade on delete cascade,
 index ind_user_id(user_id),

@@ -1,7 +1,18 @@
 <?php
-require_once 'database.php';
-$conn=mysqli_connect($database['host'],$database['user'],$database['password'],$database['name']);
-$layoutID=mysqli_real_escape_string($conn,$_GET['layoutID']);
+/* require_once 'database.php';
+$conn=mysqli_connect($database['host'],$database['user'],$database['password'],$database['name']); */
+
+$file=fopen("layouts.json","r");
+$layouts=json_decode(fread($file,filesize("layouts.json")),true);
+foreach($layouts as $layout){
+    if($layout["id"]==$_GET['layoutID']){
+        fclose($file);
+        echo json_encode($layout);
+        break;
+    } 
+}
+
+/* $layoutID=mysqli_real_escape_string($conn,$_GET['layoutID']);
 $query="select * from layouts where id=".$layoutID;
 $res=mysqli_query($conn,$query);
 $row=mysqli_fetch_assoc($res);
@@ -14,5 +25,5 @@ $content=json_decode(fread($file,filesize("layout$layoutID.json")));
 $result["content"]=$content;
 mysqli_free_result($res);
 mysqli_close($conn);
-echo json_encode($result);
+echo json_encode($result); */
 ?>

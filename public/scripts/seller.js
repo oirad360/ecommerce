@@ -248,6 +248,7 @@ function showDesc(event){
 }
 
 function onLayouts(layouts){
+    console.log(layouts)
     const section=document.querySelector('section')
     let layoutID
     let flag=false
@@ -280,15 +281,19 @@ function onLayouts(layouts){
         section.appendChild(msg)
     } else if(!newProductForm && layoutID) {
         layoutCreator=new LayoutCreator()
-        layoutCreator.loadLayout(layoutID).then(onJsonContent)
-        layoutContainer=layoutCreator.getLayoutContainer()
+        fetch("/ecommerce/loadLayout.php?layoutID="+layoutID).then(onResponse).then(function(json){
+            const content=layoutCreator.loadLayout(json)
+            layoutContainer=layoutCreator.getLayoutContainer()
+            section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
+            onJsonContent(content)
+        })
         for(const layout of layouts){
             layoutsList[layout.layout_id]={
                 "mobile": layout.mobile,
                 "active": layout.active
             }
         }
-        section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
+        
     }else if(newProductForm && layouts.length>0){
         mobile.classList.remove("hidden")
         activeButton.classList.remove("hidden")
@@ -317,20 +322,21 @@ function onLayouts(layouts){
             activeButton.innerText="Imposta come layout attivo"
         } else activeButton.innerText="Disabilita layout attivo"
         layoutCreator=new LayoutCreator(saveButton)
-        layoutCreator.loadLayout(layoutID).then(function(json){
+        fetch("/ecommerce/loadLayout.php?layoutID="+layoutID).then(onResponse).then(function(json){
+            const content=layoutCreator.loadLayout(json)
             for(const layout of layouts){
                 if(layout.layout_id==layoutID) {
                     if(layout.mobile==1) mobile.childNodes[0].checked=true
                     break
                 }
             }
-            onJsonContent(json)
+            layoutMenu=layoutCreator.getLayoutMenu()
+            layoutContainer=layoutCreator.getLayoutContainer()
+            section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
+            section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
+            layoutMenu.classList.add("hidden")
+            onJsonContent(content)
         })
-        layoutMenu=layoutCreator.getLayoutMenu()
-        layoutContainer=layoutCreator.getLayoutContainer()
-        section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
-        section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
-        layoutMenu.classList.add("hidden")
     }
 }
 
@@ -361,7 +367,8 @@ function selectLayout(event){
     const selectedID=event.currentTarget.innerText
     const lastID=layoutCreator.getLayoutID()
     event.currentTarget.innerText="..."
-    layoutCreator.loadLayout(selectedID).then(function(content){
+    fetch("/ecommerce/loadLayout.php?layoutID="+selectedID).then(onResponse).then(function(json){
+        const content=layoutCreator.loadLayout(json)
         layoutCreator.quit()
         addContentButton.classList.add("hidden")
         removeContentButton.classList.add("hidden")
@@ -444,9 +451,19 @@ function saveLayout(){
         loading.src=app_url+"/assets/loading.gif"
         saveButton.appendChild(loading)
         if(layoutCreator.getLayoutID()==="new"){
-            layoutCreator.save().then(function(layoutID){
+            layout=layoutCreator.save()
+           
+            fetch("/ecommerce/saveLayout.php",{
+                method: 'POST',
+                body: JSON.stringify(layout),
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                }
+            }).then(onResponseText).then(function(layoutID){
                 fetch(app_url+"/saveUsersLayout/"+layoutID+"/"+mobile.childNodes[0].checked).then(function(response){
                     if(response.ok){
+                        layoutCreator.setLayoutID(layoutID)
                         const idContainer=document.querySelector('#layouts')
                         const span=document.createElement('span')
                         span.classList.add('layoutID')
@@ -480,11 +497,23 @@ function saveLayout(){
                     }
                 })
             })
-        } else layoutCreator.save().then(function(layoutID){
-            saveButton.querySelector('img').remove()
-            saveButton.innerText="Salvataggio effettuato"
-            saveButton.addEventListener('click',saveLayout)
-        })
+        } else {
+            layout=layoutCreator.save()
+            fetch("/ecommerce/saveLayout.php",{
+                method: 'POST',
+                body: JSON.stringify(layout),
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function(response){
+                if(response.ok){
+                    saveButton.querySelector('img').remove()
+                    saveButton.innerText="Salvataggio effettuato"
+                    saveButton.addEventListener('click',saveLayout)
+                }
+            })
+        }
     }
 }
 
@@ -536,7 +565,10 @@ function quit(event){
                     break
                 }
             }
-            layoutCreator.loadLayout(layoutID).then(onJsonContent)
+            fetch("/ecommerce/loadLayout.php?layoutID="+layoutID).then(onResponse).then(function(json){
+                const content=layoutCreator.loadLayout(json)
+                onJsonContent(content)
+            })
         }
     }else{
         newLayoutButton.classList.remove("hidden")
@@ -544,7 +576,10 @@ function quit(event){
         event.currentTarget.addEventListener('click',modify)
         deleteLayoutButton.classList.remove("hidden")
         layoutMenu.classList.add("hidden")
-        layoutCreator.loadLayout(layoutCreator.getLayoutID()).then(onJsonContent)
+        fetch("/ecommerce/loadLayout.php?layoutID="+layoutCreator.getLayoutID()).then(onResponse).then(function(json){
+            const content=layoutCreator.loadLayout(json)
+            onJsonContent(content)
+        })
     }
     event.currentTarget.removeEventListener('click',quit)
 }
@@ -878,7 +913,10 @@ function reportWindowSize(){
         if(vw<width){
             for(const key of Object.keys(layoutsList)){
                 if(layoutsList[key].mobile==1 && layoutsList[key].active==1){
-                    layoutCreator.loadLayout(key).then(onJsonContent)
+                    fetch("/ecommerce/loadLayout.php?layoutID="+key).then(onResponse).then(function(json){
+                        const content=layoutCreator.loadLayout(json)
+                        onJsonContent(content)
+                    })
                     flag=true
                     break
                 }
@@ -886,7 +924,10 @@ function reportWindowSize(){
         } else {
             for(const key of Object.keys(layoutsList)){
                 if(layoutsList[key].mobile==0 && layoutsList[key].active==1){
-                    layoutCreator.loadLayout(key).then(onJsonContent)
+                    fetch("/ecommerce/loadLayout.php?layoutID="+key).then(onResponse).then(function(json){
+                        const content=layoutCreator.loadLayout(json)
+                        onJsonContent(content)
+                    })
                     flag=true
                     break
                 }
@@ -895,7 +936,10 @@ function reportWindowSize(){
         if(!flag)
         for(const key of Object.keys(layoutsList)){
             if(layoutsList[key].active==1){
-                layoutCreator.loadLayout(key).then(onJsonContent)
+                fetch("/ecommerce/loadLayout.php?layoutID="+key).then(onResponse).then(function(json){
+                    const content=layoutCreator.loadLayout(json)
+                    onJsonContent(content)
+                })
                 break
             }
         }
@@ -954,6 +998,7 @@ let productsToRemove=[]
 let modifyFlag=false
 let productList=[]
 let firstLoading=true
+let layout
 const width=800
 const newProductButton=document.querySelector('#newProductButton')
 const newProductForm=document.forms["newProduct"]

@@ -33,7 +33,7 @@ class SellerController extends BaseController{
     public function newProduct(Request $request){
         $errors=array();
         $fileName="defaultProductImage.png";
-        $noImgUpload=false;
+        $imgUpload=false;
         if($request->imgOption==="upload"){
             if($request->image){
                 $file = $request->image;
@@ -51,9 +51,10 @@ class SellerController extends BaseController{
                     $path = $request->file('image')->store('productImages');
                     $pathArray=explode("/",$path);
                     $fileName=$pathArray[count($pathArray)-1];
+                    $imgUpload=true;
                 }
-            } else $noImgUpload=true;
-        } else if($request->url!=="") $fileName=$request->url;
+            };
+        } else if($request->url) $fileName=$request->url;
         
         if(floatval($request->price)<=0){
             $errors[]="Inserisci un prezzo";
@@ -77,8 +78,8 @@ class SellerController extends BaseController{
             $newProduct->title=$request->title;
             $newProduct->price=$request->price;
             $newProduct->quantity=$request->quantity;
-            if($request->productID!==""){
-                if(!$noImgUpload) $newProduct->image=$fileName;
+            if($request->productID){
+                if($imgUpload) $newProduct->image=$fileName;
             } else $newProduct->image=$fileName;
             if($request->desc!=="")$newProduct->description=$request->desc;
             $newProduct->category=$request->category;
@@ -103,18 +104,40 @@ class SellerController extends BaseController{
         }
     }
 
-    public function saveUsersLayout($layoutID,$mobile){
-        $usersLayout=UsersLayout::find($layoutID);
-        if(!isset($usersLayout)){
+    public function saveUsersLayout(Request $request){
+        $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","r");
+        $layouts=json_decode(fread($file,filesize("C:/xampp/htdocs/ecommerce/layouts.json")),true);
+        $result;
+        $newLayout=$request->all();
+        $new=false;
+        if($newLayout['id']==="new"){
+            $keys=array_keys($layouts);
+            if(count($keys)>0) $newLayout["id"]=$keys[count($keys)-1]+1;
+            else $newLayout["id"]=1;
             $usersLayout = new UsersLayout();
-            $usersLayout->user_id=session('id');
-            $usersLayout->layout_id=$layoutID;
-            if(UsersLayout::where('user_id',session('id'))->where('active',true)->first()===null) $usersLayout->active=true;
+            $usersLayout->layout_id=$newLayout["id"];
+            if(UsersLayout::where('user_id',session('id'))->first()===null) $usersLayout->active=true;
             else $usersLayout->active=false;
-            if($mobile==="true") $usersLayout->mobile=true;
+            $usersLayout->user_id=session('id');
+            if($newLayout["mobile"]===true) $usersLayout->mobile=true;
             else $usersLayout->mobile=false;
             $usersLayout->save();
+            $new=true;
         }
+        unset($newLayout["mobile"]);
+        $layouts[$newLayout["id"]]=$newLayout;
+        $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","w");
+        fwrite($file,json_encode($layouts));
+        fclose($file);
+        $result=array("layoutID"=>$newLayout["id"],"new"=>$new);
+        return $result;
+    }
+
+    public function loadLayout($layoutID){
+        $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","r");
+        $layouts=json_decode(fread($file,filesize("C:/xampp/htdocs/ecommerce/layouts.json")),true);
+        fclose($file);
+        return $layouts[$layoutID];
     }
 
     public function active($layoutID,$val){
@@ -170,30 +193,30 @@ class SellerController extends BaseController{
     }
 
     public function deleteProduct($productID){
-        $product=Product::find($productID);
-        $product->delete();
-        $rows=User::find(session('id'))->layouts;
-        $layoutsIDs=array();
-        if(isset($rows)){
-            foreach($rows as $row) $layoutsIDs[]=$row["layout_id"];
-        }
-        $newContent=array();
-        foreach($layoutsIDs as $layoutID){
-            $file=fopen("C:/xampp/htdocs/ecommerce/layout$layoutID.json","r");
-            $content=json_decode(fread($file,filesize("C:/xampp/htdocs/ecommerce/layout$layoutID.json")),true);
-            foreach($content as $key=>$value){
-                foreach($content[$key] as $id=>$value){
-                    unset($value[array_search($productID,$value)]);
-                    $newContent[$key][$id]=array_values($value);
+        $userLayouts=User::find(session('id'))->layouts;
+        if(isset($userLayouts)){
+            $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","r");
+            $layouts=json_decode(fread($file,filesize("C:/xampp/htdocs/ecommerce/layouts.json")),true);
+            foreach($userLayouts as $userLayout){
+                $i=0;
+                foreach($layouts[$userLayout["layout_id"]]["childs"] as $child){
+                    if($child["hasChilds"]==false){
+                        $index=array_search($productID,$child["content"]);
+                        if($index!==false){
+                            array_splice($child["content"], array_search($productID,$child["content"]), 1);
+                            $layouts[$userLayout["layout_id"]]["childs"][$i]["content"]=$child["content"];
+                        }
+                    }
+                    //unset($child["content"][$index]);
+                    $i++;
                 }
             }
-            unlink("C:/xampp/htdocs/ecommerce/layout$layoutID.json");
+            $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","w");
+            fwrite($file,json_encode($layouts));
             fclose($file);
-            $file=fopen("C:/xampp/htdocs/ecommerce/layout$layoutID.json","w");
-            fwrite($file,json_encode($newContent));
-            fclose($file);
-            $newContent=array();
         }
+        $product=Product::find($productID);
+        $product->delete();
     }
     public function fetchReviews($seller){
         $userID=User::where('username',$seller)->first()->id;
@@ -212,6 +235,15 @@ class SellerController extends BaseController{
             }
         }
         return $reviews;
+    }
+    public function deleteLayout($layoutID){
+        UsersLayout::find($layoutID)->delete();
+        $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","r");
+        $layouts=json_decode(fread($file,filesize("C:/xampp/htdocs/ecommerce/layouts.json")),true);
+        unset($layouts[$layoutID]);
+        $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","w");
+        fwrite($file,json_encode($layouts));
+        fclose($file);
     }
     public function deleteReview($id){
         $review=Review::find($id);

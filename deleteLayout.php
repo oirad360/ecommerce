@@ -1,10 +1,16 @@
 <?php
-require_once 'database.php';
-$conn=mysqli_connect($database['host'],$database['user'],$database['password'],$database['name']);
-$layoutID=mysqli_real_escape_string($conn,$_GET['layoutID']);
-$query="delete from layouts where id=$layoutID";
-$res=mysqli_query($conn,$query);
-unlink("layout$layoutID.json");
-mysqli_free_result($res);
-mysqli_close($conn);
+$file=fopen("layouts.json","r");
+$layouts=json_decode(fread($file,filesize("layouts.json")),true);
+fclose($file);
+$i=0;
+foreach($layouts as $layout){
+    if($layout["id"]==$_GET['layoutID']){
+        array_splice($layouts,$i,1);
+        break;
+    }
+    $i++;
+}
+$file=fopen("layouts.json","w");
+fwrite($file,json_encode($layouts));
+fclose($file);
 ?>

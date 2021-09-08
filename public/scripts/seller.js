@@ -174,7 +174,7 @@ function onJsonProducts(json){
             const block=document.createElement('div')
             block.classList.add('block')
             const title=document.createElement('h3')
-            title.innerText=item.title
+            title.innerText=item.title+" "+item.id
             block.appendChild(title)
             const img=document.createElement('img')
             if(item.image.substring(0,4)==="http") img.src=item.image
@@ -248,28 +248,13 @@ function showDesc(event){
 }
 
 function onLayouts(layouts){
-    console.log(layouts)
     const section=document.querySelector('section')
     let layoutID
-    let flag=false
+    let val=(vw>breakpoint) ? 0 : 1
     for(const layout of layouts){
-        if(vw>width){
-            if(layout.active==1 && layout.mobile==0) {
-                layoutID=layout.layout_id
-                flag=true
-                break
-            }
-        } else {
-            if(layout.active==1 && layout.mobile==1) {
-                layoutID=layout.layout_id
-                flag=true
-                break
-            }
-        }
-    }
-    if(!flag){
-        for(const layout of layouts){
-            if(layout.active==1){
+        if(layout.active==1){
+            layoutID=layout.layout_id
+            if(layout.mobile==val) {
                 layoutID=layout.layout_id
                 break
             }
@@ -281,7 +266,7 @@ function onLayouts(layouts){
         section.appendChild(msg)
     } else if(!newProductForm && layoutID) {
         layoutCreator=new LayoutCreator()
-        fetch("/ecommerce/loadLayout.php?layoutID="+layoutID).then(onResponse).then(function(json){
+        fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
             const content=layoutCreator.loadLayout(json)
             layoutContainer=layoutCreator.getLayoutContainer()
             section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
@@ -318,18 +303,13 @@ function onLayouts(layouts){
         }
         if(!layoutID) {
             layoutID=layouts[0].layout_id
-            layoutsList[Object.keys(layoutsList)[0]].span.style.border="1px solid black"
+            layoutsList[layoutID].span.style.border="1px solid black"
             activeButton.innerText="Imposta come layout attivo"
         } else activeButton.innerText="Disabilita layout attivo"
+        if(layoutsList[layoutID].mobile==1) mobile.childNodes[0].checked=true
         layoutCreator=new LayoutCreator(saveButton)
-        fetch("/ecommerce/loadLayout.php?layoutID="+layoutID).then(onResponse).then(function(json){
+        fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
             const content=layoutCreator.loadLayout(json)
-            for(const layout of layouts){
-                if(layout.layout_id==layoutID) {
-                    if(layout.mobile==1) mobile.childNodes[0].checked=true
-                    break
-                }
-            }
             layoutMenu=layoutCreator.getLayoutMenu()
             layoutContainer=layoutCreator.getLayoutContainer()
             section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
@@ -365,33 +345,41 @@ function selectLayout(event){
     event.currentTarget.removeEventListener('click',selectLayout)
     const selected=event.currentTarget
     const selectedID=event.currentTarget.innerText
-    const lastID=layoutCreator.getLayoutID()
+    let lastID
+    for(const key in layoutsList){
+        if(layoutsList[key].span.style.border!==""){
+            lastID=key
+            break
+        }
+    }
     event.currentTarget.innerText="..."
-    fetch("/ecommerce/loadLayout.php?layoutID="+selectedID).then(onResponse).then(function(json){
+    saveButton.innerText="Salva"
+    addContentButton.classList.add("hidden")
+    removeContentButton.classList.add("hidden")
+    deleteLayoutButton.classList.remove("hidden")
+    activeButton.classList.remove("hidden")
+    layoutMenu.classList.add("hidden")
+    layoutCreator.quit()
+    modifyFlag=false
+    for(const product of productsToInsert) product.style.border=""
+    productsToInsert=[]
+    productsToRemove=[]
+    mobile.childNodes[0].checked=layoutsList[selectedID].mobile
+    modifyLayoutButton.innerText="Modifica layout"
+    modifyLayoutButton.addEventListener('click',modify)
+    newLayoutButton.addEventListener('click',newLayout)
+    newLayoutButton.innerText="Crea un nuovo layout"
+    modifyLayoutButton.classList.remove('hidden')
+    newLayoutButton.classList.remove('hidden')
+    if(lastID) layoutsList[lastID].span.style.border=""
+    selected.style.border="1px solid black"
+    if(selected.style.color==="red") activeButton.innerText="Disabilita layout attivo"
+    else activeButton.innerText="Imposta come layout attivo"
+    selected.addEventListener('click',selectLayout)
+    selected.innerText=selectedID
+    fetch(app_url+"/loadLayout/"+selectedID).then(onResponse).then(function(json){
         const content=layoutCreator.loadLayout(json)
-        layoutCreator.quit()
-        addContentButton.classList.add("hidden")
-        removeContentButton.classList.add("hidden")
-        deleteLayoutButton.classList.remove("hidden")
-        activeButton.classList.remove("hidden")
-        layoutMenu.classList.add("hidden")
-        modifyFlag=false
-        for(const product of productsToInsert) product.style.border=""
-        productsToInsert=[]
-        productsToRemove=[]
-        mobile.childNodes[0].checked=layoutsList[selectedID].mobile
-        modifyLayoutButton.innerText="Modifica layout"
-        newLayoutButton.innerText="Crea un nuovo layout"
-        modifyLayoutButton.classList.remove('hidden')
-        newLayoutButton.classList.remove('hidden')
-        if(layoutsList[lastID])
-        layoutsList[lastID].span.style.border=""
-        selected.style.border="1px solid black"
-        if(selected.style.color==="red") activeButton.innerText="Disabilita layout attivo"
-        else activeButton.innerText="Imposta come layout attivo"
         onJsonContent(content)
-        selected.addEventListener('click',selectLayout)
-        selected.innerText=selectedID
     })
 }
 
@@ -403,8 +391,8 @@ function active(){
     loading.src=app_url+"/assets/loading.gif"
     activeButton.appendChild(loading)
     let layoutID
-    for(const key of Object.keys(layoutsList)){
-        if(layoutsList[key].span.style.border!=="") layoutID=layoutsList[key].span
+    for(const id in layoutsList){
+        if(layoutsList[id].span.style.border!=="") layoutID=layoutsList[id].span
     }
     let val
     if(layoutID.style.color==="red") val=false
@@ -424,7 +412,6 @@ function active(){
             console.log("Hai già un layout attivo per la versione "+(mobile.childNodes[0].checked ? "mobile" : "desktop"))
             activeButton.querySelector('img').remove()
         }
-            
             activeButton.addEventListener('click',active)
     })
 }
@@ -436,9 +423,9 @@ function modify(event){
     event.currentTarget.classList.remove('hidden')
     event.currentTarget.innerText="Annulla"
     layoutMenu.classList.remove("hidden")
-    
     layoutCreator.modify()
     event.currentTarget.addEventListener('click',quit)
+    event.currentTarget.removeEventListener('click',modify)
 }
 
 function saveLayout(){
@@ -450,70 +437,53 @@ function saveLayout(){
         loading.width=17
         loading.src=app_url+"/assets/loading.gif"
         saveButton.appendChild(loading)
-        if(layoutCreator.getLayoutID()==="new"){
-            layout=layoutCreator.save()
-           
-            fetch("/ecommerce/saveLayout.php",{
-                method: 'POST',
-                body: JSON.stringify(layout),
-                headers:
-                {
-                    'Content-Type': 'application/json'
+        layout=layoutCreator.save()
+        layout.mobile=mobile.childNodes[0].checked
+        fetch(app_url+"/saveUsersLayout",{
+            method: 'POST',
+            body: JSON.stringify(layout),
+            headers:
+            {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+            }
+        }).then(onResponse).then(function(json){
+            if(json.new==1){
+                const layoutID=json.layoutID
+                layoutCreator.setLayoutID(layoutID)
+                const idContainer=document.querySelector('#layouts')
+                const span=document.createElement('span')
+                span.classList.add('layoutID')
+                span.innerText=layoutID
+                span.addEventListener('click',selectLayout)
+                idContainer.appendChild(span)
+                let active
+                if((Object.keys(layoutsList)).length===0){
+                    span.style.color="red"
+                    activeButton.classList.remove("hidden")
+                    activeButton.innerText="Disabilita layout attivo"
+                    active=1
                 }
-            }).then(onResponseText).then(function(layoutID){
-                fetch(app_url+"/saveUsersLayout/"+layoutID+"/"+mobile.childNodes[0].checked).then(function(response){
-                    if(response.ok){
-                        layoutCreator.setLayoutID(layoutID)
-                        const idContainer=document.querySelector('#layouts')
-                        const span=document.createElement('span')
-                        span.classList.add('layoutID')
-                        span.innerText=layoutID
-                        span.addEventListener('click',selectLayout)
-                        idContainer.appendChild(span)
-                        let active
-                        if((Object.keys(layoutsList)).length===0){
-                            span.style.color="red"
-                            activeButton.classList.remove("hidden")
-                            activeButton.innerText="Disabilita layout attivo"
-                            active=1
-                        }
-                        else {
-                            activeButton.innerText="Imposta come layout attivo"
-                            active=0
-                        }
-                        for(const key of Object.keys(layoutsList)){
-                            layoutsList[key].span.style.border=""
-                        }
-                        layoutsList[layoutID]={
-                            "span":span,
-                            "mobile":mobile.childNodes[0].checked ? 1 : 0,
-                            "active": active
-                        }
-                        span.style.border="1px solid black"
-                        saveButton.querySelector('img').remove()
-                        saveButton.innerText="Salvataggio effettuato"
-                        deleteLayoutButton.classList.remove("hidden")
-                        saveButton.addEventListener('click',saveLayout)
-                    }
-                })
-            })
-        } else {
-            layout=layoutCreator.save()
-            fetch("/ecommerce/saveLayout.php",{
-                method: 'POST',
-                body: JSON.stringify(layout),
-                headers:
-                {
-                    'Content-Type': 'application/json'
+                else {
+                    activeButton.innerText="Imposta come layout attivo"
+                    active=0
                 }
-            }).then(function(response){
-                if(response.ok){
-                    saveButton.querySelector('img').remove()
-                    saveButton.innerText="Salvataggio effettuato"
-                    saveButton.addEventListener('click',saveLayout)
+                for(const id in layoutsList){
+                    layoutsList[id].span.style.border=""
                 }
-            })
-        }
+                layoutsList[layoutID]={
+                    "span":span,
+                    "mobile":mobile.childNodes[0].checked ? 1 : 0,
+                    "active": active
+                }
+                span.style.border="1px solid black"
+                deleteLayoutButton.classList.remove("hidden")
+                
+            }
+            saveButton.querySelector('img').remove()
+            saveButton.innerText="Salvataggio effettuato"
+            saveButton.addEventListener('click',saveLayout)
+        })
     }
 }
 
@@ -527,9 +497,9 @@ function mobileVersion(event){
             console.log("Hai già un layout attivo per la versione "+(mobile.childNodes[0].checked ? "mobile" : "desktop"))
             currentTarget.checked=!val
         } else {
-            for(const key of Object.keys(layoutsList)){
-                if(key==layoutID){
-                    layoutsList[key].mobile=val ? 1 : 0
+            for(const id in layoutsList){
+                if(id==layoutID){
+                    layoutsList[id].mobile=val ? 1 : 0
                     break
                 }
             }
@@ -558,14 +528,14 @@ function quit(event){
             modifyLayoutButton.classList.remove("hidden")
             deleteLayoutButton.classList.remove("hidden")
             let layoutID
-            for(const key of Object.keys(layoutsList)){
-                if(layoutsList[key].span.style.border!==""){
-                    layoutID=layoutsList[key].span.innerText
-                    mobile.childNodes[0].checked=layoutsList[key].mobile
+            for(const id in layoutsList){
+                if(layoutsList[id].span.style.border!==""){
+                    layoutID=layoutsList[id].span.innerText
+                    mobile.childNodes[0].checked=layoutsList[id].mobile
                     break
                 }
             }
-            fetch("/ecommerce/loadLayout.php?layoutID="+layoutID).then(onResponse).then(function(json){
+            fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
                 const content=layoutCreator.loadLayout(json)
                 onJsonContent(content)
             })
@@ -576,7 +546,7 @@ function quit(event){
         event.currentTarget.addEventListener('click',modify)
         deleteLayoutButton.classList.remove("hidden")
         layoutMenu.classList.add("hidden")
-        fetch("/ecommerce/loadLayout.php?layoutID="+layoutCreator.getLayoutID()).then(onResponse).then(function(json){
+        fetch(app_url+"/loadLayout/"+layoutCreator.getLayoutID()).then(onResponse).then(function(json){
             const content=layoutCreator.loadLayout(json)
             onJsonContent(content)
         })
@@ -662,9 +632,9 @@ function modalDelete(event){
     div.classList.add('modalDelete')
     const msg=document.createElement('p')
     let layoutID
-    for(const key of Object.keys(layoutsList)){
-        if(layoutsList[key].span.style.border!==""){
-            layoutID=layoutsList[key].span.innerText
+    for(const id in layoutsList){
+        if(layoutsList[id].span.style.border!==""){
+            layoutID=layoutsList[id].span.innerText
             break
         }
     }
@@ -696,13 +666,13 @@ function modalDelete(event){
 
 function deleteLayout(){
     let layoutID
-    for(const key of Object.keys(layoutsList)){
-        if(layoutsList[key].span.style.border!=="") {
-            layoutID=layoutsList[key].span.innerText
+    for(const id in layoutsList){
+        if(layoutsList[id].span.style.border!=="") {
+            layoutID=id
             break
         }
     }
-    layoutCreator.deleteLayout().then(function(){
+    fetch(app_url+"/deleteLayout/"+layoutID).then(function(){
         document.body.classList.remove('noScroll')
         modalView.classList.add('hidden')
         modalView.innerHTML = ''
@@ -732,19 +702,21 @@ function deleteLayout(){
 
 function deleteProduct(event){
     const productID=event.currentTarget.dataset.product_id
-    fetch(app_url+"/deleteProduct/"+productID).then(function(){
-        if(layoutCreator){
-            const products=layoutContainer.querySelectorAll("[data-product_id=\'"+productID+"\']")
-            if(products) for(const product of products) product.remove()
+    fetch(app_url+"/deleteProduct/"+productID).then(function(response){
+        if(response.ok){
+            if(layoutCreator){
+                const products=layoutContainer.querySelectorAll("[data-product_id=\'"+productID+"\']")
+                if(products) for(const product of products) product.remove()
+            }
+            fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
         }
-        fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
     })
 }
 
 function onJsonContent(content){
     const productContainer=document.querySelector('#yourProductsContainer')
-    for(const gen of Object.keys(content)){
-        for(const id of Object.keys(content[gen])){
+    for(const gen in content){
+        for(const id in content[gen]){
             const genn=gen.substring(11,gen.length-2)
             const idd=id.substring(10,id.length-2)
             const childSection=layoutCreator.getSection(genn,idd)
@@ -909,37 +881,17 @@ function onPurchases(purchases){
 function reportWindowSize(){
     vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     if(layoutContainer){
-        let flag=false
-        if(vw<width){
-            for(const key of Object.keys(layoutsList)){
-                if(layoutsList[key].mobile==1 && layoutsList[key].active==1){
-                    fetch("/ecommerce/loadLayout.php?layoutID="+key).then(onResponse).then(function(json){
+        let val=(vw>breakpoint) ? 0 : 1
+        for(const id in layoutsList){
+            if(layoutsList[id].active==1 && layoutsList[id].mobile==val){
+                if(id!=layoutCreator.getLayoutID()){
+                    window.removeEventListener('resize', reportWindowSize)
+                    fetch(app_url+"/loadLayout/"+id).then(onResponse).then(function(json){
                         const content=layoutCreator.loadLayout(json)
                         onJsonContent(content)
+                        window.addEventListener('resize', reportWindowSize)
                     })
-                    flag=true
-                    break
                 }
-            }
-        } else {
-            for(const key of Object.keys(layoutsList)){
-                if(layoutsList[key].mobile==0 && layoutsList[key].active==1){
-                    fetch("/ecommerce/loadLayout.php?layoutID="+key).then(onResponse).then(function(json){
-                        const content=layoutCreator.loadLayout(json)
-                        onJsonContent(content)
-                    })
-                    flag=true
-                    break
-                }
-            }
-        }
-        if(!flag)
-        for(const key of Object.keys(layoutsList)){
-            if(layoutsList[key].active==1){
-                fetch("/ecommerce/loadLayout.php?layoutID="+key).then(onResponse).then(function(json){
-                    const content=layoutCreator.loadLayout(json)
-                    onJsonContent(content)
-                })
                 break
             }
         }
@@ -952,37 +904,48 @@ function showEditor(event){
         editor.classList.remove("hidden")
         event.currentTarget.innerText="Chiudi il layout editor"
         window.removeEventListener('resize', reportWindowSize)
+        if(layoutContainer){
+            const click= new Event('click')
+            layoutsList[layoutCreator.getLayoutID()].span.dispatchEvent(click)
+        }
     } else {
         editor.classList.add("hidden")
         event.currentTarget.innerText="Apri il layout editor"
         window.addEventListener('resize', reportWindowSize)
-        let flag=false
+        let found=false
+        let active
         let layoutID
-        for(const key of Object.keys(layoutsList)){
-            if(vw>width){
-                if(layoutsList[key].active==1 && layoutsList[key].mobile==0) {
-                    layoutID=layoutsList[key].span
-                    flag=true
-                    break
-                }
-            } else {
-                if(layoutsList[key].active==1 && layoutsList[key].mobile==1) {
-                    layoutID=layoutsList[key].span
-                    flag=true
-                    break
+        const val= (vw>breakpoint) ? 0 : 1
+        if(Object.keys(layoutsList).length>0){
+            for(const id in layoutsList){
+                if(layoutsList[id].active==1){
+                    active=id
+                    if(layoutsList[id].mobile==val){
+                        layoutID=layoutsList[id].span
+                        found=true
+                        break
+                    }
                 }
             }
-        }
-        if(!flag){
-            for(const key of Object.keys(layoutsList)){
-                if(layoutsList[key].active==1){
-                    layoutID=layoutsList[key].span
-                    break
+            if(!found){
+                if(active)layoutID=layoutsList[active].span
+                else{
+                    for(const id in layoutsList){
+                        if(layoutsList[id].span.style.border!==""){
+                            layoutID=layoutsList[id].span
+                            found=true
+                            break
+                        }
+                    }
                 }
             }
+            const click= new Event('click')
+            layoutID.dispatchEvent(click)
+        } else if(layoutCreator){
+            layoutContainer.remove()
+            layoutMenu.remove()
         }
-        const newEvent=new Event('click')
-        layoutID.dispatchEvent(newEvent)
+        
     }
 }
 
@@ -999,7 +962,7 @@ let modifyFlag=false
 let productList=[]
 let firstLoading=true
 let layout
-const width=800
+const breakpoint=800
 const newProductButton=document.querySelector('#newProductButton')
 const newProductForm=document.forms["newProduct"]
 const addContentButton=document.querySelector('#addContentButton')

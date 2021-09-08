@@ -39,11 +39,13 @@ Route::get('seller/{seller}/fetchReviews', 'SellerController@fetchReviews');
 Route::post('seller/newProduct', 'SellerController@newProduct');
 Route::get('fetchProducts/{seller}', 'SellerController@fetchProducts');
 Route::get('layout/{seller}', 'SellerController@layout');
-Route::get('saveUsersLayout/{layoutID}/{mobile}', 'SellerController@saveUsersLayout');
+Route::post('saveUsersLayout', 'SellerController@saveUsersLayout');
+Route::get('loadLayout/{layoutID}', 'SellerController@loadLayout');
 Route::get('active/{layoutID}/{val}', 'SellerController@active');
 Route::get('mobile/{layoutID}/{val}', 'SellerController@mobile');
 Route::get('deleteProduct/{productID}', 'SellerController@deleteProduct');
 Route::get('deleteReview/{reviewID}', 'SellerController@deleteReview');
+Route::get('deleteLayout/{layoutID}', 'SellerController@deleteLayout');
 Route::get('fetchPurchases', 'SellerController@fetchPurchases');
 
 

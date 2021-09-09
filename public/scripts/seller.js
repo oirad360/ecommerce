@@ -341,47 +341,6 @@ function newLayout(event){
     event.currentTarget.removeEventListener('click',newLayout)
 }
 
-function selectLayout(event){
-    event.currentTarget.removeEventListener('click',selectLayout)
-    const selected=event.currentTarget
-    const selectedID=event.currentTarget.innerText
-    let lastID
-    for(const key in layoutsList){
-        if(layoutsList[key].span.style.border!==""){
-            lastID=key
-            break
-        }
-    }
-    event.currentTarget.innerText="..."
-    saveButton.innerText="Salva"
-    addContentButton.classList.add("hidden")
-    removeContentButton.classList.add("hidden")
-    deleteLayoutButton.classList.remove("hidden")
-    activeButton.classList.remove("hidden")
-    layoutMenu.classList.add("hidden")
-    layoutCreator.quit()
-    modifyFlag=false
-    for(const product of productsToInsert) product.style.border=""
-    productsToInsert=[]
-    productsToRemove=[]
-    mobile.childNodes[0].checked=layoutsList[selectedID].mobile
-    modifyLayoutButton.innerText="Modifica layout"
-    modifyLayoutButton.addEventListener('click',modify)
-    newLayoutButton.addEventListener('click',newLayout)
-    newLayoutButton.innerText="Crea un nuovo layout"
-    modifyLayoutButton.classList.remove('hidden')
-    newLayoutButton.classList.remove('hidden')
-    if(lastID) layoutsList[lastID].span.style.border=""
-    selected.style.border="1px solid black"
-    if(selected.style.color==="red") activeButton.innerText="Disabilita layout attivo"
-    else activeButton.innerText="Imposta come layout attivo"
-    selected.addEventListener('click',selectLayout)
-    selected.innerText=selectedID
-    fetch(app_url+"/loadLayout/"+selectedID).then(onResponse).then(function(json){
-        const content=layoutCreator.loadLayout(json)
-        onJsonContent(content)
-    })
-}
 
 function active(){
     activeButton.removeEventListener('click',active)
@@ -506,6 +465,52 @@ function mobileVersion(event){
         }
     })
 }
+
+function selectLayout(event){
+    event.currentTarget.removeEventListener('click',selectLayout)
+    const selected=event.currentTarget
+    const selectedID=event.currentTarget.innerText
+    let lastID
+    for(const key in layoutsList){
+        if(layoutsList[key].span.style.border!==""){
+            lastID=key
+            break
+        }
+    }
+    event.currentTarget.innerText="..."
+    layoutMenu.classList.add("hidden")
+    layoutCreator.quit()
+    
+    fetch(app_url+"/loadLayout/"+selectedID).then(onResponse).then(function(json){
+        const content=layoutCreator.loadLayout(json)
+        onJsonContent(content)
+        saveButton.innerText="Salva"
+        addContentButton.classList.add("hidden")
+        removeContentButton.classList.add("hidden")
+        deleteLayoutButton.classList.remove("hidden")
+        activeButton.classList.remove("hidden")
+        modifyFlag=false
+        for(const product of productsToInsert) product.style.border=""
+        productsToInsert=[]
+        productsToRemove=[]
+        mobile.childNodes[0].checked=layoutsList[selectedID].mobile
+        modifyLayoutButton.innerText="Modifica layout"
+        modifyLayoutButton.addEventListener('click',modify)
+        modifyLayoutButton.removeEventListener('click',quit)
+        modifyLayoutButton.classList.remove('hidden')
+        newLayoutButton.innerText="Crea un nuovo layout"
+        newLayoutButton.addEventListener('click',newLayout)
+        newLayoutButton.removeEventListener('click',quit)
+        newLayoutButton.classList.remove('hidden')
+        if(lastID) layoutsList[lastID].span.style.border=""
+        selected.style.border="1px solid black"
+        if(selected.style.color==="red") activeButton.innerText="Disabilita layout attivo"
+        else activeButton.innerText="Imposta come layout attivo"
+        selected.addEventListener('click',selectLayout)
+        selected.innerText=selectedID
+    })
+}
+
 
 function quit(event){
     layoutCreator.quit()
@@ -904,10 +909,10 @@ function showEditor(event){
         editor.classList.remove("hidden")
         event.currentTarget.innerText="Chiudi il layout editor"
         window.removeEventListener('resize', reportWindowSize)
-        if(layoutContainer){
+        /* if(layoutContainer){
             const click= new Event('click')
             layoutsList[layoutCreator.getLayoutID()].span.dispatchEvent(click)
-        }
+        } */
     } else {
         editor.classList.add("hidden")
         event.currentTarget.innerText="Apri il layout editor"

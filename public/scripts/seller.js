@@ -1,9 +1,11 @@
 function onResponse(response){
     return response.json()
 }
+
 function onResponseText(response){
     return response.text()
 }
+
 function showForm(event){
     if(event.currentTarget.id==="newProductButton"){
         newProductForm.productID.value=""
@@ -174,7 +176,7 @@ function onJsonProducts(json){
             const block=document.createElement('div')
             block.classList.add('block')
             const title=document.createElement('h3')
-            title.innerText=item.title+" "+item.id
+            title.innerText=item.title
             block.appendChild(title)
             const img=document.createElement('img')
             if(item.image.substring(0,4)==="http") img.src=item.image
@@ -267,10 +269,10 @@ function onLayouts(layouts){
     } else if(!newProductForm && layoutID) {
         layoutCreator=new LayoutCreator()
         fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
-            const content=layoutCreator.loadLayout(json)
+            const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
             layoutContainer=layoutCreator.getLayoutContainer()
             section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
-            onJsonContent(content)
+            
         })
         for(const layout of layouts){
             layoutsList[layout.layout_id]={
@@ -309,13 +311,13 @@ function onLayouts(layouts){
         if(layoutsList[layoutID].mobile==1) mobile.childNodes[0].checked=true
         layoutCreator=new LayoutCreator(saveButton)
         fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
-            const content=layoutCreator.loadLayout(json)
+            const content= layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
             layoutMenu=layoutCreator.getLayoutMenu()
             layoutContainer=layoutCreator.getLayoutContainer()
             section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
             section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
             layoutMenu.classList.add("hidden")
-            onJsonContent(content)
+            
         })
     }
 }
@@ -340,7 +342,6 @@ function newLayout(event){
     event.currentTarget.addEventListener('click',quit)
     event.currentTarget.removeEventListener('click',newLayout)
 }
-
 
 function active(){
     activeButton.removeEventListener('click',active)
@@ -398,6 +399,22 @@ function saveLayout(){
         saveButton.appendChild(loading)
         layout=layoutCreator.save()
         layout.mobile=mobile.childNodes[0].checked
+        const childsSections=layoutCreator.getAllSections()
+        let content={}
+        for(const section of childsSections){
+            const gen=section.parentNode.dataset.gen
+            const id=section.parentNode.dataset.id
+            const products=section.querySelectorAll('.block')
+            let productsID=[]
+            for(const product of products){
+                productsID.push(product.parentNode.dataset.product_id)
+            }
+            if(!content[gen]){
+                content[gen]={}
+            }
+            content[gen][id]=productsID
+        }
+        layout.content=content
         fetch(app_url+"/saveUsersLayout",{
             method: 'POST',
             body: JSON.stringify(layout),
@@ -478,12 +495,12 @@ function selectLayout(event){
         }
     }
     event.currentTarget.innerText="..."
-    layoutMenu.classList.add("hidden")
-    layoutCreator.quit()
     
     fetch(app_url+"/loadLayout/"+selectedID).then(onResponse).then(function(json){
-        const content=layoutCreator.loadLayout(json)
-        onJsonContent(content)
+        const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+selectedID)
+        
+        layoutMenu.classList.add("hidden")
+        layoutCreator.quit()
         saveButton.innerText="Salva"
         addContentButton.classList.add("hidden")
         removeContentButton.classList.add("hidden")
@@ -511,7 +528,6 @@ function selectLayout(event){
     })
 }
 
-
 function quit(event){
     layoutCreator.quit()
     modifyFlag=false
@@ -522,6 +538,7 @@ function quit(event){
     addContentButton.classList.add("hidden")
     removeContentButton.classList.add("hidden")
     activeButton.classList.remove("hidden")
+    saveButton.innerText="Salva"
     if(event.currentTarget.id==="newLayoutButton"){
         event.currentTarget.innerText="Crea un nuovo layout"
         event.currentTarget.addEventListener('click',newLayout)
@@ -541,8 +558,8 @@ function quit(event){
                 }
             }
             fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
-                const content=layoutCreator.loadLayout(json)
-                onJsonContent(content)
+                const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
+                
             })
         }
     }else{
@@ -551,9 +568,10 @@ function quit(event){
         event.currentTarget.addEventListener('click',modify)
         deleteLayoutButton.classList.remove("hidden")
         layoutMenu.classList.add("hidden")
-        fetch(app_url+"/loadLayout/"+layoutCreator.getLayoutID()).then(onResponse).then(function(json){
-            const content=layoutCreator.loadLayout(json)
-            onJsonContent(content)
+        const layoutID=layoutCreator.getLayoutID()
+        fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
+            const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
+            
         })
     }
     event.currentTarget.removeEventListener('click',quit)
@@ -595,16 +613,23 @@ function addContent(){
     if(productsToInsert.length>0){
         for(const product of productsToInsert){
             const id=parseInt(product.dataset.product_id)
-            const content = layoutCreator.getContent()
-            if(!content.includes(id)){
-                layoutCreator.addContent(id)
+            const section = layoutCreator.getSection()
+            const products=section.querySelectorAll('.block')
+            let productsID=[]
+            for(const product of products){
+                productsID.push(product.parentNode.dataset.product_id)
+            }
+            if(!productsID.includes(id)){
+                saveButton.innerText="Salva"
+                saveButton.classList.remove("hidden")
+                //layoutCreator.addContent(id)
                 const clone=product.cloneNode(true)
                 clone.style.border=""
                 clone.addEventListener('click',select)
                 clone.querySelector('.descButton').addEventListener('click',showDesc)
                 clone.querySelector('.deleteProductButton').remove()
                 clone.querySelector('.modifyButton').remove()
-                layoutCreator.getSection().appendChild(clone)
+                section.appendChild(clone)
             }
         }
     } else {
@@ -616,7 +641,7 @@ function removeContent(){
     if(productsToRemove.length>0){
         for(const product of productsToRemove){
             const child=product.parentNode.parentNode
-            const gen=child.dataset.gen
+            /*const gen=child.dataset.gen
             const id=child.dataset.id
             const content=layoutCreator.getContent(gen,id)
             let i=0
@@ -624,8 +649,10 @@ function removeContent(){
                 if(item===parseInt(product.dataset.product_id)) break
                 i++
             }
-            layoutCreator.removeContent(i,gen,id)
+            layoutCreator.removeContent(i,gen,id) */
             child.querySelector("[data-product_id=\'"+product.dataset.product_id+"\']").remove()
+            saveButton.innerText="Salva"
+            saveButton.classList.remove("hidden")
         }
         productsToRemove=[]
         removeContentButton.classList.add("hidden")
@@ -718,7 +745,7 @@ function deleteProduct(event){
     })
 }
 
-function onJsonContent(content){
+/* function onJsonContent(content){
     const productContainer=document.querySelector('#yourProductsContainer')
     for(const gen in content){
         for(const id in content[gen]){
@@ -731,7 +758,7 @@ function onJsonContent(content){
                 if(productContainer) {
                     const node=productContainer.querySelector("[data-product_id=\'"+productID+"\']")
                     product=node.cloneNode(true)
-                    node.classList.add("inLayout")
+                    //node.classList.add("inLayout")
                 }
                 else for(const item of productList){
                     if(item.dataset.product_id==productID){
@@ -748,7 +775,7 @@ function onJsonContent(content){
             }
         }
     }
-}
+} */
 
 function onReviews(json){
     const container=document.querySelector("#reviews")
@@ -892,8 +919,8 @@ function reportWindowSize(){
                 if(id!=layoutCreator.getLayoutID()){
                     window.removeEventListener('resize', reportWindowSize)
                     fetch(app_url+"/loadLayout/"+id).then(onResponse).then(function(json){
-                        const content=layoutCreator.loadLayout(json)
-                        onJsonContent(content)
+                        const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+id)
+                        
                         window.addEventListener('resize', reportWindowSize)
                     })
                 }

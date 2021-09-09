@@ -126,11 +126,42 @@ class SellerController extends BaseController{
         }
         unset($newLayout["mobile"]);
         $layouts[$newLayout["id"]]=$newLayout;
+        $content=$newLayout["content"];
+        foreach($content as $gen=>$childs){
+            foreach($childs as $id=>$products){
+                $locations=ProductsLocation::where('layout_id',$newLayout['id'])->where('data_gen',$gen)->where('data_id',$id)->get();
+                if(isset($locations)) foreach($locations as $location) $location->delete();
+                foreach($products as $product){
+                    $newLocation=new ProductsLocation();
+                    $newLocation->product_id=$product;
+                    $newLocation->layout_id=$newLayout["id"];
+                    $newLocation->data_gen=$gen;
+                    $newLocation->data_id=$id;
+                    $newLocation->save();
+                }
+            }
+        }
+        unset($newLayout["content"]);
         $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","w");
         fwrite($file,json_encode($layouts));
         fclose($file);
         $result=array("layoutID"=>$newLayout["id"],"new"=>$new);
         return $result;
+    }
+
+    public function loadLocations($layoutID){
+        $map;
+        $locations=UsersLayout::find($layoutID)->locations;
+        foreach($locations as $location){
+            $product=Product::find($location->product_id);
+            $image;
+            if(substr($product->image,0,4)==="http") $image=$product->image;
+            else $image="/".env('APP_FOLDER')."/storage/app/productImages/".$product->image;
+            if(!isset($map[$location["data_gen"]])) $map[$location["data_gen"]]=array();
+            if(!isset($map[$location["data_gen"]][$location["data_id"]])) $map[$location["data_gen"]][$location["data_id"]]="";
+            $map[$location["data_gen"]][$location["data_id"]].="<div data-product_id='".$product->id."'><div class='block' data-producer='".$product->producer."' data-category='".$product->category."'><h3>".$product->title."</h3><a href='/".env('APP_FOLDER')."/public/reviews/".$product->id."'><img src='$image'></a><span>".$product->price."€</span><div class='productButtonsContainer'><p class='quantity'>Disponibilità: ".$product->quantity."</p></div><div class='productButtonsContainer'><p class='descButton'>Scheda tecnica</p></div></div><p class='desc hidden'>".$product->description."</p></div>";
+        }
+        return $map;
     }
 
     public function loadLayout($layoutID){

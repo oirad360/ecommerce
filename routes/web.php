@@ -41,6 +41,7 @@ Route::get('fetchProducts/{seller}', 'SellerController@fetchProducts');
 Route::get('layout/{seller}', 'SellerController@layout');
 Route::post('saveUsersLayout', 'SellerController@saveUsersLayout');
 Route::get('loadLayout/{layoutID}', 'SellerController@loadLayout');
+Route::get('loadLocations/{layoutID}', 'SellerController@loadLocations');
 Route::get('active/{layoutID}/{val}', 'SellerController@active');
 Route::get('mobile/{layoutID}/{val}', 'SellerController@mobile');
 Route::get('deleteProduct/{productID}', 'SellerController@deleteProduct');

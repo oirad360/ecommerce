@@ -7,8 +7,14 @@ class UsersLayout extends Model
     public $timestamps=false;
     protected $primaryKey='layout_id';
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo('User');
+    }
+
+    public function locations()
+    {
+        return $this->hasMany('ProductsLocation','layout_id');
     }
 }
 

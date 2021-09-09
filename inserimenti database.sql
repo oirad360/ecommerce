@@ -116,6 +116,19 @@ active boolean not null,
 mobile boolean not null
 )engine = 'InnoDB';
 
+create table products_locations(
+id integer primary key auto_increment,
+product_id integer not null,
+foreign key(product_id) references products(id) on update cascade on delete cascade,
+index ind_product_id(product_id),
+layout_id integer not null,
+foreign key(layout_id) references users_layouts(layout_id) on update cascade on delete cascade,
+index ind_layout_id(layout_id),
+data_gen integer not null,
+data_id integer not null,
+unique(product_id,layout_id,data_gen,data_id)
+)engine = 'InnoDB';
+
 delimiter //
 create trigger aggiorna_attributi_users
 before update on user_product

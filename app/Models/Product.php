@@ -19,6 +19,11 @@ class Product extends Model
     {
         return $this->belongsToMany('User','user_product');
     }
+
+    public function locations()
+    {
+        return $this->hasMany('ProductsLocation');
+    }
 }
 
 ?>

@@ -215,7 +215,7 @@ class LayoutCreator {
         
         this.#layoutContainer=document.createElement('div')
         this.#layoutContainer.id='layoutContainer'
-        this.#layoutContainer.dataset.layout="new"
+        this.#layoutContainer.dataset.layout_id="new"
         this.#layoutContainer.style.height=height
         this.#layoutContainer.style.width=width
         this.#layoutContainer.dataset.id=0
@@ -285,9 +285,8 @@ class LayoutCreator {
         this.#setBorderAndBackground(this.#lastSelected)
         
     }
-    
 
-    loadLayout(json,endpoint,modify){//carica il layout per mostrarlo e ritorna il json per i contenuti
+    async loadLayout(json,endpoint,modify){//carica il layout per mostrarlo e ritorna il json per i contenuti
         this.#layoutContainer.innerHTML=""
         this.#counter.innerText=0
         for(let property of Object.keys(json)){
@@ -350,14 +349,13 @@ class LayoutCreator {
                 content["gen="+child.dataset.gen]["id="+child.dataset.id]=""
             }
         }
-        fetch(endpoint).then(function(response){
+        await fetch(endpoint).then(function(response){
             return response.json()
         }).then((function(html){
             const sections=this.getAllSections()
             for(const section of sections){
                 section.innerHTML=html[section.parentNode.dataset.gen][section.parentNode.dataset.id]
             }
-            console.log(html)
         }).bind(this))
     }
 
@@ -548,7 +546,7 @@ class LayoutCreator {
     }
 
     setLayoutID(layoutID){
-        this.#layoutContainer.dataset.layout=layoutID
+        this.#layoutContainer.dataset.layout_id=layoutID
     }
 
     isSaved(){//ritorna vero se il layout è salvato, falso altrimenti (ovvero quando sono apportate modifiche dopo l'ultimo salvataggio)

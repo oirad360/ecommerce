@@ -249,6 +249,7 @@ class SellerController extends BaseController{
         $product=Product::find($productID);
         $product->delete();
     }
+
     public function fetchReviews($seller){
         $userID=User::where('username',$seller)->first()->id;
         $products=User::find($userID)->reviews;
@@ -267,6 +268,7 @@ class SellerController extends BaseController{
         }
         return $reviews;
     }
+
     public function deleteLayout($layoutID){
         UsersLayout::find($layoutID)->delete();
         $file=fopen("C:/xampp/htdocs/ecommerce/layouts.json","r");
@@ -276,10 +278,12 @@ class SellerController extends BaseController{
         fwrite($file,json_encode($layouts));
         fclose($file);
     }
+
     public function deleteReview($id){
         $review=Review::find($id);
         $review->delete();
     }
+    
     public function fetchPurchases(){
         $products=User::find(session('id'))->user_product;
         $purchases=[];

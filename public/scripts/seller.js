@@ -269,7 +269,7 @@ function onLayouts(layouts){
     } else if(!newProductForm && layoutID) {
         layoutCreator=new LayoutCreator()
         fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
-            const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
+            layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID).then(onContent)
             layoutContainer=layoutCreator.getLayoutContainer()
             section.insertBefore(layoutContainer,document.querySelector('#reviewTitle'))
             
@@ -311,7 +311,7 @@ function onLayouts(layouts){
         if(layoutsList[layoutID].mobile==1) mobile.childNodes[0].checked=true
         layoutCreator=new LayoutCreator(saveButton)
         fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
-            const content= layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
+            layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID).then(onContent)
             layoutMenu=layoutCreator.getLayoutMenu()
             layoutContainer=layoutCreator.getLayoutContainer()
             section.insertBefore(layoutMenu,document.querySelector('#reviewTitle'))
@@ -495,10 +495,8 @@ function selectLayout(event){
         }
     }
     event.currentTarget.innerText="..."
-    
     fetch(app_url+"/loadLayout/"+selectedID).then(onResponse).then(function(json){
-        const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+selectedID)
-        
+        layoutCreator.loadLayout(json,app_url+"/loadLocations/"+selectedID).then(onContent)
         layoutMenu.classList.add("hidden")
         layoutCreator.quit()
         saveButton.innerText="Salva"
@@ -558,8 +556,7 @@ function quit(event){
                 }
             }
             fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
-                const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
-                
+                layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID).then(onContent)
             })
         }
     }else{
@@ -570,8 +567,7 @@ function quit(event){
         layoutMenu.classList.add("hidden")
         const layoutID=layoutCreator.getLayoutID()
         fetch(app_url+"/loadLayout/"+layoutID).then(onResponse).then(function(json){
-            const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID)
-            
+            layoutCreator.loadLayout(json,app_url+"/loadLocations/"+layoutID).then(onContent)
         })
     }
     event.currentTarget.removeEventListener('click',quit)
@@ -910,6 +906,11 @@ function onPurchases(purchases){
     }
 }
 
+function onContent(){
+    const buttons=layoutContainer.querySelectorAll('.descButton')
+    for(const button of buttons) button.addEventListener('click',showDesc)
+}
+
 function reportWindowSize(){
     vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     if(layoutContainer){
@@ -919,8 +920,7 @@ function reportWindowSize(){
                 if(id!=layoutCreator.getLayoutID()){
                     window.removeEventListener('resize', reportWindowSize)
                     fetch(app_url+"/loadLayout/"+id).then(onResponse).then(function(json){
-                        const content=layoutCreator.loadLayout(json,app_url+"/loadLocations/"+id)
-                        
+                        layoutCreator.loadLayout(json,app_url+"/loadLocations/"+id).then(onContent)
                         window.addEventListener('resize', reportWindowSize)
                     })
                 }

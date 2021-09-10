@@ -32,7 +32,7 @@ class LayoutCreator {
     #marginUpdateBinded
     #flexDirectionUpdateBinded
     #deleteChildsBinded
-    constructor(height,width,saveButton){//crea il layoutMenu associandogli tutti gli event listener necessari per le modifiche e imposta il layoutContainer inizialmente vuoto
+    constructor(saveButton,height,width){//crea il layoutMenu associandogli tutti gli event listener necessari per le modifiche e imposta il layoutContainer inizialmente vuoto
         this.#gen=0
         this.#saved=true
 
@@ -354,6 +354,7 @@ class LayoutCreator {
         }).then((function(html){
             const sections=this.getAllSections()
             for(const section of sections){
+                if(html[section.parentNode.dataset.gen][section.parentNode.dataset.id])
                 section.innerHTML=html[section.parentNode.dataset.gen][section.parentNode.dataset.id]
             }
         }).bind(this))
@@ -364,7 +365,7 @@ class LayoutCreator {
         if(this.#layoutContainer.dataset.noBorder==="true") borderWidth="0px"
         else borderWidth=this.#layoutContainer.style.borderWidth
         const data={
-            "id": this.#layoutContainer.dataset.layout,
+            "id": this.#layoutContainer.dataset.layout_id,
             "display": this.#layoutContainer.style.display,
             "flexDirection": this.#layoutContainer.style.flexDirection,
             "height": this.#layoutContainer.style.height,
@@ -492,7 +493,6 @@ class LayoutCreator {
         } else {
             console.log("scegli una sezione")
         }
-        
     }
 
     getContent(gen,id){//ritorna la lista dei contenuti del child scelto

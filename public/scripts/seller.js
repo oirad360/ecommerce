@@ -230,8 +230,6 @@ function onJsonProducts(json){
         const text=document.querySelector('#yourProducts')
         text.innerText="Non hai nessun prodotto in vendita"
     }
-    if(firstLoading)fetch(app_url+"/layout/"+seller).then(onResponse).then(onLayouts)
-    firstLoading=false
 }
 
 function showDesc(event){
@@ -398,7 +396,6 @@ function saveLayout(){
         loading.src=app_url+"/assets/loading.gif"
         saveButton.appendChild(loading)
         layout=layoutCreator.save()
-        layout.mobile=mobile.childNodes[0].checked
         const childsSections=layoutCreator.getAllSections()
         let content={}
         for(const section of childsSections){
@@ -415,6 +412,7 @@ function saveLayout(){
             content[gen][id]=productsID
         }
         layout.content=content
+        if(layout.id==="new") layout.mobile=mobile.childNodes[0].checked
         fetch(app_url+"/saveUsersLayout",{
             method: 'POST',
             body: JSON.stringify(layout),
@@ -423,9 +421,8 @@ function saveLayout(){
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
             }
-        }).then(onResponse).then(function(json){
-            if(json.new==1){
-                const layoutID=json.layoutID
+        }).then(onResponseText).then(function(layoutID){
+            if(layout.id==="new"){
                 layoutCreator.setLayoutID(layoutID)
                 const idContainer=document.querySelector('#layouts')
                 const span=document.createElement('span')
@@ -732,7 +729,7 @@ function deleteProduct(event){
     const productID=event.currentTarget.dataset.product_id
     fetch(app_url+"/deleteProduct/"+productID).then(function(response){
         if(response.ok){
-            if(layoutCreator){
+            if(layoutContainer){
                 const products=layoutContainer.querySelectorAll("[data-product_id=\'"+productID+"\']")
                 if(products) for(const product of products) product.remove()
             }
@@ -992,7 +989,6 @@ let productsToInsert=[]
 let productsToRemove=[]
 let modifyFlag=false
 let productList=[]
-let firstLoading=true
 let layout
 const breakpoint=800
 const newProductButton=document.querySelector('#newProductButton')
@@ -1010,6 +1006,7 @@ const title=document.querySelector('h1').innerText
 const seller=title.substring(10,title.length)
 let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
+fetch(app_url+"/layout/"+seller).then(onResponse).then(onLayouts)
 fetch(app_url+"/seller/"+seller+"/fetchReviews").then(onResponse).then(onReviews)
 window.addEventListener('resize', reportWindowSize)
 if(newProductForm){

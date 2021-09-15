@@ -294,7 +294,7 @@ class LayoutCreator {
                 this.#layoutContainer.style[property]=json[property]
             }
         }
-        this.#layoutContainer.dataset.layout=json.id
+        this.#layoutContainer.dataset.layout_id=json.id
         this.#layoutContainer.classList.add("hasChilds")
         
         let flag=false
@@ -429,8 +429,8 @@ class LayoutCreator {
         const childs=this.#layoutContainer.querySelectorAll('.child')
         for(const child of childs){
             child.removeEventListener('click',this.#selectBinded)
-            if(!child.classList.contains("hasChilds") && child.querySelector('.childTitle').innerText===""){
-                child.querySelector('.childTitle').remove()
+            if(!child.classList.contains("hasChilds") && child.querySelector('.childTitle')){
+                if(child.querySelector('.childTitle').innerText==="")child.querySelector('.childTitle').remove()
             }
         }
         if(this.#lastSelected!==this.#layoutContainer)this.#lastSelected.style.borderStyle="solid"
@@ -542,7 +542,7 @@ class LayoutCreator {
     }
 
     getLayoutID(){
-        return this.#layoutContainer.dataset.layout
+        return this.#layoutContainer.dataset.layout_id
     }
 
     setLayoutID(layoutID){

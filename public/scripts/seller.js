@@ -491,11 +491,11 @@ function selectLayout(event){
             break
         }
     }
+    layoutCreator.quit()
     event.currentTarget.innerText="..."
     fetch(app_url+"/loadLayout/"+selectedID).then(onResponse).then(function(json){
         layoutCreator.loadLayout(json,app_url+"/loadLocations/"+selectedID).then(onContent)
         layoutMenu.classList.add("hidden")
-        layoutCreator.quit()
         saveButton.innerText="Salva"
         addContentButton.classList.add("hidden")
         removeContentButton.classList.add("hidden")

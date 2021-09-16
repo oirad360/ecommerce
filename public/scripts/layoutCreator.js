@@ -466,12 +466,12 @@ class LayoutCreator {
         if(gen && id){
             const child=this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']")
             if(child && child!==this.#layoutContainer) {
-                this.#showSaveButton()
+                this.showSaveButton()
                 this.#content["[data-gen=\'"+gen+"\']"]["[data-id=\'"+id+"\']"].push(sectionContent)
             }
             else console.log("scegli una sezione")
         } else if(this.#lastSelected!==this.#layoutContainer){
-            this.#showSaveButton()
+            this.showSaveButton()
             this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"].push(sectionContent)
         } else {
             console.log("scegli una sezione")
@@ -483,12 +483,12 @@ class LayoutCreator {
         if(gen && id){
             const child=this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']")
             if(child && child!==this.#layoutContainer) {
-                this.#showSaveButton()
+                this.showSaveButton()
                 this.#content["[data-gen=\'"+gen+"\']"]["[data-id=\'"+id+"\']"].splice(index,1)
             }
             else console.log("scegli una sezione")
         } else if(this.#lastSelected!==this.#layoutContainer){
-            this.#showSaveButton()
+            this.showSaveButton()
             this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"].splice(index,1)
         } else {
             console.log("scegli una sezione")
@@ -566,7 +566,7 @@ class LayoutCreator {
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 
-    #showSaveButton(){//mostra il bottone per salvare, è necessario averlo dentro ogni metodo della classe che apporta modifiche
+    showSaveButton(){//mostra il bottone per salvare, è necessario averlo dentro ogni metodo della classe che apporta modifiche
         if(this.#saveButton){
             if(this.#layoutContainer.querySelector(".child")){
                 this.#saveButton.innerHTML=this.#originalSaveButton.innerHTML
@@ -706,7 +706,7 @@ class LayoutCreator {
         }
         const click= new Event('click') //adesso seleziono il primo figlio, come se, dopo aver generato tutti i figli, facessi click sul primo
         this.#lastSelected.querySelector('.child[data-id=\'1\']').dispatchEvent(click)//dunque dopo questa istruzione lastSelected diventerà il primo figlio che è stato generato dentro il padre (l'ex lastSelected, vedi il funzionamento di select())
-        this.#showSaveButton()
+        this.showSaveButton()
         
     }
     
@@ -733,7 +733,7 @@ class LayoutCreator {
     }
     
     #sizeUpdate(){//aggiorna le dimensioni del div selezionato, impostandole al valore che metto in input nel form, stessa cosa per marginUpdate,titleUpdate,fontUpdate
-        this.#showSaveButton()
+        this.showSaveButton()
         const border=parseInt(this.#lastSelected.style.borderWidth.split("px")[0])
         this.#lastSelected.style.width="calc("+this.#formLayout.width.value+"% - "+(parseInt(this.#formLayout.marginRight.value)+parseInt(this.#formLayout.marginLeft.value)+2*border)+"px)"
         this.#lastSelected.style.height="calc("+this.#formLayout.height.value+"% - "+(parseInt(this.#formLayout.marginBottom.value)+parseInt(this.#formLayout.marginTop.value)+2*border)+"px)"
@@ -741,17 +741,17 @@ class LayoutCreator {
     }
 
     #layoutHeightUpdate(event){
-        this.#showSaveButton()
+        this.showSaveButton()
         this.#layoutContainer.style.height=event.currentTarget.value+"px"
     }
 
     #borderColorUpdate(){
-        this.#showSaveButton()
+        this.showSaveButton()
         this.#lastSelected.style.borderColor=this.#formLayout.borderColor.value
     }
 
     #borderWidthUpdate(){
-        this.#showSaveButton()
+        this.showSaveButton()
         this.#lastSelected.style.borderWidth=this.#formLayout.borderWidth.value+"px"
         if(this.#lastSelected!==this.#layoutContainer){
             const border=parseInt(this.#lastSelected.style.borderWidth.split("px")[0])
@@ -763,17 +763,17 @@ class LayoutCreator {
     }
 
     #borderRadiusUpdate(){
-        this.#showSaveButton()
+        this.showSaveButton()
         this.#lastSelected.style.borderRadius=this.#formLayout.borderRadius.value+"px"
     }
 
     #backgroundColorUpdate(){
-        this.#showSaveButton()
+        this.showSaveButton()
         this.#lastSelected.style.backgroundColor=this.#formLayout.backgroundColor.value
     }
     
     #marginUpdate(){//aggiorna le dimensioni dei margini del div selezionato
-        this.#showSaveButton()
+        this.showSaveButton()
         const border=parseInt(this.#lastSelected.style.borderWidth.split("px")[0])
         this.#lastSelected.style.margin=this.#formLayout.marginTop.value+"px "+this.#formLayout.marginRight.value+"px "+this.#formLayout.marginBottom.value+"px "+this.#formLayout.marginLeft.value+"px "
         this.#lastSelected.style.width="calc("+this.#formLayout.width.value+"% - "+(parseInt(this.#formLayout.marginRight.value)+parseInt(this.#formLayout.marginLeft.value)+2*border)+"px)"
@@ -782,20 +782,20 @@ class LayoutCreator {
     }
     
     #titleUpdate(){//aggiorna il titolo del div selezionato
-        this.#showSaveButton()
+        this.showSaveButton()
         this.#lastSelected.childNodes[0].innerText=this.#formLayout.title.value
         
     }
     
     #fontUpdate(){//aggiorna le dimensioni del font del titolo
-        this.#showSaveButton()
+        this.showSaveButton()
         this.#lastSelected.childNodes[0].style.fontSize=this.#formLayout.fontSize.value+"px"
         
     }
     
     #flexDirectionUpdate(){//cambia la flex-direction del div selezionato e di conseguenza anche dei div figli che contengono altri figli
         if(this.#lastSelected.classList.contains('hasChilds') && this.#formLayout.flexDirection.value!==this.#lastSelected.style.flexDirection){
-            this.#showSaveButton()
+            this.showSaveButton()
             if(this.#formLayout.flexDirection.value.split("-")[0]!==this.#lastSelected.style.flexDirection.split("-")[0]){
                 this.#lastSelected.style.flexDirection=this.#formLayout.flexDirection.value
                 const childs = this.#lastSelected.querySelectorAll(".child")
@@ -831,7 +831,7 @@ class LayoutCreator {
     }
 
     #addChild(){//aggiunge un div figlio dentro il div selezionato (che contiene almeno 2 figli)
-        this.#showSaveButton()
+        this.showSaveButton()
         const child=document.createElement('div')
         child.classList.add("child")
         child.dataset.parent_gen=this.#lastSelected.dataset.gen
@@ -882,7 +882,7 @@ class LayoutCreator {
     }
 
     #removeChild(){//rimuove un div figlio dal div selezionato (solo se contiene più di 2 figli)
-        this.#showSaveButton()
+        this.showSaveButton()
         if(this.#lastSelected.parentNode.querySelectorAll(".child[data-gen=\'"+this.#lastSelected.dataset.gen+"\']").length>1){
             const parent=this.#lastSelected.parentNode
             const length=this.#lastSelected.querySelectorAll('.child').length+1
@@ -915,7 +915,7 @@ class LayoutCreator {
             this.#titleCommands[1].classList.add("hidden")
         }
         else {
-            this.#showSaveButton()
+            this.showSaveButton()
             this.#lastSelected.addEventListener('click',this.#selectBinded)
             this.#setChild(this.#lastSelected,"Inserisci un titolo",24)
             this.#formLayout.title.value="Inserisci un titolo"

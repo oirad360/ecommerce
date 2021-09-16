@@ -395,7 +395,7 @@ function saveLayout(){
         loading.width=17
         loading.src=app_url+"/assets/loading.gif"
         saveButton.appendChild(loading)
-        layout=layoutCreator.save()
+        const layout=layoutCreator.save()
         const childsSections=layoutCreator.getAllSections()
         let content={}
         for(const section of childsSections){
@@ -613,9 +613,7 @@ function addContent(){
                 productsID.push(product.parentNode.dataset.product_id)
             }
             if(!productsID.includes(id)){
-                saveButton.innerText="Salva"
-                saveButton.classList.remove("hidden")
-                //layoutCreator.addContent(id)
+                layoutCreator.showSaveButton()
                 const clone=product.cloneNode(true)
                 clone.style.border=""
                 clone.addEventListener('click',select)
@@ -634,18 +632,8 @@ function removeContent(){
     if(productsToRemove.length>0){
         for(const product of productsToRemove){
             const child=product.parentNode.parentNode
-            /*const gen=child.dataset.gen
-            const id=child.dataset.id
-            const content=layoutCreator.getContent(gen,id)
-            let i=0
-            for(const item of content){
-                if(item===parseInt(product.dataset.product_id)) break
-                i++
-            }
-            layoutCreator.removeContent(i,gen,id) */
             child.querySelector("[data-product_id=\'"+product.dataset.product_id+"\']").remove()
-            saveButton.innerText="Salva"
-            saveButton.classList.remove("hidden")
+            layoutCreator.showSaveButton()
         }
         productsToRemove=[]
         removeContentButton.classList.add("hidden")
@@ -904,8 +892,11 @@ function onPurchases(purchases){
 }
 
 function onContent(){
-    const buttons=layoutContainer.querySelectorAll('.descButton')
-    for(const button of buttons) button.addEventListener('click',showDesc)
+    const products=layoutContainer.querySelectorAll('.block')
+    for(const product of products) {
+        product.parentNode.addEventListener('click',select)
+        product.querySelector('.descButton').addEventListener('click',showDesc)
+    }
 }
 
 function reportWindowSize(){
@@ -989,7 +980,7 @@ let productsToInsert=[]
 let productsToRemove=[]
 let modifyFlag=false
 let productList=[]
-let layout
+
 const breakpoint=800
 const newProductButton=document.querySelector('#newProductButton')
 const newProductForm=document.forms["newProduct"]

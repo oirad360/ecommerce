@@ -357,6 +357,8 @@ class LayoutCreator {
                 if(html[section.parentNode.dataset.gen][section.parentNode.dataset.id])
                 section.innerHTML=html[section.parentNode.dataset.gen][section.parentNode.dataset.id]
             }
+        }).bind(this),(function(){
+            console.log("Content not found for layout "+this.#layoutContainer.dataset.layout_id)
         }).bind(this))
     }
 
@@ -423,6 +425,16 @@ class LayoutCreator {
         }
         this.#saved=true
         return data
+    }
+
+    showSaveButton(){//mostra il bottone per salvare, è necessario averlo dentro ogni metodo della classe che apporta modifiche
+        if(this.#saveButton){
+            if(this.#layoutContainer.querySelector(".child")){
+                this.#saveButton.innerHTML=this.#originalSaveButton.innerHTML
+                this.#saveButton.classList.remove("hidden")
+                this.#saved=false
+            }
+        }
     }
 
     quit(){//termina le modifiche (senza salvare)
@@ -564,16 +576,6 @@ class LayoutCreator {
 
     rgbToHex(r, g, b) {
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-
-    showSaveButton(){//mostra il bottone per salvare, è necessario averlo dentro ogni metodo della classe che apporta modifiche
-        if(this.#saveButton){
-            if(this.#layoutContainer.querySelector(".child")){
-                this.#saveButton.innerHTML=this.#originalSaveButton.innerHTML
-                this.#saveButton.classList.remove("hidden")
-                this.#saved=false
-            }
-        }
     }
 
     #setSize(lastSelected){//è una funzione che chiamo ogni qualvolta voglio mostrare i campi per l'inserimento

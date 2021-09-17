@@ -969,7 +969,7 @@ function showEditor(event){
     }
 }
 
-let saveButton=document.createElement('button')
+const saveButton=document.createElement('button')
 saveButton.addEventListener('click', saveLayout)
 saveButton.innerText="Salva"
 let layoutCreator

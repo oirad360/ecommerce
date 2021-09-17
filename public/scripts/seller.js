@@ -402,7 +402,7 @@ function saveLayout(){
             const gen=section.parentNode.dataset.gen
             const id=section.parentNode.dataset.id
             const products=section.querySelectorAll('.block')
-            let productsID=[]
+            const productsID=[]
             for(const product of products){
                 productsID.push(product.parentNode.dataset.product_id)
             }

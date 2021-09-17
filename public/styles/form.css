@@ -9,22 +9,16 @@ body{
     margin: 0px;
     height: 100vh;
     width: 100vw;
+    font-family: 'Raleway';
 }
 
-section{
-    font-family: 'Oxygen', sans-serif;
+#description{
     color: white;
     text-align: center;
     z-index: 1;
+    font-size: 2.5rem;
 }
-section p{
-    font-size: 40px;
-}
-#titolo{
-    font-size: 55px;
-    font-weight: 600;
-    font-style: italic;
-}
+
 
 #overlay{
     position: absolute;
@@ -40,8 +34,8 @@ main{
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 15px;
     display: flex;
-    font-family: 'Raleway',sans-serif;
     z-index: 1;
+    font-size: 1rem;
 }
 form{
     display: flex;
@@ -75,9 +69,7 @@ form div{
         flex-direction: column;
         background-position-x: 60%;
     }
-    main{
-        font-size: 15px;
-    }
+    
     input[type="text"],input[type="password"],input[type="file"]{
         margin-left:-10px;
     }

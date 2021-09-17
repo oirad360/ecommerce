@@ -17,10 +17,8 @@
         <title>@yield('title')</title>
     </head>
     <body>
-    <div id="overlay"></div>
-        <section>
-            <p>@yield('descrizione')</p>
-        </section>
+        <div id="overlay"></div>
+        <p id=description>@yield('description')</p>
         <main>
             @yield('form')
             

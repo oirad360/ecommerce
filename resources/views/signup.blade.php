@@ -6,7 +6,7 @@
 
 @section('title','Signup')
 
-@section('descrizione', 'Registrati inserendo i tuoi dati')
+@section('description', 'Registrati inserendo i tuoi dati')
 
 @section('form')
 <form name="form" method='POST' enctype="multipart/form-data">

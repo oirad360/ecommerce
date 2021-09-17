@@ -6,7 +6,7 @@
 
 @section('title','Login')
 
-@section('descrizione', 'Inserisci le tue credenziali')
+@section('description', 'Inserisci le tue credenziali')
 
 @section('form')
     <form name="form" method='POST'>

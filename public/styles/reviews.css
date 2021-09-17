@@ -95,7 +95,6 @@
     background-color: rgba(255, 0, 0, 0.432);
 }
 .likeContainer{
-    font-family: 'Raleway',sans-serif;
     border-radius: 15px;
     display: flex;
     flex-direction: column;

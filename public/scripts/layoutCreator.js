@@ -64,11 +64,11 @@ class LayoutCreator {
         this.#removeChildButton.id="removeChildButton"
         this.#removeChildButton.innerText="Rimuovi sezione"
 
-        if(saveButton)this.#layoutMenu.appendChild(this.#saveButton)
-        this.#layoutMenu.appendChild(this.#levelButton)
-        this.#layoutMenu.appendChild(this.#deleteButton)
-        this.#layoutMenu.appendChild(this.#addChildButton)
-        this.#layoutMenu.appendChild(this.#removeChildButton)
+        if(saveButton)this.#layoutMenu.appendChild(this.#saveButton)//Se è stato passato il parametro 'saveButton' nel costruttore, lo appendiamo al menù
+        this.#layoutMenu.appendChild(this.#levelButton)//'Seleziona livello superiore'
+        this.#layoutMenu.appendChild(this.#deleteButton)//'Svuota sezione'
+        this.#layoutMenu.appendChild(this.#addChildButton)//'Aggiungi sezione'
+        this.#layoutMenu.appendChild(this.#removeChildButton)//'Rimuovi sezione'
 
         this.#formLayout=document.createElement('form')
         this.#formLayout.name="layout"
@@ -286,20 +286,19 @@ class LayoutCreator {
         
     }
 
-    async loadLayout(json,endpoint,modify){//carica il layout per mostrarlo e ritorna il json per i contenuti
+    async loadLayout(layout,endpoint,modify){
         this.#layoutContainer.innerHTML=""
         this.#counter.innerText=0
-        for(let property of Object.keys(json)){
+        for(let property of Object.keys(layout)){
             if(property!=="id" && property!=="childs"){
-                this.#layoutContainer.style[property]=json[property]
+                this.#layoutContainer.style[property]=layout[property]
             }
         }
-        this.#layoutContainer.dataset.layout_id=json.id
+        this.#layoutContainer.dataset.layout_id=layout.id
         this.#layoutContainer.classList.add("hasChilds")
         
         let flag=false
-        const content={"layoutID":json.id}
-        for(let child of json.childs){
+        for(let child of layout.childs){
             const childNode=document.createElement('div')
 
 
@@ -344,10 +343,6 @@ class LayoutCreator {
 
             this.#counter.innerText++
             this.#gen=child.dataset.gen
-            if(child.hasChilds!=1){
-                if(!content["gen="+child.dataset.gen]) content["gen="+child.dataset.gen]={}
-                content["gen="+child.dataset.gen]["id="+child.dataset.id]=""
-            }
         }
         await fetch(endpoint).then(function(response){
             return response.json()
@@ -357,16 +352,18 @@ class LayoutCreator {
                 if(html[section.parentNode.dataset.gen][section.parentNode.dataset.id])
                 section.innerHTML=html[section.parentNode.dataset.gen][section.parentNode.dataset.id]
             }
+            return true
         }).bind(this),(function(){
             console.log("Content not found for layout "+this.#layoutContainer.dataset.layout_id)
+            return "Content not found for layout "+this.#layoutContainer.dataset.layout_id
         }).bind(this))
     }
 
-    save(){//salva il layout e il file json per i contenuti di quel layout
+    saveLayout(){
         let borderWidth
         if(this.#layoutContainer.dataset.noBorder==="true") borderWidth="0px"
         else borderWidth=this.#layoutContainer.style.borderWidth
-        const data={
+        const layout={
             "id": this.#layoutContainer.dataset.layout_id,
             "display": this.#layoutContainer.style.display,
             "flexDirection": this.#layoutContainer.style.flexDirection,
@@ -397,7 +394,7 @@ class LayoutCreator {
                 let borderWidth
                 if(child.dataset.noBorder==="true") borderWidth="0px"
                 else borderWidth=child.style.borderWidth
-                data.childs.push({
+                layout.childs.push({
                     "dataset": {
                         "gen": child.dataset.gen,
                         "id": child.dataset.id,
@@ -424,7 +421,7 @@ class LayoutCreator {
             }
         }
         this.#saved=true
-        return data
+        return layout
     }
 
     showSaveButton(){//mostra il bottone per salvare, è necessario averlo dentro ogni metodo della classe che apporta modifiche
@@ -473,51 +470,6 @@ class LayoutCreator {
             }
         }
     }
-
-    /* addContent(sectionContent,gen,id){//aggiunge un nuovo oggetto (sectionContent) nella lista dei contenuti del child scelto
-        if(gen && id){
-            const child=this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']")
-            if(child && child!==this.#layoutContainer) {
-                this.showSaveButton()
-                this.#content["[data-gen=\'"+gen+"\']"]["[data-id=\'"+id+"\']"].push(sectionContent)
-            }
-            else console.log("scegli una sezione")
-        } else if(this.#lastSelected!==this.#layoutContainer){
-            this.showSaveButton()
-            this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"].push(sectionContent)
-        } else {
-            console.log("scegli una sezione")
-        }
-        
-    }
-
-    removeContent(index,gen,id){//rimuove un oggetto dalla lista dei contenuti del child scelto, tramite la sua posizione in lista
-        if(gen && id){
-            const child=this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']")
-            if(child && child!==this.#layoutContainer) {
-                this.showSaveButton()
-                this.#content["[data-gen=\'"+gen+"\']"]["[data-id=\'"+id+"\']"].splice(index,1)
-            }
-            else console.log("scegli una sezione")
-        } else if(this.#lastSelected!==this.#layoutContainer){
-            this.showSaveButton()
-            this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"].splice(index,1)
-        } else {
-            console.log("scegli una sezione")
-        }
-    }
-
-    getContent(gen,id){//ritorna la lista dei contenuti del child scelto
-        if(gen && id){
-            const child=this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']")
-            if(child && child!==this.#layoutContainer) {
-                return this.#content["[data-gen=\'"+gen+"\']"]["[data-id=\'"+id+"\']"]
-            }
-            else console.log("scegli una sezione")
-        } else if(this.#lastSelected!==this.#layoutContainer){
-            return this.#content["[data-gen=\'"+this.#lastSelected.dataset.gen+"\']"]["[data-id=\'"+this.#lastSelected.dataset.id+"\']"]
-        } else console.log("scegli una sezione")
-    } */
 
     getSection(gen,id){
         if(gen && id) return this.#layoutContainer.querySelector(".child[data-gen=\'"+gen+"\'][data-id=\'"+id+"\']").querySelector('section')
@@ -641,19 +593,16 @@ class LayoutCreator {
     #select(event){//è la funzione che mi permette di selezionare il div che clicco
         this.#removeChildButton.classList.remove("hidden")
         this.#lastSelected.style.borderStyle="solid"
+        this.#levelButton.classList.remove("hidden")
+        this.#titleCommands[0].classList.remove("hidden")
+        this.#titleCommands[1].classList.remove("hidden")
         if(this.#lastSelected.dataset.noBorder==="true") this.#lastSelected.style.borderWidth="0px"
         this.#lastSelected=event.currentTarget
-        const gen=this.#lastSelected.dataset.gen
-        /* if(document.querySelectorAll("[data-gen=\'"+gen+"\']").length>2)  */this.#removeChildButton.classList.remove("hidden")
         this.#lastSelected.style.borderStyle="dashed"
         if(this.#lastSelected.style.borderWidth==="0px") this.#lastSelected.style.borderWidth="1px"
         this.#setSize(this.#lastSelected)
         this.#setBorderAndBackground(this.#lastSelected)
-        this.#levelButton.classList.remove("hidden")
-        this.#titleCommands[0].classList.remove("hidden")
-        this.#titleCommands[1].classList.remove("hidden")
-        const childs=this.#lastSelected.querySelectorAll('.child')
-        if(childs.length>0){
+        if(this.#lastSelected.classList.contains('hasChilds')){
             this.#splitCommands.classList.add("hidden")
             this.#deleteButton.classList.remove("hidden")
         } else {

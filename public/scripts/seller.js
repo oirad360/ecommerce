@@ -395,7 +395,7 @@ function saveLayout(){
         loading.width=17
         loading.src=app_url+"/assets/loading.gif"
         saveButton.appendChild(loading)
-        const layout=layoutCreator.save()
+        const layout=layoutCreator.saveLayout()
         const childsSections=layoutCreator.getAllSections()
         let content={}
         for(const section of childsSections){
@@ -726,38 +726,6 @@ function deleteProduct(event){
     })
 }
 
-/* function onJsonContent(content){
-    const productContainer=document.querySelector('#yourProductsContainer')
-    for(const gen in content){
-        for(const id in content[gen]){
-            const genn=gen.substring(11,gen.length-2)
-            const idd=id.substring(10,id.length-2)
-            const childSection=layoutCreator.getSection(genn,idd)
-            childSection.innerHTML=""
-            for(const productID of content[gen][id]){
-                let product
-                if(productContainer) {
-                    const node=productContainer.querySelector("[data-product_id=\'"+productID+"\']")
-                    product=node.cloneNode(true)
-                    //node.classList.add("inLayout")
-                }
-                else for(const item of productList){
-                    if(item.dataset.product_id==productID){
-                        product=item.cloneNode(true)
-                        break
-                    }
-                }
-                product.style.border=""
-                product.addEventListener('click',select)
-                product.querySelector('.descButton').addEventListener('click',showDesc)
-                product.querySelector('.deleteProductButton').remove()
-                product.querySelector('.modifyButton').remove()
-                childSection.appendChild(product)
-            }
-        }
-    }
-} */
-
 function onReviews(json){
     const container=document.querySelector("#reviews")
     container.innerHTML=""
@@ -924,10 +892,6 @@ function showEditor(event){
         editor.classList.remove("hidden")
         event.currentTarget.innerText="Chiudi il layout editor"
         window.removeEventListener('resize', reportWindowSize)
-        /* if(layoutContainer){
-            const click= new Event('click')
-            layoutsList[layoutCreator.getLayoutID()].span.dispatchEvent(click)
-        } */
     } else {
         editor.classList.add("hidden")
         event.currentTarget.innerText="Apri il layout editor"

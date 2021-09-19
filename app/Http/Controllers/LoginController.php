@@ -39,36 +39,17 @@ class LoginController extends BaseController{
         //se non ho fatto return allora ho mandato dei dati post non nulli, verifico se esiste l'utente
         $user = User::where('username', request('user'))->orWhere('email', request('user'))->first();
         if(isset($user)) { //verifichiamo che la password sia corretta
-            $password= $user->password;
-            if(password_verify(request('password'),$password)){
+            if(password_verify(request('password'),$user->password)){
                 Session::put('id', $user->id);
                 Session::put('username',$user->username);
                 return redirect('home');
             } else { //password non valida
                 return redirect('login')->withInput();
             }
-            
         }
         else {
             // email/username non valido
             return redirect('login')->withInput();
-        }
-    }
-
-    public function checkLoginJS(){   
-        $user = User::where('username', request('user'))->orWhere('email', request('user'))->first();
-        if(isset($user)) { //verifichiamo che la password sia corretta
-            $password= $user->password;
-            if(password_verify(request('password'),$password)){
-                Session::put('id', $user->id);
-                Session::put('username',$user->username);
-            } else { //password non valida
-                return 1;
-            }
-        }
-        else {
-            // email/username non valido
-            return 1;
         }
     }
 

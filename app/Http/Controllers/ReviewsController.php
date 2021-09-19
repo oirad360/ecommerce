@@ -36,35 +36,25 @@ class ReviewsController extends BaseController{
     }
 
     public function fetchReviews($productID){
-        $reviewUsers=Product::find($productID)->reviews;
-        $reviews=array("contents"=>[],"disable"=>false);
-        if($reviewUsers){
-            foreach($reviewUsers as $reviewUser){
-                $info=Review::where('product_id',$productID)->where('user_id',$reviewUser->id)->first();
-                $info["propic"]=$reviewUser->propic;
-                $info["username"]=$reviewUser->username;
-                $row=LikeReview::where('user_id',session('id'))->where('review_id',$info['id'])->first();
-                if(isset($row)){
-                    $info["youLike"]=true;
-                }
-                $reviews["contents"][]=$info;
-                if($reviewUser->id===session('id')){
-                    $reviews["disable"]=true;
-                }
+        $reviews=Product::find($productID)->reviews;
+        $result=array("contents"=>[],"disable"=>false);
+        if($reviews){
+            foreach($reviews as $review){
+                $user=User::find($review->user_id);
+                $review["username"]=$user->username;
+                $review["propic"]=$user->propic;
+                if($review->likes()->where('user_id',session('id'))->first()!==null) $review["youLike"]=true;
+                $result["contents"][]=$review;
+                if($review->user_id===session('id')) $result["disable"]=true;
             }
         }
-        if(!session('id')) $reviews["disable"]=true;
-        return $reviews;
+        if(!session('id')) $result["disable"]=true;
+        return $result;
     }
 
     public function fetchProduct($productID){
         $product=Product::find($productID);
-        $userProduct=UserProduct::where('user_id',session('id'))->where('product_id',$productID)->first();
-        if(isset($userProduct) && $userProduct->wishlist==1){
-            $product['wishlist']=true;
-        } else {
-            $product['wishlist']=false;
-        }
+        $product['wishlist']=($product->user_product()->where('user_id',session('id'))->where('wishlist',true)->first()!==null);
         return $product;
     }
 
@@ -77,20 +67,18 @@ class ReviewsController extends BaseController{
         $review->save();
     }
 
-    public function like($id){
-        $like=new LikeReview;
-        $like->user_id=session('id');
-        $like->review_id=$id;
-        $like->save();
+    public function like($reviewID){
+        $review=Review::find($reviewID);
+        $review->likes()->attach(session('id'));
     }
 
-    public function dislike($id){
-        $like=LikeReview::where('review_id',$id)->where('user_id',session('id'))->first();
-        $like->delete();
+    public function dislike($reviewID){
+        $review=Review::find($reviewID);
+        $review->likes()->detach(session('id'));
     }
 
     public function fetchLikes($id){
-        $utenti=Review::find($id)->like;
-        return $utenti;
+        $likes=Review::find($id)->likes()->get();
+        return $likes;
     }
 }

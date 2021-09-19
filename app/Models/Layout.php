@@ -2,10 +2,9 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class UsersLayout extends Model
+class Layout extends Model
 {
     public $timestamps=false;
-    protected $primaryKey='layout_id';
 
     public function user()
     {
@@ -14,7 +13,7 @@ class UsersLayout extends Model
 
     public function locations()
     {
-        return $this->hasMany('ProductsLocation','layout_id');
+        return $this->hasMany('ProductsLocation');
     }
 }
 

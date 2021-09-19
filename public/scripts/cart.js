@@ -15,7 +15,7 @@ function onCart(products){
             num+=parseInt(product.cart)
             const block=document.createElement('div')
             block.classList.add('block')
-            block.dataset.product_id=product.product_id
+            block.dataset.product_id=product.id
             const title=document.createElement('h3')
             title.innerText=product.title
             block.appendChild(title)
@@ -23,7 +23,7 @@ function onCart(products){
             if(product.image.substring(0,4)==="http") img.src=product.image
             else img.src=app_url+"/assets/"+product.image
             const link=document.createElement('a')
-            link.href=app_url+"/reviews/"+product.product_id
+            link.href=app_url+"/reviews/"+product.id
             link.appendChild(img)
             block.appendChild(link)
             const price=document.createElement('span')

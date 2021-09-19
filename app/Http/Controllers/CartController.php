@@ -8,7 +8,6 @@ class CartController extends BaseController{
         if(session('id')===null){
             return redirect('login');
         }
-
         $user=User::find(session('id'));
         return view('cart')
             ->with('app_folder', env('APP_FOLDER'))
@@ -18,57 +17,44 @@ class CartController extends BaseController{
     }
 
     public function fetchCart(){
-        $cartItems=UserProduct::where('user_id',session('id'))->where('cart','!=',0)->select('product_id','cart')->get();
+        $cartItems=User::find(session('id'))->user_product()->where('cart','>',0)->get();
         foreach($cartItems as $cartItem){
-            $cartItem['title']=Product::find($cartItem->product_id)->title;
-            $cartItem['image']=Product::find($cartItem->product_id)->image;
-            $cartItem['price']=Product::find($cartItem->product_id)->price;
-            $cartItem['quantity']=Product::find($cartItem->product_id)->quantity;
+            $cartItem['cart']=$cartItem->pivot->cart;
         }
         return $cartItems;
     }
 
     public function addCart($productID,$val){
-        $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->first();
-        $quantity=Product::find($productID)->quantity;
+        $product=Product::find($productID);
+        $user=$product->user_product()->where('user_id',session('id'))->first();
+        $quantity=$product->quantity;
         if($val==="true"){
             if($quantity>0){
-                if(isset($row)){
-                    $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->first();
-                    if($row->cart<$quantity){
-                        $row->cart=$row->cart + 1;
-                        $row->save();
-                        return 1;
-                    } else return 0;
-                } else {
-                    $row=new UserProduct;
-                    $row->user_id=session('id');
-                    $row->product_id=$productID;
-                    $row->cart=1;
-                    $row->save();
+                if(!isset($user)){
+                    $product->user_product()->attach(session('id'),["wishlist"=>false,"bought"=>false,"cart"=>1]);
                     return 1;
                 }
-            } else return 0;
-            
-        } else {
-            $row->cart=$row->cart - 1;
-            $row->save();
-            $rows=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->where('wishlist',false)->where('cart',0)->where('bought',0)->get();
-            foreach($rows as $row){
-                $row->delete();
+                if($user->pivot->cart<$quantity){
+                    $product->user_product()->updateExistingPivot(session('id'),["cart"=>$user->pivot->cart+1]);
+                    return 1;
+                }
+                return 0;
             }
+            return 0;
+        } else {
+            $product->user_product()->updateExistingPivot(session('id'),["cart"=>$user->pivot->cart-1]);
+            if($user->pivot->cart==0 && $user->pivot->bought==0 && $user->pivot->wishlist==false) $product->user_product()->detach(session('id'));
             return -1;
         }
     }
+    
     public function buy(){
-        $rows=UserProduct::where('cart','!=',0)->where('user_id',session('id'))->get();
-        foreach($rows as $row){
-            $product=Product::find($row->product_id);
-            $product->quantity-=$row->cart;
+        $products=User::find(session('id'))->user_product()->where('cart','>',0)->get();
+        foreach($products as $product){
+            $product->quantity-=$product->pivot->cart;
             $product->save();
-            $row->bought+=$row->cart;
-            $row->cart=0;
-            $row->save();
+            $product->user_product()->updateExistingPivot(session('id'),['cart'=>0,'bought'=>$product->pivot->bought+$product->pivot->cart]);
         }
+        return $products;
     }
 }

@@ -12,7 +12,7 @@ class ProductsLocation extends Model
     }
     public function layout()
     {
-        return $this->belongsTo('UsersLayout','layout_id');
+        return $this->belongsTo('Layout');
     }
 }
 

@@ -12,12 +12,12 @@ class Product extends Model
 
     public function reviews()
     {
-        return $this->belongsToMany('User','reviews');
+        return $this->hasMany('Review');
     }
 
     public function user_product()
     {
-        return $this->belongsToMany('User','user_product');
+        return $this->belongsToMany('User','user_product')->withPivot('wishlist','cart','bought');;
     }
 
     public function locations()

@@ -7,18 +7,18 @@ class User extends Model
     protected $hidden = ['password'];
     public $timestamps=false;
 
-
     public function reviews()
     {
-        return $this->belongsToMany('Product','reviews');
+        return $this->hasMany('Review');
     }
-    public function like()
+
+    public function likes()
     {
-        return $this->belongsToMany('Review','like_review');
+        return $this->belongsToMany('Review','likes');
     }
     public function user_product()
     {
-        return $this->belongsToMany('Product','user_product');
+        return $this->belongsToMany('Product','user_product')->withPivot('wishlist','cart','bought');
     }
     public function products()
     {
@@ -26,7 +26,7 @@ class User extends Model
     }
     public function layouts()
     {
-        return $this->hasMany('UsersLayout');
+        return $this->hasMany('Layout');
     }
 }
 

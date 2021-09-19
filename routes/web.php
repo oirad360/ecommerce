@@ -18,7 +18,6 @@ Route::get('/', function(){
 });
 Route::get('login', 'LoginController@login');
 Route::post('login', 'LoginController@checkLogin');
-Route::post('login/check', 'LoginController@checkLoginJS');
 
 Route::get('signup', 'SignupController@signup');
 Route::post('signup', 'SignupController@checkSignup');
@@ -39,7 +38,7 @@ Route::get('seller/{seller}/fetchReviews', 'SellerController@fetchReviews');
 Route::post('seller/newProduct', 'SellerController@newProduct');
 Route::get('fetchProducts/{seller}', 'SellerController@fetchProducts');
 Route::get('layout/{seller}', 'SellerController@layout');
-Route::post('saveUsersLayout', 'SellerController@saveUsersLayout');
+Route::post('saveLayout', 'SellerController@saveLayout');
 Route::get('loadLayout/{layoutID}', 'SellerController@loadLayout');
 Route::get('loadLocations/{layoutID}', 'SellerController@loadLocations');
 Route::get('active/{layoutID}/{val}', 'SellerController@active');

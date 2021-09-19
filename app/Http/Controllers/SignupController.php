@@ -97,25 +97,6 @@ class SignupController extends BaseController{
             }
         } else $fileName="defaultAvatar.jpg";
 
-        /* if(isset($_FILES['image'])){
-            if($_FILES['image']['error']===0){
-                if($_FILES['image']['size']<2000000){
-                    $type = exif_imagetype($_FILES['image']['tmp_name']);
-                    $allowedExt = array(IMAGETYPE_PNG => 'png', IMAGETYPE_JPEG => 'jpg', IMAGETYPE_GIF => 'gif');
-                    if(isset($allowedExt[$type])){
-                        $fileName = uniqid('', true).".".$allowedExt[$type];
-                        move_uploaded_file($_FILES['image']['tmp_name'], "uploads".DIRECTORY_SEPARATOR."$fileName");
-                    }else{
-                        $errors[]="Inserisci un'immagine (jpeg, png, jpg, gif).";
-                    }
-                } else {
-                    $errors[]="L'immagine non può avere dimensioni superiori a 2MB.";
-                }
-                
-            } else {
-                $fileName="defaultAvatar.jpg";
-            }
-        } */
         if(count($errors)===0){
             $user = new User;
             $user->name=request('nome');
@@ -140,20 +121,18 @@ class SignupController extends BaseController{
                 ->with('errors', $errors);
         }
     }
+
     public function checkEmail($email){
         $error=false;
         $user=User::where('email',$email)->first();
-        if(isset($user)){
-            $error=true;
-        }
+        if(isset($user)) $error=true;
         return $error;
     }
+
     public function checkUsername($username){
         $error=false;
         $user=User::where('username',$username)->first();
-        if(isset($user)){
-            $error=true;
-        }
+        if(isset($user)) $error=true;
         return $error;
     }
 }

@@ -166,7 +166,7 @@ form.username.addEventListener('blur',checkUsername)
 form.email.addEventListener('blur',checkEmail)
 form.password.addEventListener('blur',checkPassword)
 form.confermaPass.addEventListener('blur',checkConfermaPass)
-//form.image.addEventListener('change',checkImage)
+form.image.addEventListener('change',checkImage)
 form.addEventListener('submit', validazione)
 
 

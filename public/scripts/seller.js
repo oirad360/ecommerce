@@ -248,14 +248,15 @@ function showDesc(event){
 }
 
 function onLayouts(layouts){
+    console.log(layouts)
     const section=document.querySelector('section')
     let layoutID
     let val=(vw>breakpoint) ? 0 : 1
     for(const layout of layouts){
         if(layout.active==1){
-            layoutID=layout.layout_id
+            layoutID=layout.id
             if(layout.mobile==val) {
-                layoutID=layout.layout_id
+                layoutID=layout.id
                 break
             }
         }
@@ -273,7 +274,7 @@ function onLayouts(layouts){
             
         })
         for(const layout of layouts){
-            layoutsList[layout.layout_id]={
+            layoutsList[layout.id]={
                 "mobile": layout.mobile,
                 "active": layout.active
             }
@@ -288,13 +289,13 @@ function onLayouts(layouts){
         idContainer.innerHTML=""
         for(const layout of layouts){
             const span=document.createElement('span')
-            span.innerText=layout.layout_id
+            span.innerText=layout.id
             span.classList.add('layoutID')
             span.addEventListener('click',selectLayout)
             if(layout.active==1) span.style.color="red"
-            if(layout.layout_id===layoutID) span.style.border="1px solid black"
+            if(layout.id===layoutID) span.style.border="1px solid black"
             idContainer.appendChild(span)
-            const id=layout.layout_id
+            const id=layout.id
             layoutsList[id]={
                 "span":span, 
                 "mobile": layout.mobile,
@@ -302,7 +303,7 @@ function onLayouts(layouts){
             }
         }
         if(!layoutID) {
-            layoutID=layouts[0].layout_id
+            layoutID=layouts[0].id
             layoutsList[layoutID].span.style.border="1px solid black"
             activeButton.innerText="Imposta come layout attivo"
         } else activeButton.innerText="Disabilita layout attivo"
@@ -413,7 +414,7 @@ function saveLayout(){
         }
         layout.content=content
         if(layout.id==="new") layout.mobile=mobile.childNodes[0].checked
-        fetch(app_url+"/saveUsersLayout",{
+        fetch(app_url+"/saveLayout",{
             method: 'POST',
             body: JSON.stringify(layout),
             headers:

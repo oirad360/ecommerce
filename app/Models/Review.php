@@ -6,9 +6,19 @@ class Review extends Model
 {
     public $timestamps=false;
 
-    public function like()
+    public function likes()
     {
-        return $this->belongsToMany('User','like_review');
+        return $this->belongsToMany('User','likes');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo('Product');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('User');
     }
 }
 

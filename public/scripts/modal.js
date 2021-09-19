@@ -64,7 +64,3 @@ function onModalClick() {
 
 const modalView = document.querySelector('#modal')
 modalView.addEventListener('click', onModalClick)
-const propic=document.querySelectorAll('.propic')
-/* for(item of propic){
-    item.addEventListener('click',onProPicClick)
-} */

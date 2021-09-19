@@ -106,14 +106,14 @@ function quitModifyProduct(event){
 function newProduct(event){
     event.preventDefault()
     const errors=document.querySelectorAll('error')
-    let flag=false
+    let found=false
     for(const error of errors){
         if(!error.classList.contains("hidden")){
-            flag=true
+            found=true
             break
         }
     }
-    if(!flag&&newProductForm.producer.value!==""&&newProductForm.title.value!==""&&newProductForm.price.value>0) {
+    if(!found&&newProductForm.producer.value!==""&&newProductForm.title.value!==""&&newProductForm.price.value>0) {
         newProductForm.removeEventListener('submit',newProduct)
         const formData={method:'post',body: new FormData(newProductForm)}
         newProductForm.send.value="     "

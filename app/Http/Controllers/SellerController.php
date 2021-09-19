@@ -145,7 +145,8 @@ class SellerController extends BaseController{
     }
 
     public function loadLocations($layoutID){
-        $map;
+        $map[1]=array();
+        $map[1][1]="";
         $locations=UsersLayout::find($layoutID)->locations;
         foreach($locations as $location){
             $product=Product::find($location->product_id);
@@ -154,9 +155,25 @@ class SellerController extends BaseController{
             else $image="/".env('APP_FOLDER')."/storage/app/productImages/".$product->image;
             if(!isset($map[$location["data_gen"]])) $map[$location["data_gen"]]=array();
             if(!isset($map[$location["data_gen"]][$location["data_id"]])) $map[$location["data_gen"]][$location["data_id"]]="";
-            $map[$location["data_gen"]][$location["data_id"]].="<div data-product_id='".$product->id."'><div class='block' data-producer='".$product->producer."' data-category='".$product->category."'><h3>".$product->title."</h3><a href='/".env('APP_FOLDER')."/public/reviews/".$product->id."'><img src='$image'></a><span>".$product->price."€</span><div class='productButtonsContainer'><p class='quantity'>Disponibilità: ".$product->quantity."</p></div><div class='productButtonsContainer'><p class='descButton'>Scheda tecnica</p></div></div><p class='desc hidden'>".$product->description."</p></div>";
+            $map[$location["data_gen"]][$location["data_id"]].="
+            <div data-product_id='".$product->id."'>
+                <div class='block' data-producer='".$product->producer."' data-category='".$product->category."'>
+                    <h3>".$product->title."</h3>
+                    <a href='/".env('APP_FOLDER')."/public/reviews/".$product->id."'>
+                        <img src='$image'>
+                    </a>
+                    <span>".$product->price."€</span>
+                    <div class='productButtonsContainer'>
+                        <p class='quantity'>Disponibilità: ".$product->quantity."</p>
+                    </div>
+                    <div class='productButtonsContainer'>
+                        <p class='descButton'>Scheda tecnica</p>
+                    </div>
+                </div>
+                <p class='desc hidden'>".$product->description."</p>
+            </div>";
         }
-        if(isset($map))return $map;
+        return $map;
     }
 
     public function loadLayout($layoutID){

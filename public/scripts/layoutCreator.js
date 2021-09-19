@@ -297,7 +297,7 @@ class LayoutCreator {
         this.#layoutContainer.dataset.layout_id=layout.id
         this.#layoutContainer.classList.add("hasChilds")
         
-        let flag=false
+        let found=false
         for(let child of layout.childs){
             const childNode=document.createElement('div')
 
@@ -327,10 +327,10 @@ class LayoutCreator {
             }
             if(child.hasChilds!=1 && modify===true) {
                 childNode.addEventListener('click',this.#selectBinded)
-                if(!flag){
+                if(!found){
                     const click = new Event('click')
                     childNode.dispatchEvent(click)
-                    flag=true
+                    found=true
                 }
             }
             if(child.hasChilds!=1) childNode.classList.add("noChilds")
@@ -352,10 +352,6 @@ class LayoutCreator {
                 if(html[section.parentNode.dataset.gen][section.parentNode.dataset.id])
                 section.innerHTML=html[section.parentNode.dataset.gen][section.parentNode.dataset.id]
             }
-            return true
-        }).bind(this),(function(){
-            console.log("Content not found for layout "+this.#layoutContainer.dataset.layout_id)
-            return "Content not found for layout "+this.#layoutContainer.dataset.layout_id
         }).bind(this))
     }
 

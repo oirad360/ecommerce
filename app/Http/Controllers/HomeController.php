@@ -66,8 +66,8 @@ class HomeController extends BaseController{
         }
         foreach($results as $result){
             $result["seller"]=User::find($result["user_id"])->username;
-            $row=UserProduct::where('user_id',session('id'))->where('product_id',$result['id'])->first();
-            if(isset($row)) $result["wishlist"]=$row->wishlist;
+            $user=$result->user_product()->where('user_id',session('id'))->first();
+            if(isset($user)) $result["wishlist"]=$user->pivot->wishlist;
             else $result["wishlist"]=false;
         }
         return $results;

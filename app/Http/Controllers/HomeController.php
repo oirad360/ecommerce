@@ -21,18 +21,11 @@ class HomeController extends BaseController{
 
     public function fetchProducts(){
         $products=Product::all();
-        $userProducts=UserProduct::where('user_id',session('id'))->get();
         foreach($products as $product){
             if(session('id')){
-                $flag=false;
-                foreach($userProducts as $userProduct){
-                    if($userProduct->product_id===$product->id){
-                        if($userProduct->wishlist) $product["wishlist"]=true;
-                        else $product["wishlist"]=false;
-                        $flag=true;
-                    }
-                }
-                if(!$flag) $product["wishlist"]=false;
+                $user=$product->user_product()->where('user_id',session('id'))->first();
+                if(isset($user)) $product["wishlist"]=$user->pivot->wishlist;
+                else $product["wishlist"]=false;
             }  
             if($product->quantity<=10) $product["lastAvailables"]=true;
             else $product["lastAvailables"]=false;
@@ -49,23 +42,14 @@ class HomeController extends BaseController{
     }
 
     public function addWishlist($productID,$val){
-        $row=UserProduct::where('user_id',session('id'))->where('product_id',$productID)->first();
+        $product=Product::find($productID);
+        $user=$product->user_product()->where('user_id',session('id'))->first();
         if($val==="true"){
-            if(isset($row)){
-                $row->wishlist=true;
-                $row->save();
-            } else {
-                $row=new UserProduct;
-                $row->user_id=session('id');
-                $row->product_id=$productID;
-                $row->wishlist=true;
-                $row->save();
-            }
+            if(isset($user)) $product->user_product()->updateExistingPivot(session('id'),["wishlist"=>true]);
+            else $product->user_product()->attach(session('id'),["wishlist"=>true,"cart"=>0,"bought"=>0]);
         } else {
-            $row->wishlist=false;
-            $row->save();
-            $row=UserProduct::where('user_id',session('id'))->where('product_id', $productID)->where('wishlist',false)->where('cart',0)->where('bought',0)->first();
-            if(isset($row)) $row->delete();
+            $product->user_product()->updateExistingPivot(session('id'),["wishlist"=>false]);
+            if($user->pivot->cart==0 && $user->pivot->bought==0) $user->user_product()->detach($productID);
         }
     }
 

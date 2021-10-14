@@ -140,11 +140,9 @@ function newProduct(event){
 }
 
 function onJsonProducts(json){
-    if(newProductForm){
-        newProductForm.send.value="Invia"
-        newProductForm.send.style.backgroundImage=""
-        newProductForm.addEventListener('submit', newProduct)
-    }
+    newProductForm.send.value="Invia"
+    newProductForm.send.style.backgroundImage=""
+    newProductForm.addEventListener('submit', newProduct)
     if(json.errors){
         const errorContainer=document.querySelector('#errorsPhp')
         for(const error of json.errors){
@@ -164,14 +162,12 @@ function onJsonProducts(json){
         }
     }else if(json.length>0){
         let container
-        if(newProductForm){
-            container=document.querySelector('#yourProductsContainer')
-            container.innerHTML=""
-            newProductForm.classList.add("hidden")
-            newProductButton.classList.remove("hidden")
-            newProductButton.innerText="Inserisci un nuovo prodotto"
-            quitModifyProductButton.classList.add("hidden")
-        }
+        container=document.querySelector('#yourProductsContainer')
+        container.innerHTML=""
+        newProductForm.classList.add("hidden")
+        newProductButton.classList.remove("hidden")
+        newProductButton.innerText="Inserisci un nuovo prodotto"
+        quitModifyProductButton.classList.add("hidden")
         for(const item of json){
             const block=document.createElement('div')
             block.classList.add('block')
@@ -226,7 +222,7 @@ function onJsonProducts(json){
             if(newProductForm)container.appendChild(parentBlock)
             else productList.push(parentBlock)
         }
-    } else if(newProductForm){
+    } else {
         const text=document.querySelector('#yourProducts')
         text.innerText="Non hai nessun prodotto in vendita"
     }
@@ -248,10 +244,9 @@ function showDesc(event){
 }
 
 function onLayouts(layouts){
-    console.log(layouts)
     const section=document.querySelector('section')
     let layoutID
-    let val=(vw>breakpoint) ? 0 : 1
+    let val=(vw<breakpoint)
     for(const layout of layouts){
         if(layout.active==1){
             layoutID=layout.id
@@ -871,7 +866,7 @@ function onContent(){
 function reportWindowSize(){
     vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     if(layoutContainer){
-        let val=(vw>breakpoint) ? 0 : 1
+        let val=(vw<breakpoint) 
         for(const id in layoutsList){
             if(layoutsList[id].active==1 && layoutsList[id].mobile==val){
                 if(id!=layoutCreator.getLayoutID()){
@@ -900,7 +895,7 @@ function showEditor(event){
         let found=false
         let active
         let layoutID
-        const val= (vw>breakpoint) ? 0 : 1
+        const val= (vw<breakpoint)
         if(Object.keys(layoutsList).length>0){
             for(const id in layoutsList){
                 if(layoutsList[id].active==1){
@@ -961,11 +956,11 @@ const editorButton=document.querySelector('#editorButton')
 const title=document.querySelector('h1').innerText
 const seller=title.substring(10,title.length)
 let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
 fetch(app_url+"/layout/"+seller).then(onResponse).then(onLayouts)
 fetch(app_url+"/seller/"+seller+"/fetchReviews").then(onResponse).then(onReviews)
 window.addEventListener('resize', reportWindowSize)
 if(newProductForm){
+    fetch(app_url+"/fetchProducts").then(onResponse).then(onJsonProducts)
     fetch(app_url+"/fetchPurchases").then(onResponse).then(onPurchases)
     newProductButton.addEventListener('click',showForm)
     newProductForm.title.addEventListener('blur',check)

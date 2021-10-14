@@ -168,11 +168,3 @@ form.password.addEventListener('blur',checkPassword)
 form.confermaPass.addEventListener('blur',checkConfermaPass)
 form.image.addEventListener('change',checkImage)
 form.addEventListener('submit', validazione)
-
-
-if(radios[1].checked===true){
-    const labels=document.querySelectorAll(".impiegato")
-    for(label of labels){
-        label.classList.remove("hidden")
-    }
-}

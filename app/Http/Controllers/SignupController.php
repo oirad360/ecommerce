@@ -107,7 +107,6 @@ class SignupController extends BaseController{
             $user->propic=$fileName;
             $user->save();
             Session::put('id',$user->id);
-            Session::put('username',$user->username);
             return redirect("home");
         } else {
             return view('signup')

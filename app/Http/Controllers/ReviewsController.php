@@ -59,12 +59,14 @@ class ReviewsController extends BaseController{
     }
 
     public function postReview($productID){
-        $review=new Review;
-        $review->user_id=session('id');
-        $review->product_id=$productID;
-        $review->text=request('reviewText');
-        $review->stars=request('rating');
-        $review->save();
+        if(request('reviewText')!==null && request('reviewText')!==""){
+            $review=new Review;
+            $review->user_id=session('id');
+            $review->product_id=$productID;
+            $review->text=request('reviewText');
+            $review->stars=request('rating');
+            $review->save();
+        }
     }
 
     public function like($reviewID){

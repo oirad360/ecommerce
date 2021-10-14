@@ -18,14 +18,14 @@ create table products(
 id integer primary key auto_increment,
 title varchar(255) not null,
 image varchar(255),
-price integer,
+price integer not null,
 description varchar(255),
-quantity integer,
+quantity integer not null,
 user_id integer not null,
 foreign key(user_id) references users(id) on update cascade on delete cascade,
 index ind_user_id(user_id),
 category varchar(20) not null,
-producer varchar(20),
+producer varchar(20) not null,
 date timestamp default current_timestamp
 )engine='InnoDB';
 
@@ -37,7 +37,7 @@ index ind_user_id(user_id),
 product_id integer not null,
 foreign key(product_id) references products(id) on update cascade on delete cascade,
 index ind_product_id(product_id),
-text varchar(255),
+text varchar(255) not null,
 stars integer not null,
 likes integer default 0,
 unique(user_id,product_id),
@@ -91,43 +91,6 @@ data_gen integer not null,
 data_id integer not null,
 unique(product_id,layout_id,data_gen,data_id)
 )engine = 'InnoDB';
-
-/*
-create table layouts(
-id integer primary key auto_increment,
-display varchar(255),
-flexDirection varchar(255),
-height varchar(255),
-width varchar(255),
-borderColor varchar(255),
-borderWidth varchar(255),
-borderRadius varchar(255),
-backgroundColor varchar(255)
-)engine='InnoDB';
-
-create table childs(
-id integer primary key auto_increment,
-layout_id integer not null,
-foreign key(layout_id) references layouts(id) on update cascade on delete cascade,
-index ind_layout_id(layout_id),
-data_gen integer not null,
-data_id integer not null,
-data_parent_gen integer not null,
-data_parent_id integer not null,
-hasChilds boolean not null,
-title varchar(255),
-fontSize varchar(255),
-display varchar(255),
-flexDirection varchar(255),
-height varchar(255),
-width varchar(255),
-margin varchar(255),
-borderColor varchar(255),
-borderWidth varchar(255),
-borderRadius varchar(255),
-backgroundColor varchar(255)
-)engine='InnoDB';
- */
 
 delimiter //
 create trigger user_cart_on_update
@@ -208,4 +171,39 @@ insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,p
 values('AirPods Max','airpodsmax.png',629,'PESO 384,8 g. DIMENSIONI 187,8 mm x 168,6 mm x 83,4 mm. SENSORI ottico, posizione, rilevamento custodia, accelerometro, giroscopio. BATTERIA Fino a 20 ore di ascolto. Ricarica tramite connettore Lightning.',true,false,1,null,'Cuffie');
 insert into prodotto(titolo,immagine,prezzo,descrizione,disponibilita,inArrivo,produttore,searchTitle,categoria) 
 values('Surface Pro 7','surface.png',919,'DIMENSIONI 292 mm x 201 mm x 8,5 mm. SCHERMO da 12,3" 2736x1824. MEMORIA 4 GB, 8 GB o 16 GB LPDDR4x. PROCESSORE Intel® Core™ i7-1065G7 Quad-Core di decima generazione. Windows 10 Home',true,false,2,null,'Portatili');
+
+create table layouts(
+id integer primary key auto_increment,
+display varchar(255),
+flexDirection varchar(255),
+height varchar(255),
+width varchar(255),
+borderColor varchar(255),
+borderWidth varchar(255),
+borderRadius varchar(255),
+backgroundColor varchar(255)
+)engine='InnoDB';
+
+create table childs(
+id integer primary key auto_increment,
+layout_id integer not null,
+foreign key(layout_id) references layouts(id) on update cascade on delete cascade,
+index ind_layout_id(layout_id),
+data_gen integer not null,
+data_id integer not null,
+data_parent_gen integer not null,
+data_parent_id integer not null,
+hasChilds boolean not null,
+title varchar(255),
+fontSize varchar(255),
+display varchar(255),
+flexDirection varchar(255),
+height varchar(255),
+width varchar(255),
+margin varchar(255),
+borderColor varchar(255),
+borderWidth varchar(255),
+borderRadius varchar(255),
+backgroundColor varchar(255)
+)engine='InnoDB';
  */

@@ -36,7 +36,7 @@ Route::get('search', 'SearchController@search');
 Route::get('seller/{seller}', 'SellerController@seller');
 Route::get('seller/{seller}/fetchReviews', 'SellerController@fetchReviews');
 Route::post('seller/newProduct', 'SellerController@newProduct');
-Route::get('fetchProducts/{seller}', 'SellerController@fetchProducts');
+Route::get('fetchProducts', 'SellerController@fetchProducts');
 Route::get('layout/{seller}', 'SellerController@layout');
 Route::post('saveLayout', 'SellerController@saveLayout');
 Route::get('loadLayout/{layoutID}', 'SellerController@loadLayout');

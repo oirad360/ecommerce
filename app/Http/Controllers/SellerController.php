@@ -53,7 +53,7 @@ class SellerController extends BaseController{
                     $fileName=$pathArray[count($pathArray)-1];
                     $imgUpload=true;
                 }
-            };
+            }
         } else if($request->url) $fileName=$request->url;
         
         if(floatval($request->price)<=0){
@@ -90,8 +90,8 @@ class SellerController extends BaseController{
         }
     }
 
-    public function fetchProducts($seller){
-        $user=User::where('username',$seller)->first();
+    public function fetchProducts(){
+        $user=User::find(session('id'));
         return $user->products;
     }
 

@@ -80,7 +80,7 @@
             <div>
                 <h3>Contatti</h3>
                 <ul>
-                    <li>darioanzalone@live.it</li>
+                    <li>darioanzalone21@gmail.com</li>
                     <li><a href=https://github.com/oirad360>github.com/oirad360</a></li>
                 </ul>
             </div>

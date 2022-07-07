@@ -119,7 +119,7 @@ function newProduct(event){
         newProductForm.send.value="     "
         newProductForm.send.style.backgroundImage="url(../assets/loading.gif)"
         fetch(app_url+"/seller/newProduct",formData).then(function(response){
-            if(response.ok) fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(function(json){
+            if(response.ok) fetch(app_url+"/fetchProducts/"/*+seller*/).then(onResponse).then(function(json){
                 onJsonProducts(json)
                 if(newProductForm.productID.value && layoutContainer){
                     const product=document.querySelector('#yourProductsContainer').querySelector("[data-product_id=\'"+newProductForm.productID.value+"\']")
@@ -143,6 +143,7 @@ function onJsonProducts(json){
     newProductForm.send.value="Invia"
     newProductForm.send.style.backgroundImage=""
     newProductForm.addEventListener('submit', newProduct)
+    const text=document.querySelector('#yourProducts')
     if(json.errors){
         const errorContainer=document.querySelector('#errorsPhp')
         for(const error of json.errors){
@@ -161,13 +162,13 @@ function onJsonProducts(json){
             }
         }
     }else if(json.length>0){
-        let container
-        container=document.querySelector('#yourProductsContainer')
+        let container=document.querySelector('#yourProductsContainer')
         container.innerHTML=""
         newProductForm.classList.add("hidden")
         newProductButton.classList.remove("hidden")
         newProductButton.innerText="Inserisci un nuovo prodotto"
         quitModifyProductButton.classList.add("hidden")
+        text.innerText="I tuoi prodotti"
         for(const item of json){
             const block=document.createElement('div')
             block.classList.add('block')
@@ -223,7 +224,8 @@ function onJsonProducts(json){
             else productList.push(parentBlock)
         }
     } else {
-        const text=document.querySelector('#yourProducts')
+        let container=document.querySelector('#yourProductsContainer')
+        container.innerHTML=""
         text.innerText="Non hai nessun prodotto in vendita"
     }
 }
@@ -717,7 +719,7 @@ function deleteProduct(event){
                 const products=layoutContainer.querySelectorAll("[data-product_id=\'"+productID+"\']")
                 if(products) for(const product of products) product.remove()
             }
-            fetch(app_url+"/fetchProducts/"+seller).then(onResponse).then(onJsonProducts)
+            fetch(app_url+"/fetchProducts/"/*+seller*/).then(onResponse).then(onJsonProducts)
         }
     })
 }

@@ -1,4 +1,15 @@
+per avviare il sito:
+1. installare xampp, avviare mysql e apache
+2. installare composer, creare progetto laravel nella cartella htdocs di xampp chiamandolo "ecommerce"
+3. copiare e sostituire i seguenti file (dalla repository) nel progetto appena creato:
+    - .env
+    - layouts.json
+    - composer.json
+    - routes/web.php (da mettere dentro la cartella "routes" del nuovo progetto)
+    - sostituire le cartelle "app/Models", "app/Http/Controllers", "public/assets", "public/scripts", "public/styles",  "resources/views" con le corrispettive cartelle nel nuovo progetto laravel
 
+4. eseguire gli inserimenti nel database del file "inserimenti database.sql" dalla console MySQL
+5. visitare il sito localhost/ecommerce/public
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
